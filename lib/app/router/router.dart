@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:zifyr/core/utils/fade_transition/fade_transition.dart';
 import 'package:zifyr/presentation/views/chat/chat_view.dart';
 import 'package:zifyr/presentation/views/explore/explore_view.dart';
 import 'package:zifyr/presentation/views/home/home_view.dart';
@@ -59,7 +60,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const HomeView(),
                 ),
@@ -71,7 +72,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/mission',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const MissionView(),
                 ),
@@ -82,7 +83,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/live',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const LiveView(),
                 ),
@@ -93,7 +94,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/explore',
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const ExploreView(),
                 ),
@@ -106,7 +107,7 @@ GoRouter router(Ref ref) {
                 path: '/profile',
 
                 routes: [],
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const ProfileView(),
                 ),
@@ -119,7 +120,7 @@ GoRouter router(Ref ref) {
                 path: '/chat',
 
                 routes: [],
-                pageBuilder: (context, state) => NoTransitionPage(
+                pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const ChatView(),
                 ),
