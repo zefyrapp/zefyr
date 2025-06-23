@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zifyr/app/router/router.dart';
+import 'package:zifyr/shared/themes/app_themes.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -15,9 +16,7 @@ class MyApp extends ConsumerWidget {
         title: 'Zefyr',
         debugShowCheckedModeBanner: false,
         locale: const Locale('en'),
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        ),
+        theme: AppTheme.darkTheme,
         routerConfig: router,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
