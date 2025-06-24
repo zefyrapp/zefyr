@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zifyr/app/router/router.dart';
-import 'package:zifyr/shared/themes/app_themes.dart';
+import 'package:zifyr/core/app/router/router.dart';
+import 'package:zifyr/common/themes/app_themes.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});

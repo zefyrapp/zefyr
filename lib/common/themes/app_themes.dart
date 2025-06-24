@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zifyr/shared/themes/app_overlay.dart';
-import 'package:zifyr/shared/themes/custom_colors.dart';
+import 'package:zifyr/common/themes/app_overlay.dart';
+import 'package:zifyr/common/themes/custom_colors.dart';
 
 class AppTheme {
   const AppTheme();

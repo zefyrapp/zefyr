@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zifyr/core/extensions/context_theme.dart';
+import 'package:zifyr/common/extensions/context_theme.dart';
 
 class ConvexBarItem {
   const ConvexBarItem({
