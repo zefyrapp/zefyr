@@ -3,15 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import "package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart";
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:zifyr/core/constants/navigation_enum.dart';
-import 'package:zifyr/core/extensions/context_theme.dart';
 import 'package:zifyr/core/utils/fade_transition/fade_transition.dart';
 import 'package:zifyr/presentation/views/chat/chat_view.dart';
 import 'package:zifyr/presentation/views/explore/explore_view.dart';
 import 'package:zifyr/presentation/views/home/home_view.dart';
 import 'package:zifyr/presentation/views/live/live_view.dart';
+import 'package:zifyr/presentation/views/main_view.dart';
 import 'package:zifyr/presentation/views/mission/mission_view.dart';
 import 'package:zifyr/presentation/views/profile/profile_view.dart';
 
@@ -54,29 +52,8 @@ GoRouter router(Ref ref) {
     observers: [MyNavigatorObserver()],
     routes: [
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          final color = context.customTheme.overlayApp;
-          return PersistentTabView.router(
-            backgroundColor: color.black,
-            navigationShell: navigationShell,
-            tabs: NavigationEnum.values
-                .map(
-                  (nav) => PersistentRouterTabConfig(
-                    item: ItemConfig(
-                      icon: Icon(nav.icon, size: 18),
-                      activeForegroundColor: color.activeIcon,
-                      inactiveForegroundColor: color.inactiveIcon,
-                      title: nav.label,
-                    ),
-                  ),
-                )
-                .toList(),
-            navBarBuilder: (navBarConfig) => Style13BottomNavBar(
-              navBarConfig: navBarConfig,
-              navBarDecoration: NavBarDecoration(color: color.black),
-            ),
-          );
-        },
+        builder: (context, state, navigationShell) =>
+            MainView(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(
             navigatorKey: shellNavigatorKey,

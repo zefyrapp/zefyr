@@ -13,7 +13,7 @@ enum NavigationEnum {
     mission => AppIcons.mission,
     live => AppIcons.stream,
     explore => AppIcons.compas,
-    chat => AppIcons.message,
+    chat => AppIcons.ask2,
   };
 
   String get label => switch (this) {

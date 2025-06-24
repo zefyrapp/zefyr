@@ -30,7 +30,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   riverpod_generator: ^2.6.5
   build_runner: ^2.5.3
-  persistent_bottom_nav_bar_v2: ^6.1.0
+  convex_bottom_bar: ^3.2.0
+  collection: ^1.19.1
 
 flutter:
   uses-material-design: true
