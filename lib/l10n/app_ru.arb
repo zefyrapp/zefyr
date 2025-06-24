@@ -1,3 +1,7 @@
 {
-     "home":"Главная"
+  "home": "Главная",
+  "registerWithZefyr": "Зарегистрироваться в Zefyr",
+  "continueWithEmail": "Продолжить с адресом эл. почты",
+  "continueWithGoogle": "Продолжить с Google",
+  "continueWithApple": "Продолжить с Apple"
 }

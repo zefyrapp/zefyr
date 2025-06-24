@@ -9,6 +9,7 @@ class OverlayApp {
     required this.iconGradient,
     required this.indicatorColor,
     required this.badgeColor,
+    required this.backgroundColor,
   });
 
   final Color black;
@@ -18,7 +19,7 @@ class OverlayApp {
   final List<Color> iconGradient;
   final Color indicatorColor;
   final Color badgeColor;
-
+  final Color backgroundColor;
   OverlayApp copyWith({
     Color? black,
     Color? white,
@@ -27,6 +28,7 @@ class OverlayApp {
     List<Color>? iconGradient,
     Color? indicatorColor,
     Color? badgeColor,
+    Color? backgroundColor,
   }) => OverlayApp(
     black: black ?? this.black,
     white: white ?? this.white,
@@ -35,5 +37,6 @@ class OverlayApp {
     iconGradient: iconGradient ?? this.iconGradient,
     indicatorColor: indicatorColor ?? this.indicatorColor,
     badgeColor: badgeColor ?? this.badgeColor,
+    backgroundColor: backgroundColor ?? this.backgroundColor,
   );
 }

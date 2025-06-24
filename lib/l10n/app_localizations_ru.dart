@@ -10,4 +10,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get home => 'Главная';
+
+  @override
+  String get registerWithZefyr => 'Зарегистрироваться в Zefyr';
+
+  @override
+  String get continueWithEmail => 'Продолжить с адресом эл. почты';
+
+  @override
+  String get continueWithGoogle => 'Продолжить с Google';
+
+  @override
+  String get continueWithApple => 'Продолжить с Apple';
 }

@@ -16,6 +16,7 @@ class AppTheme {
           iconGradient: [Color(0xffDB2777), Color(0xff7C3AED)],
           indicatorColor: Color(0xff8B5CF6),
           badgeColor: Color(0xffDB2777),
+          backgroundColor: Color(0xff111827),
         ),
       ),
     },

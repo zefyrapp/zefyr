@@ -8,7 +8,7 @@ class RedirectService {
     required GoRouterState state,
     String redirectTo = '/auth',
   }) {
-    final isLoggedIn = true; // ref.read(isAuthenticatedProvider);
+    final isLoggedIn = false; // ref.read(isAuthenticatedProvider);
     final isOnAuthScreen = state.fullPath == redirectTo;
 
     if (!isLoggedIn && !isOnAuthScreen) return redirectTo;

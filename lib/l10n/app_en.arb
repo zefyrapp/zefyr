@@ -1,3 +1,7 @@
 {
-    "home":"Home"
+  "home": "Home",
+  "registerWithZefyr": "Register with Zefyr",
+  "continueWithEmail": "Continue with email address",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithApple": "Continue with Apple"
 }
