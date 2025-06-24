@@ -3,5 +3,39 @@
   "registerWithZefyr": "Зарегистрироваться в Zefyr",
   "continueWithEmail": "Продолжить с адресом эл. почты",
   "continueWithGoogle": "Продолжить с Google",
-  "continueWithApple": "Продолжить с Apple"
+  "continueWithApple": "Продолжить с Apple",
+  "signIn": "Войти",
+  "signUp": "Зарегистрироваться",
+  "forgotPassword": "Забыли пароль?",
+  "resetPassword": "Сбросить пароль",
+  "email": "Эл. почта",
+  "password": "Пароль",
+  "confirmPassword": "Подтвердить пароль",
+  "signInWithGoogle": "Войти с помощью Google",
+  "signInWithApple": "Войти с помощью Apple",
+  "signInWithEmail": "Войти с помощью эл. почты",
+  "or": "или",
+  "createAccount": "Создать аккаунт",
+  "alreadyHaveAccount": "Уже есть аккаунт? ",
+  "termsConditionsText": "Продолжая пользоваться аккаунтом, относящимся ",
+  "termsOfUse": "Условия использования ",
+  "toRegion": "к региону ",
+  "regionKazakhstan": "Казахстан",
+  "youAcceptAndConfirm": ", вы принимаете и подтверждаете, что ознакомились с документом « ",
+  "privacyPolicy": "Политику конфиденциальности",
+  "endQuote": "».",
+  "termsAndPrivacyFullText": "Продолжая пользоваться аккаунтом, относящимся {termsOfUse} к региону {region}, вы принимаете и подтверждаете, что ознакомились с документом « {privacyPolicy}».",
+  "@termsAndPrivacyFullText": {
+    "placeholders": {
+      "termsOfUse": {
+        "type": "String"
+      },
+      "region": {
+        "type": "String"
+      },
+      "privacyPolicy": {
+        "type": "String"
+      }
+    }
+  }
 }

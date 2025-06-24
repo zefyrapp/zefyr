@@ -22,4 +22,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get signIn => 'Sign In';
+
+  @override
+  String get signUp => 'Sign Up';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get resetPassword => 'Reset password';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signInWithApple => 'Sign in with Apple';
+
+  @override
+  String get signInWithEmail => 'Sign in with email';
+
+  @override
+  String get or => 'or';
+
+  @override
+  String get createAccount => 'Create account';
+
+  @override
+  String get termsConditionsText => 'By continuing to use an account related to the ';
+
+  @override
+  String get termsOfUse => 'Terms of Use ';
+
+  @override
+  String get toRegion => 'for the region ';
+
+  @override
+  String get regionKazakhstan => 'Kazakhstan';
+
+  @override
+  String get youAcceptAndConfirm => ', you accept and confirm that you have read the « ';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get endQuote => '».';
+
+  @override
+  String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy) {
+    return 'By continuing to use an account related to the $termsOfUse for the region $region, you accept and confirm that you have read the « $privacyPolicy».';
+  }
 }

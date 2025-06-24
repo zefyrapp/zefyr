@@ -124,6 +124,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue with Apple'**
   String get continueWithApple;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get resetPassword;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get signInWithGoogle;
+
+  /// No description provided for @signInWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple'**
+  String get signInWithApple;
+
+  /// No description provided for @signInWithEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with email'**
+  String get signInWithEmail;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get or;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get createAccount;
+
+  /// No description provided for @termsConditionsText.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing to use an account related to the '**
+  String get termsConditionsText;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use '**
+  String get termsOfUse;
+
+  /// No description provided for @toRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'for the region '**
+  String get toRegion;
+
+  /// No description provided for @regionKazakhstan.
+  ///
+  /// In en, this message translates to:
+  /// **'Kazakhstan'**
+  String get regionKazakhstan;
+
+  /// No description provided for @youAcceptAndConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **', you accept and confirm that you have read the « '**
+  String get youAcceptAndConfirm;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @endQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'».'**
+  String get endQuote;
+
+  /// No description provided for @termsAndPrivacyFullText.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing to use an account related to the {termsOfUse} for the region {region}, you accept and confirm that you have read the « {privacyPolicy}».'**
+  String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

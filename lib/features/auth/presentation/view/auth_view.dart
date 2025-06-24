@@ -1,11 +1,14 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zifyr/common/extensions/context_theme.dart';
 import 'package:zifyr/common/extensions/localization.dart';
-import 'package:collection/collection.dart';
+import 'package:zifyr/features/auth/presentation/view/enums/auth_sign_enum.dart';
+import 'package:zifyr/features/auth/presentation/view/utils/privacy_text.dart';
 
 class AuthView extends StatelessWidget {
+  /// Страница авторизации
   const AuthView({super.key});
 
   @override
@@ -72,54 +75,15 @@ class AuthView extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              PrivacyText.buildStyledTermsText(context),
+
+              const SizedBox(height: 16),
               Text.rich(
                 TextSpan(
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    height: 14 / 12,
-                    color: Color(0xffc5c5c5),
-                  ),
                   children: [
-                    const TextSpan(
-                      text: 'Продолжая пользоваться аккаунтом, относящимся ',
-                    ),
-                    const TextSpan(
-                      text: 'Условия использования ',
-                      style: TextStyle(
-                        color: Color(0xffffffff),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                    const TextSpan(text: 'к региону '),
-                    const TextSpan(
-                      text: 'Казахстан',
-                      style: TextStyle(color: Color(0xffffffff)),
-                    ),
-                    const TextSpan(
-                      text:
-                          ', вы принимаете и подтверждаете, что ознакомились с документом « ',
-                    ),
                     TextSpan(
-                      text: 'Политику конфиденциальности',
-                      recognizer: TapGestureRecognizer()..onTap = () {},
+                      text: local.alreadyHaveAccount,
                       style: const TextStyle(
-                        color: Color(0xffffffff),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                    const TextSpan(text: '».'),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              const Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Уже есть аккаунт? ',
-                      style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 16,
                         height: 24 / 16,
@@ -127,8 +91,9 @@ class AuthView extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: 'Войти',
-                      style: TextStyle(
+                      text: local.signIn,
+                      recognizer: TapGestureRecognizer()..onTap = () {},
+                      style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
                         height: 24 / 16,
@@ -143,26 +108,5 @@ class AuthView extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-enum AuthSignEnum {
-  email,
-  google,
-  apple;
-
-  Object get icon => switch (this) {
-    email => Icons.email,
-    google => 'assets/icons/google.svg',
-    apple => Icons.apple,
-  };
-
-  String title(BuildContext context) {
-    final local = context.localization;
-    return switch (this) {
-      email => local.continueWithEmail,
-      google => local.continueWithGoogle,
-      apple => local.continueWithApple,
-    };
   }
 }

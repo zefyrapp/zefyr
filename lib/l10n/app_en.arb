@@ -3,5 +3,39 @@
   "registerWithZefyr": "Register with Zefyr",
   "continueWithEmail": "Continue with email address",
   "continueWithGoogle": "Continue with Google",
-  "continueWithApple": "Continue with Apple"
+  "continueWithApple": "Continue with Apple",
+  "alreadyHaveAccount": "Already have an account? ",
+  "signIn": "Sign In",
+  "signUp": "Sign Up",
+  "forgotPassword": "Forgot password?",
+  "resetPassword": "Reset password",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm password",
+  "signInWithGoogle": "Sign in with Google",
+  "signInWithApple": "Sign in with Apple",
+  "signInWithEmail": "Sign in with email",
+  "or": "or",
+  "createAccount": "Create account",
+  "termsConditionsText": "By continuing to use an account related to the ",
+  "termsOfUse": "Terms of Use ",
+  "toRegion": "for the region ",
+  "regionKazakhstan": "Kazakhstan",
+  "youAcceptAndConfirm": ", you accept and confirm that you have read the « ",
+  "privacyPolicy": "Privacy Policy",
+  "endQuote": "».",
+  "termsAndPrivacyFullText": "By continuing to use an account related to the {termsOfUse} for the region {region}, you accept and confirm that you have read the « {privacyPolicy}».",
+  "@termsAndPrivacyFullText": {
+    "placeholders": {
+      "termsOfUse": {
+        "type": "String"
+      },
+      "region": {
+        "type": "String"
+      },
+      "privacyPolicy": {
+        "type": "String"
+      }
+    }
+  }
 }
