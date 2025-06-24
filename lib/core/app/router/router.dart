@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:zifyr/core/services/redirect_service.dart';
 import 'package:zifyr/core/utils/fade_transition/fade_transition.dart';
+import 'package:zifyr/features/auth/presentation/view/auth_view.dart';
 import 'package:zifyr/features/chat/presentation/view/chat_view.dart';
 import 'package:zifyr/features/explore/presentation/view/explore_view.dart';
 import 'package:zifyr/features/home/presentation/view/home_view.dart';
@@ -16,30 +18,6 @@ import 'package:zifyr/features/profile/presentation/view/profile_view.dart';
 part 'router.g.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
-
-class PersistentStateShell extends StatefulWidget {
-  const PersistentStateShell({required this.child, super.key});
-  final Widget child;
-
-  @override
-  State<PersistentStateShell> createState() => _PersistentStateShellState();
-}
-
-class _PersistentStateShellState extends State<PersistentStateShell> {
-  final Map<String, Widget> _persistentWidgets = {};
-
-  @override
-  Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
-    if (!_persistentWidgets.containsKey(location)) {
-      _persistentWidgets[location] = widget.child;
-    }
-    return IndexedStack(
-      index: _persistentWidgets.keys.toList().indexOf(location),
-      children: _persistentWidgets.values.toList(),
-    );
-  }
-}
 
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
@@ -71,6 +49,8 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/mission',
+                redirect: (context, state) =>
+                    RedirectService().authRedirect(ref: ref, state: state),
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const MissionView(),
@@ -100,21 +80,13 @@ GoRouter router(Ref ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                pageBuilder: (context, state) => FadeTransitionPage(
-                  key: state.pageKey,
-                  child: const ProfileView(),
-                ),
-              ),
-            ],
-          ),
+
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/chat',
+                redirect: (context, state) =>
+                    RedirectService().authRedirect(ref: ref, state: state),
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const ChatView(),
@@ -122,7 +94,26 @@ GoRouter router(Ref ref) {
               ),
             ],
           ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                redirect: (context, state) =>
+                    RedirectService().authRedirect(ref: ref, state: state),
+                pageBuilder: (context, state) => FadeTransitionPage(
+                  key: state.pageKey,
+                  child: const ProfileView(),
+                ),
+              ),
+            ],
+          ),
         ],
+      ),
+      GoRoute(
+        path: '/auth',
+        pageBuilder: (context, state) =>
+            FadeTransitionPage(key: state.pageKey, child: const AuthView()),
+        routes: [],
       ),
     ],
   );
