@@ -1,11 +1,47 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zifyr/common/extensions/context_theme.dart';
 import 'package:zifyr/common/extensions/localization.dart';
 import 'package:zifyr/features/auth/usecases/enums/auth_sign_enum.dart';
 import 'package:zifyr/features/auth/usecases/privacy_text.dart';
+
+class AuthFlowView extends ConsumerWidget {
+  const AuthFlowView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authFlowState = ref.watch(authFlowProvider);
+    final authFlowViewModel = ref.read(authFlowProvider.notifier);
+
+    return Scaffold(
+      body: SafeArea(
+        child: PageView(
+          controller: authFlowViewModel.pageController,
+          physics: const NeverScrollableScrollPhysics(), // Отключаем свайп
+          children: [
+            // Страница 0: Выбор типа авторизации
+            _InitialChoicePage(),
+
+            // Страница 1: Ввод email
+            _EmailInputPage(),
+
+            // Страница 2: Ввод пароля
+            _PasswordInputPage(),
+
+            // Страница 3: Выбор даты рождения (только для регистрации)
+            _BirthDatePage(),
+
+            // Страница 4: Ввод никнейма (только для регистрации)
+            _NicknamePage(),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class AuthView extends StatelessWidget {
   /// Страница авторизации
