@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zifyr/common/extensions/localization.dart';
+import 'package:zifyr/features/auth/presentation/view_model/auth_flow_state.dart';
+import 'package:zifyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
 
 enum AuthSignEnum {
   email,
@@ -20,4 +22,10 @@ enum AuthSignEnum {
       apple => local.continueWithApple,
     };
   }
+
+  void onTap(AuthFlowViewModel authFlowViewModel) => switch (this) {
+    email => authFlowViewModel.setFlowType(AuthFlowType.register),
+    google => () {},
+    apple => () {},
+  };
 }

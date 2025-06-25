@@ -10,6 +10,9 @@ class OverlayApp {
     required this.indicatorColor,
     required this.badgeColor,
     required this.backgroundColor,
+    required this.textFieldBorder,
+    required this.textFieldBackgroundColor,
+    required this.hintTextStyle,
   });
 
   final Color black;
@@ -20,6 +23,9 @@ class OverlayApp {
   final Color indicatorColor;
   final Color badgeColor;
   final Color backgroundColor;
+  final OutlineInputBorder textFieldBorder;
+  final Color textFieldBackgroundColor;
+  final TextStyle hintTextStyle;
   OverlayApp copyWith({
     Color? black,
     Color? white,
@@ -29,6 +35,9 @@ class OverlayApp {
     Color? indicatorColor,
     Color? badgeColor,
     Color? backgroundColor,
+    OutlineInputBorder? textFieldBorder,
+    Color? textFieldBackgroundColor,
+    TextStyle? hintTextStyle,
   }) => OverlayApp(
     black: black ?? this.black,
     white: white ?? this.white,
@@ -38,5 +47,9 @@ class OverlayApp {
     indicatorColor: indicatorColor ?? this.indicatorColor,
     badgeColor: badgeColor ?? this.badgeColor,
     backgroundColor: backgroundColor ?? this.backgroundColor,
+    textFieldBorder: textFieldBorder ?? this.textFieldBorder,
+    textFieldBackgroundColor:
+        textFieldBackgroundColor ?? this.textFieldBackgroundColor,
+    hintTextStyle: hintTextStyle ?? this.hintTextStyle,
   );
 }

@@ -17,6 +17,19 @@ class AppTheme {
           indicatorColor: Color(0xff8B5CF6),
           badgeColor: Color(0xffDB2777),
           backgroundColor: Color(0xff111827),
+
+          textFieldBackgroundColor: Color(0xff1F2937),
+          textFieldBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderSide: BorderSide(color: Color(0xff374151)),
+          ),
+          hintTextStyle: TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
+            height: 24 / 16,
+
+            color: Color(0xffADAEBC),
+          ),
         ),
       ),
     },

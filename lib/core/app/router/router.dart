@@ -112,7 +112,7 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/auth',
         pageBuilder: (context, state) =>
-            FadeTransitionPage(key: state.pageKey, child: const AuthView()),
+            FadeTransitionPage(key: state.pageKey, child: const AuthFlowView()),
         routes: [],
       ),
     ],
