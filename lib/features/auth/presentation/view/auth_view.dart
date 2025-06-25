@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zifyr/common/extensions/context_theme.dart';
 import 'package:zifyr/common/extensions/localization.dart';
-import 'package:zifyr/features/auth/presentation/view/enums/auth_sign_enum.dart';
-import 'package:zifyr/features/auth/presentation/view/utils/privacy_text.dart';
+import 'package:zifyr/features/auth/usecases/enums/auth_sign_enum.dart';
+import 'package:zifyr/features/auth/usecases/privacy_text.dart';
 
 class AuthView extends StatelessWidget {
   /// Страница авторизации
