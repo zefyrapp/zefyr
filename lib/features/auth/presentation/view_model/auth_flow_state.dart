@@ -4,9 +4,10 @@ enum AuthFlowType { login, register }
 // Enum для отслеживания текущего шага
 enum AuthStep {
   initial, // Выбор Login/Register
-  emailInput, // Ввод email
+  emailInput, // Ввод email (для register)
+  emailLogin, // Ввод email (для login)
   passwordInput, // Ввод пароля (для login)
-  registerPassword, // Ввод пароля (для register)
+
   birthDate, // Выбор даты рождения
   nickname, // Ввод никнейма
 }

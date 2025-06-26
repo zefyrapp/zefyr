@@ -87,4 +87,52 @@ class AppLocalizationsRu extends AppLocalizations {
   String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy) {
     return 'Продолжая пользоваться аккаунтом, относящимся $termsOfUse к региону $region, вы принимаете и подтверждаете, что ознакомились с документом « $privacyPolicy».';
   }
+
+  @override
+  String get birthDateTitle => 'Когда у вас день рождения?';
+
+  @override
+  String get birthDateDescription => 'Мы не покажем ваш день рождения другим пользователям.';
+
+  @override
+  String get birthDateLabel => 'День рождения';
+
+  @override
+  String get continueButton => 'Продолжить';
+
+  @override
+  String get january => 'Января';
+
+  @override
+  String get february => 'Февраля';
+
+  @override
+  String get march => 'Марта';
+
+  @override
+  String get april => 'Апреля';
+
+  @override
+  String get may => 'Мая';
+
+  @override
+  String get june => 'Июня';
+
+  @override
+  String get july => 'Июля';
+
+  @override
+  String get august => 'Августа';
+
+  @override
+  String get september => 'Сентебря';
+
+  @override
+  String get october => 'Октебря';
+
+  @override
+  String get november => 'Ноября';
+
+  @override
+  String get december => 'Декабря';
 }

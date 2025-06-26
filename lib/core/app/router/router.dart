@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zifyr/core/services/redirect_service.dart';
 import 'package:zifyr/core/utils/fade_transition/fade_transition.dart';
-import 'package:zifyr/features/auth/presentation/view/auth_view.dart';
+import 'package:zifyr/features/auth/presentation/view/auth_flow_view.dart';
 import 'package:zifyr/features/chat/presentation/view/chat_view.dart';
 import 'package:zifyr/features/explore/presentation/view/explore_view.dart';
 import 'package:zifyr/features/home/presentation/view/home_view.dart';

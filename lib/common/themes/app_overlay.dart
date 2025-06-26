@@ -13,6 +13,8 @@ class OverlayApp {
     required this.textFieldBorder,
     required this.textFieldBackgroundColor,
     required this.hintTextStyle,
+    required this.elevatedStyle,
+    required this.elevatedTextStyle,
   });
 
   final Color black;
@@ -26,6 +28,8 @@ class OverlayApp {
   final OutlineInputBorder textFieldBorder;
   final Color textFieldBackgroundColor;
   final TextStyle hintTextStyle;
+  final ButtonStyle elevatedStyle;
+  final TextStyle elevatedTextStyle;
   OverlayApp copyWith({
     Color? black,
     Color? white,
@@ -38,6 +42,8 @@ class OverlayApp {
     OutlineInputBorder? textFieldBorder,
     Color? textFieldBackgroundColor,
     TextStyle? hintTextStyle,
+    ButtonStyle? elevatedStyle,
+    TextStyle? elevatedTextStyle,
   }) => OverlayApp(
     black: black ?? this.black,
     white: white ?? this.white,
@@ -51,5 +57,7 @@ class OverlayApp {
     textFieldBackgroundColor:
         textFieldBackgroundColor ?? this.textFieldBackgroundColor,
     hintTextStyle: hintTextStyle ?? this.hintTextStyle,
+    elevatedStyle: elevatedStyle ?? this.elevatedStyle,
+    elevatedTextStyle: elevatedTextStyle ?? this.elevatedTextStyle,
   );
 }

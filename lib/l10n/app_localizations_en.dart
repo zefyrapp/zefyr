@@ -87,4 +87,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy) {
     return 'By continuing to use an account related to the $termsOfUse for the region $region, you accept and confirm that you have read the « $privacyPolicy».';
   }
+
+  @override
+  String get birthDateTitle => 'When is your birthday?';
+
+  @override
+  String get birthDateDescription => 'We won\'t show your birthday to other users.';
+
+  @override
+  String get birthDateLabel => 'Birthday';
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get january => 'January';
+
+  @override
+  String get february => 'February';
+
+  @override
+  String get march => 'March';
+
+  @override
+  String get april => 'April';
+
+  @override
+  String get may => 'May';
+
+  @override
+  String get june => 'June';
+
+  @override
+  String get july => 'July';
+
+  @override
+  String get august => 'August';
+
+  @override
+  String get september => 'September';
+
+  @override
+  String get october => 'October';
+
+  @override
+  String get november => 'November';
+
+  @override
+  String get december => 'December';
 }

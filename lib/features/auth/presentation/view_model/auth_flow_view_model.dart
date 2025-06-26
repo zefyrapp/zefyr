@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_redundant_argument_values
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zifyr/features/auth/presentation/view_model/auth_flow_state.dart';
 import 'package:zifyr/features/auth/presentation/view_model/auth_state.dart';
@@ -27,7 +26,9 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
   // Устанавливаем тип потока (login/register) и переходим к вводу email
   void setFlowType(AuthFlowType type) {
     state = state.copyWith(flowType: type, errorMessage: null);
-    _navigateToStep(AuthStep.emailInput);
+    _navigateToStep(
+      type == AuthFlowType.login ? AuthStep.emailLogin : AuthStep.emailInput,
+    );
   }
 
   // Обновляем данные формы
@@ -38,12 +39,9 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
   // Переход к следующему шагу
   void nextStep() => switch (state.currentStep) {
     AuthStep.initial => null,
-    AuthStep.emailInput =>
-      state.flowType == AuthFlowType.login
-          ? _navigateToStep(AuthStep.passwordInput)
-          : _navigateToStep(AuthStep.registerPassword),
+    AuthStep.emailInput => _navigateToStep(AuthStep.birthDate),
+    AuthStep.emailLogin => _navigateToStep(AuthStep.passwordInput),
     AuthStep.passwordInput => _performLogin(),
-    AuthStep.registerPassword => _navigateToStep(AuthStep.birthDate),
     AuthStep.birthDate => _navigateToStep(AuthStep.nickname),
     AuthStep.nickname => _performRegister(),
   };
@@ -51,9 +49,10 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
   // Переход к предыдущему шагу
   void previousStep() => switch (state.currentStep) {
     AuthStep.emailInput => _navigateToStep(AuthStep.initial),
-    AuthStep.passwordInput ||
-    AuthStep.registerPassword => _navigateToStep(AuthStep.emailInput),
-    AuthStep.birthDate => _navigateToStep(AuthStep.registerPassword),
+
+    AuthStep.emailLogin => _navigateToStep(AuthStep.initial),
+    AuthStep.passwordInput => _navigateToStep(AuthStep.emailLogin),
+    AuthStep.birthDate => _navigateToStep(AuthStep.emailInput),
     AuthStep.nickname => _navigateToStep(AuthStep.birthDate),
     AuthStep.initial => null,
   };
@@ -72,11 +71,12 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
     // Используем WidgetsBinding для отложенной навигации
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_pageController.hasClients) {
-        _pageController.animateToPage(
-          pageIndex,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
+        // _pageController.animateToPage(
+        //   pageIndex,
+        //   duration: const Duration(milliseconds: 100),
+        //   curve: Curves.easeInOut,
+        // );
+        _pageController.jumpToPage(pageIndex);
       }
     });
   }
@@ -85,10 +85,10 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
   int _getPageIndex(AuthStep step) => switch (step) {
     AuthStep.initial => 0,
     AuthStep.emailInput => 1,
-    AuthStep.passwordInput => 2,
-    AuthStep.registerPassword => 2,
-    AuthStep.birthDate => 3,
-    AuthStep.nickname => 4,
+    AuthStep.birthDate => 2,
+    AuthStep.nickname => 3,
+    AuthStep.emailLogin => 4,
+    AuthStep.passwordInput => 5,
   };
 
   // Выполнение авторизации

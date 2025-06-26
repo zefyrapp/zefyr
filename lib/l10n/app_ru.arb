@@ -37,5 +37,21 @@
         "type": "String"
       }
     }
-  }
+  },
+  "birthDateTitle": "Когда у вас день рождения?",
+  "birthDateDescription": "Мы не покажем ваш день рождения другим пользователям.",
+  "birthDateLabel": "День рождения",
+  "continueButton": "Продолжить",
+  "january": "Января",
+  "february": "Февраля",
+  "march": "Марта",
+  "april": "Апреля",
+  "may": "Мая",
+  "june": "Июня",
+  "july": "Июля",
+  "august": "Августа",
+  "september": "Сентебря",
+  "october": "Октебря",
+  "november": "Ноября",
+  "december": "Декабря"
 }

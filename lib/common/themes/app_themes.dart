@@ -8,27 +8,47 @@ class AppTheme {
   static final darkTheme = ThemeData(useMaterial3: true).copyWith(
     extensions: <ThemeExtension<CustomColors>>{
       CustomColors(
-        overlayApp: const OverlayApp(
+        overlayApp: OverlayApp(
           black: Colors.black,
           white: Colors.white,
-          activeIcon: Color(0xff9972F4),
-          inactiveIcon: Color(0xff9CA3AF),
-          iconGradient: [Color(0xffDB2777), Color(0xff7C3AED)],
-          indicatorColor: Color(0xff8B5CF6),
-          badgeColor: Color(0xffDB2777),
-          backgroundColor: Color(0xff111827),
+          activeIcon: const Color(0xff9972F4),
+          inactiveIcon: const Color(0xff9CA3AF),
+          iconGradient: const [Color(0xffDB2777), Color(0xff7C3AED)],
+          indicatorColor: const Color(0xff8B5CF6),
+          badgeColor: const Color(0xffDB2777),
+          backgroundColor: const Color(0xff111827),
 
-          textFieldBackgroundColor: Color(0xff1F2937),
-          textFieldBorder: OutlineInputBorder(
+          textFieldBackgroundColor: const Color(0xff1F2937),
+          textFieldBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8)),
             borderSide: BorderSide(color: Color(0xff374151)),
           ),
-          hintTextStyle: TextStyle(
+          hintTextStyle: const TextStyle(
             fontWeight: FontWeight.w400,
             fontSize: 16,
             height: 24 / 16,
 
             color: Color(0xffADAEBC),
+          ),
+          elevatedStyle: ButtonStyle(
+            backgroundColor: const WidgetStatePropertyAll(Color(0xff9972F4)),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            textStyle: const WidgetStatePropertyAll(
+              TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18,
+                height: 1,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          elevatedTextStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+            height: 1,
+            color: Colors.white,
           ),
         ),
       ),
