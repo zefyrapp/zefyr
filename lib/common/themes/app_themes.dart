@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:zifyr/common/themes/app_overlay.dart';
 import 'package:zifyr/common/themes/custom_colors.dart';
 
@@ -6,6 +7,15 @@ class AppTheme {
   const AppTheme();
 
   static final darkTheme = ThemeData(useMaterial3: true).copyWith(
+    brightness: Brightness.dark,
+    appBarTheme: const AppBarTheme(
+      systemOverlayStyle: SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+    ),
     extensions: <ThemeExtension<CustomColors>>{
       CustomColors(
         overlayApp: OverlayApp(

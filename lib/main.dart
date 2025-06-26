@@ -4,5 +4,6 @@ import 'package:zifyr/core/app/app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const ProviderScope(child: MyApp()));
 }
