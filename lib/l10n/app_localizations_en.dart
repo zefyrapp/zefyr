@@ -135,4 +135,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get december => 'December';
+
+  @override
+  String get emailPasswordPrompt => 'Enter your email address and create a password';
+
+  @override
+  String get enterEmail => 'Enter email address';
+
+  @override
+  String get enterValidEmail => 'Enter a valid email address';
+
+  @override
+  String get enterPassword => 'Enter password';
+
+  @override
+  String get passwordLength => '8 characters (no more than 20)';
+
+  @override
+  String get passwordRequirements => '1 letter, 1 number, 1 special character (# ? ! @)';
+
+  @override
+  String get strongPassword => 'Strong password';
+
+  @override
+  String get emailUsernameLabel => 'Email address/username';
+
+  @override
+  String get emailUsername => 'Email or username';
+
+  @override
+  String get enterEmailUsername => 'Enter email or username';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get createNickname => 'Create a nickname';
+
+  @override
+  String get nicknameDescription => 'Enter any nickname you like. If you skip this step, you will be automatically assigned a default nickname. You can change it later.';
+
+  @override
+  String get enterNickname => 'Enter nickname';
 }

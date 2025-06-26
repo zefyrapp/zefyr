@@ -4,7 +4,6 @@ import 'package:zifyr/common/extensions/context_theme.dart';
 import 'package:zifyr/common/extensions/localization.dart';
 import 'package:zifyr/core/utils/icons/app_icons_icons.dart';
 import 'package:zifyr/features/auth/presentation/view/widgets/app_text_field.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_flow_state.dart';
 import 'package:zifyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
 
 class EmailInputView extends ConsumerStatefulWidget {
@@ -62,7 +61,7 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Введите адрес эл. почты и придумайте пароль',
+                  local.emailPasswordPrompt,
                   style: TextStyle(
                     fontSize: 22,
                     height: 32 / 22,
@@ -75,13 +74,13 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
 
                 AppTextField.email(
                   controller: _emailController,
-                  hintText: 'Email',
+                  hintText: local.email,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите email';
+                      return local.enterEmail;
                     }
                     if (!value.contains('@')) {
-                      return 'Введите корректный email';
+                      return local.enterValidEmail;
                     }
                     return null;
                   },
@@ -90,16 +89,14 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
                 const SizedBox(height: 22),
                 AppTextField.password(
                   controller: _passwordController,
-                  hintText: 'Введите пароль',
+                  hintText: local.enterPassword,
 
                   onChanged: (value) {},
                 ),
                 const SizedBox(height: 32),
-                const _DotText(text: '8 символов (не более 20)'),
-                const _DotText(
-                  text: '1 буква, 1 цифра, 1 специальный символ (# ? ! @)',
-                ),
-                const _DotText(text: 'Надежный пароль'),
+                _DotText(text: local.passwordLength),
+                _DotText(text: local.passwordRequirements),
+                _DotText(text: local.strongPassword),
                 if (authFlowState.errorMessage != null) ...[
                   const SizedBox(height: 16),
                   Text(

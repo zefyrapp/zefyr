@@ -47,7 +47,7 @@ class _EmailLoginState extends ConsumerState<EmailLogin> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Адрес эл. почты/имя пользователя',
+                  local.emailUsernameLabel,
                   style: TextStyle(
                     fontSize: 18,
                     height: 32 / 22,
@@ -59,13 +59,13 @@ class _EmailLoginState extends ConsumerState<EmailLogin> {
 
                 AppTextField.email(
                   controller: _emailController,
-                  hintText: ' Почта или имя пользователя',
+                  hintText: local.emailUsername,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите email';
+                      return local.enterEmailUsername;
                     }
                     if (!value.contains('@')) {
-                      return 'Введите корректный email';
+                      return local.enterValidEmail;
                     }
                     return null;
                   },

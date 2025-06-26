@@ -39,7 +39,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get resetPassword => 'Сбросить пароль';
 
   @override
-  String get email => 'Эл. почта';
+  String get email => 'Электронная почта';
 
   @override
   String get password => 'Пароль';
@@ -135,4 +135,46 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get december => 'Декабря';
+
+  @override
+  String get emailPasswordPrompt => 'Введите адрес эл. почты и придумайте пароль';
+
+  @override
+  String get enterEmail => 'Введите электронную почту';
+
+  @override
+  String get enterValidEmail => 'Введите корректую электронную почту';
+
+  @override
+  String get enterPassword => 'Введите пароль';
+
+  @override
+  String get passwordLength => '8 символов (не более 20)';
+
+  @override
+  String get passwordRequirements => '1 буква, 1 цифра, 1 специальный символ (# ? ! @)';
+
+  @override
+  String get strongPassword => 'Надежный пароль';
+
+  @override
+  String get emailUsernameLabel => 'Адрес эл. почты/имя пользователя';
+
+  @override
+  String get emailUsername => 'Почта или имя пользователя';
+
+  @override
+  String get enterEmailUsername => 'Введите почту или имя пользователя';
+
+  @override
+  String get skip => 'Пропустить';
+
+  @override
+  String get createNickname => 'Создайте никнейм';
+
+  @override
+  String get nicknameDescription => 'Укажите любой никнейм, который вам нравится. Если пропустить этот шаг, вам будет автоматически присвоен стандартный никнейм. Его можно будет изменить позже.';
+
+  @override
+  String get enterNickname => 'Введите никнейм';
 }

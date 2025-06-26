@@ -44,7 +44,7 @@ class _NicknamePageState extends ConsumerState<NicknameView> {
               InkWell(
                 onTap: authFlowViewModel.skipNickname,
                 child: Text(
-                  'Пропустить',
+                  local.skip,
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16,
@@ -55,7 +55,7 @@ class _NicknamePageState extends ConsumerState<NicknameView> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Создайте никнейм',
+                local.createNickname,
                 style: TextStyle(
                   fontSize: 22,
                   height: 32 / 22,
@@ -65,7 +65,7 @@ class _NicknamePageState extends ConsumerState<NicknameView> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Укажите любой никнейм, который вам нравится. Если пропустить этот шаг, вам будет автоматически присвоен стандартный никнейм. Его можно будет изменить позже.',
+                local.nicknameDescription,
                 style: TextStyle(
                   fontSize: 14,
                   height: 1,
@@ -74,7 +74,7 @@ class _NicknamePageState extends ConsumerState<NicknameView> {
                 ),
               ),
               const SizedBox(height: 24),
-              const AppTextField.nickname(hintText: 'Введите никнейм'),
+              AppTextField.nickname(hintText: local.enterNickname),
               const Spacer(),
               SizedBox(
                 width: double.infinity,

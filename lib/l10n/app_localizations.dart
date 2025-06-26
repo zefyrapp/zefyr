@@ -346,6 +346,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'December'**
   String get december;
+
+  /// No description provided for @emailPasswordPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address and create a password'**
+  String get emailPasswordPrompt;
+
+  /// No description provided for @enterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email address'**
+  String get enterEmail;
+
+  /// No description provided for @enterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get enterValidEmail;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @passwordLength.
+  ///
+  /// In en, this message translates to:
+  /// **'8 characters (no more than 20)'**
+  String get passwordLength;
+
+  /// No description provided for @passwordRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'1 letter, 1 number, 1 special character (# ? ! @)'**
+  String get passwordRequirements;
+
+  /// No description provided for @strongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong password'**
+  String get strongPassword;
+
+  /// No description provided for @emailUsernameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address/username'**
+  String get emailUsernameLabel;
+
+  /// No description provided for @emailUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or username'**
+  String get emailUsername;
+
+  /// No description provided for @enterEmailUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email or username'**
+  String get enterEmailUsername;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @createNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a nickname'**
+  String get createNickname;
+
+  /// No description provided for @nicknameDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter any nickname you like. If you skip this step, you will be automatically assigned a default nickname. You can change it later.'**
+  String get nicknameDescription;
+
+  /// No description provided for @enterNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter nickname'**
+  String get enterNickname;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

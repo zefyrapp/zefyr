@@ -53,5 +53,19 @@
   "september": "September",
   "october": "October",
   "november": "November",
-  "december": "December"
+  "december": "December",
+  "emailPasswordPrompt": "Enter your email address and create a password",
+  "enterEmail": "Enter email address",
+  "enterValidEmail": "Enter a valid email address",
+  "enterPassword": "Enter password",
+  "passwordLength": "8 characters (no more than 20)",
+  "passwordRequirements": "1 letter, 1 number, 1 special character (# ? ! @)",
+  "strongPassword": "Strong password",
+  "emailUsernameLabel": "Email address/username",
+  "emailUsername": "Email or username",
+  "enterEmailUsername": "Enter email or username",
+  "skip": "Skip",
+  "createNickname": "Create a nickname",
+  "nicknameDescription": "Enter any nickname you like. If you skip this step, you will be automatically assigned a default nickname. You can change it later.",
+  "enterNickname": "Enter nickname"
 }

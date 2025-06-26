@@ -42,7 +42,7 @@ class _PasswordInputPageState extends ConsumerState<PasswordInputView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Введите пароль',
+                  local.enterPassword,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -54,10 +54,10 @@ class _PasswordInputPageState extends ConsumerState<PasswordInputView> {
 
                 AppTextField.password(
                   controller: _passwordController,
-                  hintText: 'Пароль',
+                  hintText: local.password,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите пароль';
+                      return local.enterPassword;
                     }
 
                     return null;

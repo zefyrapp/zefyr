@@ -6,7 +6,6 @@ import 'package:zifyr/common/extensions/context_theme.dart';
 import 'package:zifyr/common/extensions/localization.dart';
 import 'package:zifyr/core/utils/icons/app_icons_icons.dart';
 import 'package:zifyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
-import 'package:zifyr/features/auth/providers/auth_providers.dart';
 
 class BirthDateView extends ConsumerStatefulWidget {
   const BirthDateView({super.key});
