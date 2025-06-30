@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:zifyr/common/extensions/localization.dart';
+import 'package:zefyr/common/extensions/localization.dart';
 
 abstract class PrivacyText {
   static Widget buildStyledTermsText(BuildContext context) {

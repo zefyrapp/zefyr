@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zifyr/common/extensions/context_theme.dart';
-import 'package:zifyr/common/widgets/custom_convex_bottom_bar.dart';
-import 'package:zifyr/core/constants/navigation_enum.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/common/widgets/custom_convex_bottom_bar.dart';
+import 'package:zefyr/core/constants/navigation_enum.dart';
 
 class MainView extends StatelessWidget {
   const MainView({required this.navigationShell, super.key});

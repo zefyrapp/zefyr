@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:zifyr/core/network/network_info.dart';
+import 'package:zefyr/core/network/network_info.dart';
 
 /// Интерцептор для проверки сетевого соединения
 class NetworkInterceptor extends Interceptor {

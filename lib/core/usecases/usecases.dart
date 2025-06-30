@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:zifyr/core/error/failures.dart';
+import 'package:zefyr/core/error/failures.dart';
 
 /// Базовый абстрактный класс для всех Use Cases
 abstract class UseCase<Type, Params> {

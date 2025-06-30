@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:zifyr/core/network/dio_client.dart';
+import 'package:zefyr/core/network/dio_client.dart';
 
 /// Интерцептор для повтора запросов
 class RetryInterceptor extends Interceptor {

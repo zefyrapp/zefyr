@@ -1,4 +1,4 @@
-import 'package:zifyr/features/auth/domain/entities/user.dart';
+import 'package:zefyr/features/auth/domain/entities/user.dart';
 
 sealed class AuthState {
   const AuthState();

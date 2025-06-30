@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:zifyr/common/themes/app_overlay.dart';
+import 'package:zefyr/common/themes/app_overlay.dart';
 
 class CustomColors extends ThemeExtension<CustomColors> {
   CustomColors({required this.overlayApp});

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:zifyr/core/error/failures.dart';
-import 'package:zifyr/core/usecases/usecases.dart';
-import 'package:zifyr/features/auth/domain/repositories/auth_repository.dart';
+import 'package:zefyr/core/error/failures.dart';
+import 'package:zefyr/core/usecases/usecases.dart';
+import 'package:zefyr/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUser implements UseCase<void, NoParams> {
   const LogoutUser(this.repository);

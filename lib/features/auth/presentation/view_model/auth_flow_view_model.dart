@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_flow_state.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_state.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_view_model.dart';
-import 'package:zifyr/features/auth/providers/auth_providers.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_flow_state.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
 
 part 'auth_flow_view_model.g.dart';
 

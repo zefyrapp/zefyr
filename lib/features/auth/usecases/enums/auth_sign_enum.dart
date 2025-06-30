@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:zifyr/common/extensions/localization.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_flow_state.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zefyr/common/extensions/localization.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_flow_state.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
 
 enum AuthSignEnum {
   email,
@@ -23,9 +25,11 @@ enum AuthSignEnum {
     };
   }
 
-  void onTap(AuthFlowViewModel authFlowViewModel) => switch (this) {
-    email => authFlowViewModel.setFlowType(AuthFlowType.register),
-    google => () {},
-    apple => () {},
-  };
+  void onTap(AuthFlowViewModel authFlowViewModel, WidgetRef ref) =>
+      switch (this) {
+        email => authFlowViewModel.setFlowType(AuthFlowType.register),
+        google => ref.read(authViewModelProvider.notifier).loginWithGoogle(),
+
+        apple => () {},
+      };
 }

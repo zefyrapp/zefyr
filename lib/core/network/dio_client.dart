@@ -5,13 +5,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:zifyr/core/error/exceptions.dart';
-import 'package:zifyr/core/network/interceptors/auth_interceptor.dart';
-import 'package:zifyr/core/network/interceptors/logging_interceptor.dart';
-import 'package:zifyr/core/network/interceptors/network_interceptor.dart';
-import 'package:zifyr/core/network/interceptors/retry_interceptor.dart';
-import 'package:zifyr/core/network/network_info.dart';
-import 'package:zifyr/core/network/parsers/response_parser.dart';
+import 'package:zefyr/core/error/exceptions.dart';
+import 'package:zefyr/core/network/interceptors/auth_interceptor.dart';
+import 'package:zefyr/core/network/interceptors/logging_interceptor.dart';
+import 'package:zefyr/core/network/interceptors/network_interceptor.dart';
+import 'package:zefyr/core/network/interceptors/retry_interceptor.dart';
+import 'package:zefyr/core/network/network_info.dart';
+import 'package:zefyr/core/network/parsers/response_parser.dart';
 
 part 'dio_client.g.dart';
 

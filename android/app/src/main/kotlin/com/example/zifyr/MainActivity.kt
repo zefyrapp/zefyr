@@ -1,4 +1,4 @@
-package com.quanx.zifyr
+package com.quanx.zefyr
 
 import io.flutter.embedding.android.FlutterActivity
 

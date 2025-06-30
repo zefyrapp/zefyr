@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zifyr/common/themes/custom_colors.dart';
+import 'package:zefyr/common/themes/custom_colors.dart';
 
 extension ThemeExtension on BuildContext {
   CustomColors get customTheme => Theme.of(this).extension<CustomColors>()!;

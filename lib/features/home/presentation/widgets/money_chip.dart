@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zifyr/common/extensions/context_theme.dart';
-import 'package:zifyr/core/utils/icons/app_asset_icon.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/core/utils/icons/app_asset_icon.dart';
 
 class MoneyChip extends StatelessWidget {
   /// Чип виджет для отображения текущего количества монет

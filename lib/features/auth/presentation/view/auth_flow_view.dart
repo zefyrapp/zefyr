@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zifyr/common/extensions/context_theme.dart';
-import 'package:zifyr/features/auth/presentation/view/auth_view.dart';
-import 'package:zifyr/features/auth/presentation/view/birth_date_view.dart';
-import 'package:zifyr/features/auth/presentation/view/email_input_view.dart';
-import 'package:zifyr/features/auth/presentation/view/email_login_view.dart';
-import 'package:zifyr/features/auth/presentation/view/nickname_view.dart';
-import 'package:zifyr/features/auth/presentation/view/password_input_view.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/features/auth/presentation/view/auth_view.dart';
+import 'package:zefyr/features/auth/presentation/view/birth_date_view.dart';
+import 'package:zefyr/features/auth/presentation/view/email_input_view.dart';
+import 'package:zefyr/features/auth/presentation/view/email_login_view.dart';
+import 'package:zefyr/features/auth/presentation/view/nickname_view.dart';
+import 'package:zefyr/features/auth/presentation/view/password_input_view.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
 
 class AuthFlowView extends ConsumerWidget {
   const AuthFlowView({super.key});

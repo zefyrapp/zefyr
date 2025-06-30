@@ -1,11 +1,11 @@
 // Страница ввода пароля
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zifyr/common/extensions/context_theme.dart';
-import 'package:zifyr/common/extensions/localization.dart';
-import 'package:zifyr/core/utils/icons/app_icons_icons.dart';
-import 'package:zifyr/features/auth/presentation/view/widgets/app_text_field.dart';
-import 'package:zifyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/common/extensions/localization.dart';
+import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
+import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
+import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
 
 class PasswordInputView extends ConsumerStatefulWidget {
   const PasswordInputView({super.key});

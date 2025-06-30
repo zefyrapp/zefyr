@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zifyr/core/app/router/router.dart';
-import 'package:zifyr/common/themes/app_themes.dart';
-import 'package:zifyr/l10n/app_localizations.dart';
-import 'package:zifyr/l10n/l10n.dart';
+import 'package:zefyr/core/app/router/router.dart';
+import 'package:zefyr/common/themes/app_themes.dart';
+import 'package:zefyr/l10n/app_localizations.dart';
+import 'package:zefyr/l10n/l10n.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});

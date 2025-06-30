@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:zifyr/core/services/redirect_service.dart';
-import 'package:zifyr/core/utils/fade_transition/fade_transition.dart';
-import 'package:zifyr/features/auth/presentation/view/auth_flow_view.dart';
-import 'package:zifyr/features/chat/presentation/view/chat_view.dart';
-import 'package:zifyr/features/explore/presentation/view/explore_view.dart';
-import 'package:zifyr/features/home/presentation/view/home_view.dart';
-import 'package:zifyr/features/live/presentation/view/live_view.dart';
-import 'package:zifyr/features/main_view.dart';
-import 'package:zifyr/features/mission/presentation/view/mission_view.dart';
-import 'package:zifyr/features/profile/presentation/view/profile_view.dart';
+import 'package:zefyr/core/services/redirect_service.dart';
+import 'package:zefyr/core/utils/fade_transition/fade_transition.dart';
+import 'package:zefyr/features/auth/presentation/view/auth_flow_view.dart';
+import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
+import 'package:zefyr/features/explore/presentation/view/explore_view.dart';
+import 'package:zefyr/features/home/presentation/view/home_view.dart';
+import 'package:zefyr/features/live/presentation/view/live_view.dart';
+import 'package:zefyr/features/main_view.dart';
+import 'package:zefyr/features/mission/presentation/view/mission_view.dart';
+import 'package:zefyr/features/profile/presentation/view/profile_view.dart';
 
 part 'router.g.dart';
 

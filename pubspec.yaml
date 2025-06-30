@@ -1,4 +1,4 @@
-name: zifyr
+name: zefyr
 description: "A new Flutter project."
 
 publish_to: "none"
@@ -32,6 +32,7 @@ dependencies:
   drift_dev: ^2.27.0
   path_provider: ^2.1.5
   path: ^1.9.1
+  google_sign_in: ^7.0.0
 
 dev_dependencies:
   flutter_test:

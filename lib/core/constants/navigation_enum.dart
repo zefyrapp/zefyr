@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zifyr/core/utils/icons/app_icons_icons.dart';
+import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
 
 enum NavigationEnum {
   home,

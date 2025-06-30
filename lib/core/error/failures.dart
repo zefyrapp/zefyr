@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:zifyr/core/error/exceptions.dart';
+import 'package:zefyr/core/error/exceptions.dart';
 
 /// Абстрактный базовый класс для всех ошибок
 abstract class Failure extends Equatable {

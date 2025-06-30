@@ -1,6 +1,6 @@
-import 'package:zifyr/features/auth/data/datasources/user_dao.dart';
-import 'package:zifyr/features/auth/data/models/user_model.dart';
-import 'package:zifyr/features/auth/domain/entities/user.dart';
+import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
+import 'package:zefyr/features/auth/data/models/user_model.dart';
+import 'package:zefyr/features/auth/domain/entities/user.dart';
 
 abstract class AuthLocalDataSource {
   Future<void> cacheUser(UserModel user);

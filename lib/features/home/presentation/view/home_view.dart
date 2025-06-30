@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zifyr/common/extensions/context_theme.dart';
-import 'package:zifyr/common/widgets/gradient_border_image.dart';
-import 'package:zifyr/features/home/presentation/widgets/money_chip.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/common/widgets/gradient_border_image.dart';
+import 'package:zefyr/features/home/presentation/widgets/money_chip.dart';
 
 class HomeView extends StatelessWidget {
   /// Главный экран

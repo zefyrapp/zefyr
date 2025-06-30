@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:zifyr/core/database/database.dart';
-import 'package:zifyr/features/auth/data/models/user_model.dart';
+import 'package:zefyr/core/database/database.dart';
+import 'package:zefyr/features/auth/data/models/user_model.dart';
 
 class UserDao {
   const UserDao(this.db);

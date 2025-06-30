@@ -1,5 +1,5 @@
-import 'package:zifyr/core/database/database.dart';
-import 'package:zifyr/features/auth/domain/entities/user.dart';
+import 'package:zefyr/core/database/database.dart';
+import 'package:zefyr/features/auth/domain/entities/user.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
