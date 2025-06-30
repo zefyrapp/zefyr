@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 const List<String> _scopes = <String>[
@@ -23,10 +22,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
 
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
-    await _signIn.initialize(
-      clientId: dotenv.get('GoogleClientID'),
-      serverClientId: dotenv.get('GoogleClientSecret'),
-    );
+    await _signIn.initialize(clientId: '', serverClientId: '');
     // Можно подписаться на события, если нужно
     // _googleSignIn.authenticationEvents.listen(...);
     await _signIn.attemptLightweightAuthentication();
