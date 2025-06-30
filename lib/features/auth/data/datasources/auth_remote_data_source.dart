@@ -1,54 +1,72 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:zifyr/core/error/exceptions.dart';
+import 'package:zifyr/core/network/dio_client.dart';
 import 'package:zifyr/features/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<UserModel> login(String email, String password);
-  Future<UserModel> register(String email, String password, String name);
+  Future<UserModel> login({required String email, required String password});
+  Future<UserModel> register({
+    required String email,
+    required String password,
+    required String name,
+  });
   Future<void> logout();
+  Future<UserModel> refresh({required String refreshToken});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   const AuthRemoteDataSourceImpl({required this.client});
-  final http.Client client;
+  final DioClient client;
 
   @override
-  Future<UserModel> login(String email, String password) async {
-    final response = await client.post(
-      Uri.parse('https://api.example.com/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password}),
-    );
-
-    if (response.statusCode == 200) {
-      return UserModel.fromJson(
-        json.decode(response.body) as Map<String, dynamic>,
-      );
-    } else {
-      throw const ServerException();
-    }
-  }
+  Future<UserModel> login({
+    required String email,
+    required String password,
+  }) async => _handle<UserModel>(
+    () async => client.post<UserModel>(
+      '/api/auth/login/',
+      data: {'email': email, 'password': password},
+    ),
+  );
 
   @override
-  Future<UserModel> register(String email, String password, String name) async {
-    final response = await client.post(
-      Uri.parse('https://api.example.com/auth/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password, 'name': name}),
-    );
+  Future<UserModel> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async => _handle<UserModel>(
+    () async => client.post<UserModel>(
+      '/api/auth/register/',
+      data: {'email': email, 'password': password, 'name': name},
+    ),
+  );
 
-    if (response.statusCode == 201) {
-      return UserModel.fromJson(
-        json.decode(response.body) as Map<String, dynamic>,
+  @override
+  Future<UserModel> refresh({required String refreshToken}) async =>
+      _handle<UserModel>(
+        () async => client.post<UserModel>(
+          '/api/auth/refresh/',
+          data: {"refresh_token": refreshToken},
+        ),
       );
-    } else {
-      throw const ServerException();
-    }
-  }
 
   @override
   Future<void> logout() async {
     // Реализация выхода из системы
+  }
+
+  T _handle<T>(Future<T> Function() f) {
+    try {
+      return f.call() as T;
+    } catch (e) {
+      throw _handleException(e);
+    }
+  }
+
+  /// Обработка исключений для конкретного контекста
+  Exception _handleException(dynamic e) {
+    if (e is AppException) {
+      return e;
+    }
+    return ServerException('Auth service error: ${e.toString()}');
   }
 }

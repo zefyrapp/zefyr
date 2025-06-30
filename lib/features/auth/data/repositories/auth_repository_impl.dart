@@ -17,7 +17,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User>> login(String email, String password) async {
     try {
-      final user = await remoteDataSource.login(email, password);
+      final user = await remoteDataSource.login(
+        email: email,
+        password: password,
+      );
       await localDataSource.cacheUser(user);
       return Right(user);
     } on ServerException {
@@ -32,7 +35,11 @@ class AuthRepositoryImpl implements AuthRepository {
     String name,
   ) async {
     try {
-      final user = await remoteDataSource.register(email, password, name);
+      final user = await remoteDataSource.register(
+        email: email,
+        password: password,
+        name: name,
+      );
       await localDataSource.cacheUser(user);
       return Right(user);
     } on ServerException {

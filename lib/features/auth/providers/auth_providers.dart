@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:zifyr/core/network/dio_client.dart';
 import 'package:zifyr/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:zifyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zifyr/features/auth/data/repositories/auth_repository_impl.dart';
@@ -10,12 +11,9 @@ import 'package:zifyr/features/auth/usecases/login_user.dart';
 import 'package:zifyr/features/auth/usecases/logout_user.dart';
 import 'package:zifyr/features/auth/usecases/register_user.dart';
 
-// HTTP Client Provider
-final httpClientProvider = Provider<http.Client>((ref) => http.Client());
-
 // Data Sources
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
-  (ref) => AuthRemoteDataSourceImpl(client: ref.read(httpClientProvider)),
+  (ref) => AuthRemoteDataSourceImpl(client: ref.read(dioClientProvider)),
 );
 
 final authLocalDataSourceProvider = Provider<AuthLocalDataSource>(
