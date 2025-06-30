@@ -1,5 +1,5 @@
-class User {
-  const User({
+class UserEntity {
+  const UserEntity({
     required this.id,
     required this.email,
     required this.name,
@@ -13,7 +13,7 @@ class User {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is User &&
+    return other is UserEntity &&
         other.id == id &&
         other.email == email &&
         other.name == name &&

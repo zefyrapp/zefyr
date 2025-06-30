@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
+import 'package:zifyr/core/database/database.dart';
 import 'package:zifyr/core/network/dio_client.dart';
 import 'package:zifyr/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:zifyr/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:zifyr/features/auth/data/datasources/user_dao.dart';
 import 'package:zifyr/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:zifyr/features/auth/domain/repositories/auth_repository.dart';
 import 'package:zifyr/features/auth/presentation/view_model/auth_state.dart';
@@ -16,8 +17,16 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
   (ref) => AuthRemoteDataSourceImpl(client: ref.read(dioClientProvider)),
 );
 
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  final db = AppDatabase();
+  ref.onDispose(() => db.close());
+  return db;
+});
+final userDaoProvider = Provider<UserDao>(
+  (ref) => UserDao(ref.read(appDatabaseProvider)),
+);
 final authLocalDataSourceProvider = Provider<AuthLocalDataSource>(
-  (ref) => const AuthLocalDataSourceImpl(),
+  (ref) => AuthLocalDataSourceImpl(ref.read(userDaoProvider)),
 );
 
 // Repository

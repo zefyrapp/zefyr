@@ -4,12 +4,12 @@ import 'package:zifyr/core/usecases/usecases.dart';
 import 'package:zifyr/features/auth/domain/entities/user.dart';
 import 'package:zifyr/features/auth/domain/repositories/auth_repository.dart';
 
-class RegisterUser implements UseCase<User, RegisterParams> {
+class RegisterUser implements UseCase<UserEntity, RegisterParams> {
   const RegisterUser(this.repository);
   final AuthRepository repository;
 
   @override
-  Future<Either<Failure, User>> call(RegisterParams params) async =>
+  Future<Either<Failure, UserEntity>> call(RegisterParams params) async =>
       repository.register(params.email, params.password, params.name);
 }
 
