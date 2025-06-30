@@ -24,8 +24,8 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
     await _signIn.initialize(
-      clientId: dotenv.env['GoogleClientID'],
-      serverClientId: dotenv.env['GoogleClientSecret'],
+      clientId: dotenv.get('GoogleClientID'),
+      serverClientId: dotenv.get('GoogleClientSecret'),
     );
     // Можно подписаться на события, если нужно
     // _googleSignIn.authenticationEvents.listen(...);
