@@ -98,4 +98,13 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> checkEmail({required String email}) async {
+    try {
+      return Right(await remoteDataSource.checkEmail(email: email));
+    } on ServerException {
+      return const Left(ServerFailure());
+    }
+  }
 }

@@ -6,12 +6,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/error/exceptions.dart';
+import 'package:zefyr/core/network/exceptions.dart';
 import 'package:zefyr/core/network/interceptors/auth_interceptor.dart';
 import 'package:zefyr/core/network/interceptors/logging_interceptor.dart';
 import 'package:zefyr/core/network/interceptors/network_interceptor.dart';
 import 'package:zefyr/core/network/interceptors/retry_interceptor.dart';
+import 'package:zefyr/core/network/models/api_response.dart';
 import 'package:zefyr/core/network/network_info.dart';
 import 'package:zefyr/core/network/parsers/response_parser.dart';
+import 'package:zefyr/features/auth/data/models/api_response.dart';
 
 part 'dio_client.g.dart';
 
@@ -65,7 +68,153 @@ class DioClient {
     ]);
   }
 
-  /// GET запрос с универсальным парсингом
+  // --- МЕТОДЫ С ApiResponse ОБЕРТКОЙ ---
+
+  /// GET запрос с ApiResponse оберткой
+  Future<ApiResponse<T>> getWithApiResponse<T>(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        path,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// POST запрос с ApiResponse оберткой
+  Future<ApiResponse<T>> postWithApiResponse<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.post<dynamic>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// PUT запрос с ApiResponse оберткой
+  Future<ApiResponse<T>> putWithApiResponse<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.put<dynamic>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// PATCH запрос с ApiResponse оберткой
+  Future<ApiResponse<T>> patchWithApiResponse<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.patch<dynamic>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// DELETE запрос с ApiResponse оберткой
+  Future<ApiResponse<T>> deleteWithApiResponse<T>(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.delete<dynamic>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // --- МЕТОДЫ ДЛЯ СПИСКОВ С ApiListResponse ---
+
+  /// GET запрос для получения списка с ApiListResponse оберткой
+  Future<ApiListResponse<T>> getListWithApiResponse<T>(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        path,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiListResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // --- КЛАССИЧЕСКИЕ МЕТОДЫ (БЕЗ ApiResponse ОБЕРТКИ) ---
+
+  /// Классический GET запрос без ApiResponse обертки
   Future<T> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -81,13 +230,13 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson);
+      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  /// POST запрос с универсальным парсингом
+  /// Классический POST запрос без ApiResponse обертки
   Future<T> post<T>(
     String path, {
     dynamic data,
@@ -105,13 +254,13 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson);
+      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  /// PUT запрос с универсальным парсингом
+  /// Классический PUT запрос без ApiResponse обертки
   Future<T> put<T>(
     String path, {
     dynamic data,
@@ -129,13 +278,13 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson);
+      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  /// PATCH запрос с универсальным парсингом
+  /// Классический PATCH запрос без ApiResponse обертки
   Future<T> patch<T>(
     String path, {
     dynamic data,
@@ -153,13 +302,13 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson);
+      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  /// DELETE запрос с универсальным парсингом
+  /// Классический DELETE запрос без ApiResponse обертки
   Future<T> delete<T>(
     String path, {
     dynamic data,
@@ -177,13 +326,39 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson);
+      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  /// Загрузка файла
+  // --- МЕТОДЫ ЗАГРУЗКИ И СКАЧИВАНИЯ ---
+
+  /// Загрузка файла с ApiResponse оберткой
+  Future<ApiResponse<T>> uploadWithApiResponse<T>(
+    String path, {
+    required FormData formData,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.post<dynamic>(
+        path,
+        data: formData,
+        options: options,
+        onSendProgress: onSendProgress,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// Классическая загрузка файла
   Future<T> upload<T>(
     String path, {
     required FormData formData,
@@ -201,13 +376,13 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson);
+      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
     } catch (e) {
       throw _handleError(e);
     }
   }
 
-  /// Скачивание файла
+  /// Скачивание файла (остается без изменений)
   Future<void> download(
     String urlPath,
     String savePath, {
@@ -232,6 +407,30 @@ class DioClient {
     } catch (e) {
       throw _handleError(e);
     }
+  }
+
+  Future<ApiResponse<T>> _parseApiResponse<T>(
+    Response<dynamic> response,
+    T Function(Map<String, dynamic>)? fromJson,
+  ) async {
+    // Проверяем статус код
+    if (response.statusCode != null && response.statusCode! >= 400) {
+      throw _createHttpException(response);
+    }
+
+    // Парсим через ResponseParser
+    final result = await _parser.parseResponse<ApiResponse<T>>(
+      response,
+      fromJson: fromJson,
+      useApiResponseWrapper: true,
+    );
+
+    // Проверяем success в ApiResponse
+    if (!result.isSuccess) {
+      throw ApiResponseException(result.message, errors: result.errors);
+    }
+
+    return result;
   }
 
   /// Универсальный парсинг ответа через compute
@@ -260,9 +459,9 @@ class DioClient {
       return const NetworkException('Нет подключения к интернету');
     }
 
-    if (error is FormatException) {
-      return FormatException('Ошибка формата данных: ${error.message}');
-    }
+    // if (error is FormatException) {
+    //   return FormatException('Ошибка формата данных: ${error.message}');
+    // }
 
     return ServerException('Неизвестная ошибка: ${error.toString()}');
   }

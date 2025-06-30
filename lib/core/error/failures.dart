@@ -135,56 +135,29 @@ class GeneralFailure extends Failure {
 
 /// Утилита для преобразования исключений в ошибки
 class FailureMapper {
-  static Failure mapExceptionToFailure(Exception exception) =>
-      switch (exception.runtimeType) {
-        const (ServerException) => ServerFailure(
-          message: exception.toString(),
-          code: (exception as ServerException).code,
-        ),
-        const (NetworkException) => NetworkFailure(
-          message: exception.toString(),
-          code: (exception as NetworkException).code,
-        ),
-        const (CacheException) => CacheFailure(
-          message: exception.toString(),
-          code: (exception as CacheException).code,
-        ),
-        const (ValidationException) => ValidationFailure(
-          message: exception.toString(),
-          code: (exception as ValidationException).code,
-        ),
-        const (AuthException) => AuthFailure(
-          message: exception.toString(),
-          code: (exception as AuthException).code,
-        ),
-        const (PermissionException) => PermissionFailure(
-          message: exception.toString(),
-          code: (exception as PermissionException).code,
-        ),
-        const (TimeoutException) => TimeoutFailure(
-          message: exception.toString(),
-          code: (exception as TimeoutException).code,
-        ),
-        const (FormatException) => FormatFailure(
-          message: exception.toString(),
-          code: (exception as FormatException).code,
-        ),
-        const (NotFoundException) => NotFoundFailure(
-          message: exception.toString(),
-          code: (exception as NotFoundException).code,
-        ),
-        const (ConflictException) => ConflictFailure(
-          message: exception.toString(),
-          code: (exception as ConflictException).code,
-        ),
-        const (LimitExceededException) => LimitExceededFailure(
-          message: exception.toString(),
-          code: (exception as LimitExceededException).code,
-        ),
-        const (ServiceUnavailableException) => ServiceUnavailableFailure(
-          message: exception.toString(),
-          code: (exception as ServiceUnavailableException).code,
-        ),
-        _ => GeneralFailure(message: exception.toString()),
-      };
+  static Failure mapExceptionToFailure(
+    Exception exception,
+  ) => switch (exception.runtimeType) {
+    const (ServerException) => ServerFailure(message: exception.toString()),
+    const (NetworkException) => NetworkFailure(message: exception.toString()),
+    const (CacheException) => CacheFailure(message: exception.toString()),
+    const (ValidationException) => ValidationFailure(
+      message: exception.toString(),
+    ),
+    const (AuthException) => AuthFailure(message: exception.toString()),
+    const (PermissionException) => PermissionFailure(
+      message: exception.toString(),
+    ),
+    const (TimeoutException) => TimeoutFailure(message: exception.toString()),
+    const (FormatException) => FormatFailure(message: exception.toString()),
+    const (NotFoundException) => NotFoundFailure(message: exception.toString()),
+    const (ConflictException) => ConflictFailure(message: exception.toString()),
+    const (LimitExceededException) => LimitExceededFailure(
+      message: exception.toString(),
+    ),
+    const (ServiceUnavailableException) => ServiceUnavailableFailure(
+      message: exception.toString(),
+    ),
+    _ => GeneralFailure(message: exception.toString()),
+  };
 }

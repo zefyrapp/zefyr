@@ -3,6 +3,7 @@ import 'package:zefyr/core/error/failures.dart';
 import 'package:zefyr/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
+  Future<Either<Failure, bool>> checkEmail({required String email});
   Future<Either<Failure, UserEntity>> login(String email, String password);
   Future<Either<Failure, UserEntity>> register(
     String email,
