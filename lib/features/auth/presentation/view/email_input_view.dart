@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
@@ -79,7 +80,7 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
                     if (value == null || value.isEmpty) {
                       return local.enterEmail;
                     }
-                    if (!value.contains('@')) {
+                    if (!EmailValidator.validate(value)) {
                       return local.enterValidEmail;
                     }
                     return null;
@@ -92,6 +93,26 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
                   hintText: local.enterPassword,
 
                   onChanged: (value) {},
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return local.enterPassword;
+                    }
+                    if (value.length < 8 || value.length > 20) {
+                      return local.passwordLengthError;
+                    }
+
+                    final hasLetter = RegExp('[A-Za-z]').hasMatch(value);
+                    final hasDigit = RegExp(r'\d').hasMatch(value);
+                    final hasSpecial = RegExp(
+                      r'[!@#\$%^&*(),.?":{}|<>_\-+=\\/\[\]]',
+                    ).hasMatch(value);
+
+                    if (!hasLetter || !hasDigit || !hasSpecial) {
+                      return local.passwordShouldContainAll;
+                    }
+
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 32),
                 _DotText(text: local.passwordLength),

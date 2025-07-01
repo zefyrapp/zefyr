@@ -177,4 +177,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterNickname => 'Enter nickname';
+
+  @override
+  String get passwordLengthError => 'Password must be between 8 and 20 characters';
+
+  @override
+  String get passwordShouldContainAll => 'Password must contain at least one letter, one number, and one special character';
 }

@@ -430,6 +430,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter nickname'**
   String get enterNickname;
+
+  /// No description provided for @passwordLengthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be between 8 and 20 characters'**
+  String get passwordLengthError;
+
+  /// No description provided for @passwordShouldContainAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least one letter, one number, and one special character'**
+  String get passwordShouldContainAll;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

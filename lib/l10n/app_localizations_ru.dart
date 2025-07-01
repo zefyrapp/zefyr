@@ -177,4 +177,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get enterNickname => 'Введите никнейм';
+
+  @override
+  String get passwordLengthError => 'Пароль должен быть от 8 до 20 символов';
+
+  @override
+  String get passwordShouldContainAll => 'Пароль должен содержать хотя бы одну букву, цифру и специальный символ';
 }

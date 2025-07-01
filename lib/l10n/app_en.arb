@@ -67,5 +67,7 @@
   "skip": "Skip",
   "createNickname": "Create a nickname",
   "nicknameDescription": "Enter any nickname you like. If you skip this step, you will be automatically assigned a default nickname. You can change it later.",
-  "enterNickname": "Enter nickname"
+  "enterNickname": "Enter nickname",
+  "passwordLengthError": "Password must be between 8 and 20 characters",
+  "passwordShouldContainAll": "Password must contain at least one letter, one number, and one special character"
 }

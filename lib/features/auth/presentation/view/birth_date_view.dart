@@ -6,6 +6,7 @@ import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
+import 'package:zefyr/l10n/app_localizations.dart';
 
 class BirthDateView extends ConsumerStatefulWidget {
   const BirthDateView({super.key});
@@ -14,6 +15,7 @@ class BirthDateView extends ConsumerStatefulWidget {
 }
 
 class _BirthDatePageState extends ConsumerState<BirthDateView> {
+  final selectedDateTime = StateProvider<String?>((ref) => null);
   int? _selectedDay;
   int? _selectedMonth;
   int? _selectedYear;
@@ -67,6 +69,16 @@ class _BirthDatePageState extends ConsumerState<BirthDateView> {
   }
 
   int _getDaysInMonth(int year, int month) => DateTime(year, month + 1, 0).day;
+  void updateSelectedText(AppLocalizations localizations) {
+    ref
+        .read(selectedDateTime.notifier)
+        .update(
+          (state) => DateFormat(
+            'dd MMMM yyyy',
+            localizations.localeName,
+          ).format(_selectedDate ?? DateTime.now()),
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +86,9 @@ class _BirthDatePageState extends ConsumerState<BirthDateView> {
     final color = context.customTheme.overlayApp;
     final localizations = context.localization;
     final monthNames = _getMonthNames(context);
-
+    final birthDate = ref.watch(
+      authFlowViewModelProvider.select((data) => data.formData.birthDate),
+    );
     return Scaffold(
       backgroundColor: color.backgroundColor,
       appBar: AppBar(
@@ -125,18 +139,13 @@ class _BirthDatePageState extends ConsumerState<BirthDateView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  ref.watch(authFlowViewModelProvider).formData.birthDate !=
-                          null
+                  birthDate != null
                       ? DateFormat(
                           'dd MMMM yyyy',
                           localizations.localeName,
-                        ).format(
-                          ref
-                              .watch(authFlowViewModelProvider)
-                              .formData
-                              .birthDate!,
-                        )
-                      : localizations.birthDateLabel,
+                        ).format(birthDate)
+                      : ref.watch(selectedDateTime) ??
+                            localizations.birthDateLabel,
                   style: const TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16,
@@ -162,6 +171,7 @@ class _BirthDatePageState extends ConsumerState<BirthDateView> {
                             setState(() {
                               _selectedDay = index + 1;
                             });
+                            updateSelectedText(localizations);
                           },
                           childDelegate: ListWheelChildBuilderDelegate(
                             childCount:
@@ -221,6 +231,7 @@ class _BirthDatePageState extends ConsumerState<BirthDateView> {
                                 }
                               }
                             });
+                            updateSelectedText(localizations);
                           },
                           childDelegate: ListWheelChildBuilderDelegate(
                             childCount: 12,
@@ -273,6 +284,7 @@ class _BirthDatePageState extends ConsumerState<BirthDateView> {
                                 }
                               }
                             });
+                            updateSelectedText(localizations);
                           },
                           childDelegate: ListWheelChildBuilderDelegate(
                             childCount: DateTime.now().year - 1900 + 1,

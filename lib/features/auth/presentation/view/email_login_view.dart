@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
@@ -64,7 +65,7 @@ class _EmailLoginState extends ConsumerState<EmailLogin> {
                     if (value == null || value.isEmpty) {
                       return local.enterEmailUsername;
                     }
-                    if (!value.contains('@')) {
+                    if (!EmailValidator.validate(value)) {
                       return local.enterValidEmail;
                     }
                     return null;
@@ -85,8 +86,8 @@ class _EmailLoginState extends ConsumerState<EmailLogin> {
                                   email: _emailController.text.trim(),
                                 ),
                               );
+                              authFlowViewModel.nextStep();
                             }
-                            authFlowViewModel.nextStep();
                           },
                     style: color.elevatedStyle,
                     child: authFlowState.isLoading
