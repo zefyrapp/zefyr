@@ -10,16 +10,32 @@ part 'database.g.dart';
 class Users extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get email => text()();
-  TextColumn get name => text().nullable()();
-  // Добавьте остальные поля из UserModel
+  BoolColumn get isActive => boolean().nullable()();
+  DateTimeColumn get lastActive => dateTime().nullable()();
 }
 
-@DriftDatabase(tables: [Users])
+// Таблица для хранения токенов аутентификации
+class AuthTokens extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get userId =>
+      integer().references(Users, #id, onDelete: KeyAction.cascade)();
+  TextColumn get accessToken => text()();
+  TextColumn get refreshToken => text()();
+}
+
+@DriftDatabase(tables: [Users, AuthTokens])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+  );
 }
 
 LazyDatabase _openConnection() => LazyDatabase(() async {

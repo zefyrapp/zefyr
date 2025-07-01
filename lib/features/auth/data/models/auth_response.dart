@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:zefyr/core/database/database.dart';
 import 'package:zefyr/features/auth/data/models/user_model.dart';
 
 class AuthResponse {
@@ -17,6 +18,14 @@ class AuthResponse {
 
   factory AuthResponse.fromJson(String source) =>
       AuthResponse.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory AuthResponse.fromDrift({
+    required User userRow,
+    required AuthToken tokenRow,
+  }) => AuthResponse(
+    accessToken: tokenRow.accessToken,
+    refreshToken: tokenRow.refreshToken,
+    user: UserModel.fromDrift(userRow),
+  );
 
   final String accessToken;
   final String refreshToken;
@@ -39,6 +48,16 @@ class AuthResponse {
   };
 
   String toJson() => json.encode(toMap());
+
+  // /// Проверяет, истек ли токен
+  // bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
+
+  // /// Проверяет, скоро ли истечет токен (за 5 минут до истечения)
+  // bool get isExpiringSoon {
+  //   if (expiresAt == null) return false;
+  //   final fiveMinutesFromNow = DateTime.now().add(const Duration(minutes: 5));
+  //   return fiveMinutesFromNow.isAfter(expiresAt!);
+  // }
 
   @override
   String toString() =>

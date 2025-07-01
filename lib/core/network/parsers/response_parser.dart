@@ -68,8 +68,8 @@ class ResponseParser {
   /// Поддерживает как обычные данные, так и обернутые в ApiResponse.
   Future<T> parseResponse<T>(
     Response<dynamic> response, {
-    Function? fromJson,
-    bool useApiResponseWrapper = true, // Новый параметр
+    T Function(Map<String, dynamic>)? fromJson,
+    bool useApiResponseWrapper = true,
   }) async {
     final dynamic data = response.data;
 
@@ -99,35 +99,28 @@ class ResponseParser {
   /// Парсинг с использованием ApiResponse обертки
   Future<T> _parseWithApiResponseWrapper<T>(
     Map<String, dynamic> data,
-    Function fromJson,
+    T Function(Map<String, dynamic>) fromJson,
   ) async {
     // Получаем строковое представление типа T
     final typeString = T.toString();
 
     // Приводим fromJson к нужному типу
-    final typedFromJson = fromJson as T Function(Map<String, dynamic>);
 
     // Определяем тип T и парсим соответственно
     if (typeString.contains('ApiResponse<')) {
       // T это ApiResponse<SomeModel>
-      final result = await _parseApiResponseInCompute<dynamic>(
-        data,
-        typedFromJson,
-      );
+      final result = await _parseApiResponseInCompute<dynamic>(data, fromJson);
       return result as T;
     } else if (typeString.contains('ApiListResponse<')) {
       // T это ApiListResponse<SomeModel>
       final result = await _parseApiListResponseInCompute<dynamic>(
         data,
-        typedFromJson,
+        fromJson,
       );
       return result as T;
     } else {
       // T это обычная модель, но мы все равно должны парсить через ApiResponse
-      final apiResponse = await _parseApiResponseInCompute<T>(
-        data,
-        typedFromJson,
-      );
+      final apiResponse = await _parseApiResponseInCompute<T>(data, fromJson);
       return apiResponse as T;
     }
   }

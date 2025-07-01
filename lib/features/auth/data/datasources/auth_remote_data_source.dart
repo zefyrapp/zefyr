@@ -51,8 +51,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String dateOfBirth,
     String? name,
-  }) async => _handle<AuthResponse>(
-    () async => client.post<AuthResponse>(
+  }) async => _handle<AuthResponse>(() async {
+    final response = await client.postWithApiResponse<AuthResponse>(
       '/api/auth/register/',
       data: {
         'email': email,
@@ -60,8 +60,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'date_of_birth': dateOfBirth,
         'nickname': name,
       },
-    ),
-  );
+      fromJson: AuthResponse.fromMap,
+    );
+    return response.data!;
+  });
 
   @override
   Future<AuthResponse> refresh({required String refreshToken}) async =>

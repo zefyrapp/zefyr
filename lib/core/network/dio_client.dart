@@ -443,7 +443,7 @@ class DioClient {
     // Парсим через ResponseParser
     final result = await _parser.parseResponse<ApiListResponse<T>>(
       response,
-      fromJson: fromJson,
+      fromJson: ApiListResponse<T>.fromJson,
     );
 
     // Проверяем success в ApiListResponse
