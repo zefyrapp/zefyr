@@ -1,18 +1,19 @@
 import 'package:drift/drift.dart';
 import 'package:zefyr/core/database/database.dart';
+import 'package:zefyr/features/auth/data/models/auth_response.dart';
 import 'package:zefyr/features/auth/data/models/user_model.dart';
 
 class UserDao {
   const UserDao(this.db);
   final AppDatabase db;
 
-  Future<void> insertOrUpdateUser(UserModel user) async {
+  Future<void> insertOrUpdateUser(AuthResponse user) async {
     await db.into(db.users).insertOnConflictUpdate(user.toCompanion());
   }
 
-  Future<UserModel?> getUser() async {
+  Future<AuthResponse?> getUser() async {
     final row = await db.select(db.users).getSingleOrNull();
-    return row == null ? null : UserModel.fromDrift(row);
+    return row == null ? null : AuthResponse.fromDrift(row);
   }
 
   Future<void> clearUser() async {

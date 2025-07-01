@@ -4,6 +4,7 @@ import 'package:zefyr/core/error/failures.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/google_signIn_data_source.dart';
+import 'package:zefyr/features/auth/data/models/auth_response.dart';
 import 'package:zefyr/features/auth/domain/entities/user.dart';
 import 'package:zefyr/features/auth/domain/repositories/auth_repository.dart';
 
@@ -17,7 +18,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthLocalDataSource localDataSource;
   final GoogleSignInDataSource googleSignInDataSource;
   @override
-  Future<Either<Failure, UserEntity>> login(
+  Future<Either<Failure, AuthResponse>> login(
     String email,
     String password,
   ) async {
@@ -34,15 +35,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> register(
+  Future<Either<Failure, AuthResponse>> register(
     String email,
     String password,
-    String name,
+    String dateOfBirth,
+    String? name,
   ) async {
     try {
       final user = await remoteDataSource.register(
         email: email,
         password: password,
+        dateOfBirth: dateOfBirth,
         name: name,
       );
       await localDataSource.cacheUser(user);
@@ -64,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity?>> getCurrentUser() async {
+  Future<Either<Failure, AuthResponse?>> getCurrentUser() async {
     try {
       final user = await localDataSource.getCachedUser();
       return Right(user);
@@ -74,7 +77,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> loginWithGoogle() async {
+  Future<Either<Failure, AuthResponse>> loginWithGoogle() async {
     try {
       final client = await googleSignInDataSource.signIn();
       if (client == null) {

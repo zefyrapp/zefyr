@@ -1,11 +1,12 @@
 import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
+import 'package:zefyr/features/auth/data/models/auth_response.dart';
 import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/domain/entities/user.dart';
 
 abstract class AuthLocalDataSource {
-  Future<void> cacheUser(UserModel user);
+  Future<void> cacheUser(AuthResponse user);
   Future<void> clearCache();
-  Future<UserEntity?> getCachedUser();
+  Future<AuthResponse?> getCachedUser();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -13,13 +14,13 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final UserDao userDao;
 
   @override
-  Future<void> cacheUser(UserModel user) => userDao.insertOrUpdateUser(user);
+  Future<void> cacheUser(AuthResponse user) => userDao.insertOrUpdateUser(user);
 
   @override
   Future<void> clearCache() => userDao.clearUser();
 
   @override
-  Future<UserEntity?> getCachedUser() async {
+  Future<AuthResponse?> getCachedUser() async {
     final user = await userDao.getUser();
     return user;
   }

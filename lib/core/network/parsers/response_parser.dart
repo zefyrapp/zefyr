@@ -101,39 +101,57 @@ class ResponseParser {
     Map<String, dynamic> data,
     Function fromJson,
   ) async {
+    // Получаем строковое представление типа T
+    final typeString = T.toString();
+
+    // Приводим fromJson к нужному типу
+    final typedFromJson = fromJson as T Function(Map<String, dynamic>);
+
     // Определяем тип T и парсим соответственно
-    if (T.toString().startsWith('ApiResponse<')) {
+    if (typeString.contains('ApiResponse<')) {
       // T это ApiResponse<SomeModel>
-      final result = await _parseApiResponseInCompute<dynamic>(data, fromJson);
+      final result = await _parseApiResponseInCompute<dynamic>(
+        data,
+        typedFromJson,
+      );
       return result as T;
-    } else if (T.toString().startsWith('ApiListResponse<')) {
+    } else if (typeString.contains('ApiListResponse<')) {
       // T это ApiListResponse<SomeModel>
       final result = await _parseApiListResponseInCompute<dynamic>(
         data,
-        fromJson,
+        typedFromJson,
       );
       return result as T;
     } else {
-      // T это обычная модель, оборачиваем в ApiResponse
-      final apiResponse = await _parseApiResponseInCompute<T>(data, fromJson);
+      // T это обычная модель, но мы все равно должны парсить через ApiResponse
+      final apiResponse = await _parseApiResponseInCompute<T>(
+        data,
+        typedFromJson,
+      );
       return apiResponse as T;
     }
   }
 
   /// Парсинг без обертки (классический подход)
   Future<T> _parseWithoutWrapper<T>(dynamic data, Function fromJson) async {
+    // Приводим fromJson к нужному типу
+    final typedFromJson = fromJson as dynamic Function(Map<String, dynamic>);
+
     // 1. Если данные - это СПИСОК
     if (data is List) {
-      final List<dynamic> result = await _parseSimpleListInCompute(
+      final List<dynamic> result = await _parseSimpleListInCompute<dynamic>(
         data,
-        fromJson,
+        typedFromJson,
       );
       return result as T;
     }
 
     // 2. Если данные - это ОБЪЕКТ
     if (data is Map<String, dynamic>) {
-      final dynamic result = await _parseSimpleObjectInCompute(data, fromJson);
+      final dynamic result = await _parseSimpleObjectInCompute<dynamic>(
+        data,
+        typedFromJson,
+      );
       return result as T;
     }
 
@@ -143,9 +161,9 @@ class ResponseParser {
       // JSON-массив
       if (trimmedData.startsWith('[') && trimmedData.endsWith(']')) {
         final List<dynamic> listData = await _decodeListInCompute(trimmedData);
-        final List<dynamic> result = await _parseSimpleListInCompute(
+        final List<dynamic> result = await _parseSimpleListInCompute<dynamic>(
           listData,
-          fromJson,
+          typedFromJson,
         );
         return result as T;
       }
@@ -154,9 +172,9 @@ class ResponseParser {
         final Map<String, dynamic> jsonData = await _decodeObjectInCompute(
           trimmedData,
         );
-        final dynamic result = await _parseSimpleObjectInCompute(
+        final dynamic result = await _parseSimpleObjectInCompute<dynamic>(
           jsonData,
-          fromJson,
+          typedFromJson,
         );
         return result as T;
       }
@@ -210,27 +228,40 @@ class ResponseParser {
 
   Future<T> _parseSimpleObjectInCompute<T>(
     Map<String, dynamic> data,
-    T Function(Map<String, dynamic>) fromJson,
+    Function fromJson,
   ) async {
     if (data.length > 50 && !kIsWeb) {
       return compute(
         _parseSimpleObject<T>,
-        ParseSimpleParams<T>(data, fromJson),
+        ParseSimpleParams<T>(
+          data,
+          fromJson as T Function(Map<String, dynamic>),
+        ),
       );
     }
-    return _parseSimpleObject<T>(ParseSimpleParams<T>(data, fromJson));
+    return _parseSimpleObject<T>(
+      ParseSimpleParams<T>(data, fromJson as T Function(Map<String, dynamic>)),
+    );
   }
 
   Future<List<T>> _parseSimpleListInCompute<T>(
     List<dynamic> data,
-    T Function(Map<String, dynamic>) fromJson,
+    Function fromJson,
   ) async {
     if (data.length > 100 && !kIsWeb) {
       return compute(
         _parseSimpleList<T>,
-        ParseSimpleListParams<T>(data, fromJson),
+        ParseSimpleListParams<T>(
+          data,
+          fromJson as T Function(Map<String, dynamic>),
+        ),
       );
     }
-    return _parseSimpleList<T>(ParseSimpleListParams<T>(data, fromJson));
+    return _parseSimpleList<T>(
+      ParseSimpleListParams<T>(
+        data,
+        fromJson as T Function(Map<String, dynamic>),
+      ),
+    );
   }
 }

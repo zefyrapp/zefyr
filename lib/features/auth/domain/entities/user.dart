@@ -2,12 +2,12 @@ class UserEntity {
   const UserEntity({
     required this.id,
     required this.email,
-    required this.name,
+    this.name,
     this.avatar,
   });
   final String id;
   final String email;
-  final String name;
+  final String? name;
   final String? avatar;
 
   @override

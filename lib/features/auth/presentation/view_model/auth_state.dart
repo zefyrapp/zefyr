@@ -1,4 +1,4 @@
-import 'package:zefyr/features/auth/domain/entities/user.dart';
+import 'package:zefyr/features/auth/data/models/auth_response.dart';
 
 sealed class AuthState {
   const AuthState();
@@ -14,7 +14,7 @@ class AuthLoading extends AuthState {
 
 class AuthAuthenticated extends AuthState {
   const AuthAuthenticated(this.user);
-  final UserEntity user;
+  final AuthResponse user;
 }
 
 class AuthUnauthenticated extends AuthState {

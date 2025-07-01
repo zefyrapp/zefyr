@@ -5,7 +5,7 @@ class UserModel extends UserEntity {
   const UserModel({
     required super.id,
     required super.email,
-    required super.name,
+    super.name,
     super.avatar,
   });
 

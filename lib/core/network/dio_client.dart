@@ -14,7 +14,6 @@ import 'package:zefyr/core/network/interceptors/retry_interceptor.dart';
 import 'package:zefyr/core/network/models/api_response.dart';
 import 'package:zefyr/core/network/network_info.dart';
 import 'package:zefyr/core/network/parsers/response_parser.dart';
-import 'package:zefyr/features/auth/data/models/api_response.dart';
 
 part 'dio_client.g.dart';
 
@@ -230,7 +229,7 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
+      return await _parseResponse<T>(response, fromJson);
     } catch (e) {
       throw _handleError(e);
     }
@@ -254,7 +253,7 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
+      return await _parseResponse<T>(response, fromJson);
     } catch (e) {
       throw _handleError(e);
     }
@@ -278,7 +277,7 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
+      return await _parseResponse<T>(response, fromJson);
     } catch (e) {
       throw _handleError(e);
     }
@@ -302,7 +301,7 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
+      return await _parseResponse<T>(response, fromJson);
     } catch (e) {
       throw _handleError(e);
     }
@@ -326,7 +325,7 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
+      return await _parseResponse<T>(response, fromJson);
     } catch (e) {
       throw _handleError(e);
     }
@@ -376,7 +375,7 @@ class DioClient {
         cancelToken: cancelToken,
       );
 
-      return await _parseResponse<T>(response, fromJson, useApiWrapper: false);
+      return await _parseResponse<T>(response, fromJson);
     } catch (e) {
       throw _handleError(e);
     }
@@ -422,7 +421,6 @@ class DioClient {
     final result = await _parser.parseResponse<ApiResponse<T>>(
       response,
       fromJson: fromJson,
-      useApiResponseWrapper: true,
     );
 
     // Проверяем success в ApiResponse
@@ -433,16 +431,44 @@ class DioClient {
     return result;
   }
 
-  /// Универсальный парсинг ответа через compute
-  Future<T> _parseResponse<T>(
+  Future<ApiListResponse<T>> _parseApiListResponse<T>(
     Response<dynamic> response,
     T Function(Map<String, dynamic>)? fromJson,
   ) async {
+    // Проверяем статус код
     if (response.statusCode != null && response.statusCode! >= 400) {
       throw _createHttpException(response);
     }
 
-    return _parser.parseResponse<T>(response, fromJson: fromJson);
+    // Парсим через ResponseParser
+    final result = await _parser.parseResponse<ApiListResponse<T>>(
+      response,
+      fromJson: fromJson,
+    );
+
+    // Проверяем success в ApiListResponse
+    if (!result.isSuccess) {
+      throw ApiResponseException(result.message, errors: result.errors);
+    }
+
+    return result;
+  }
+
+  /// Универсальный парсинг ответа через compute
+  Future<T> _parseResponse<T>(
+    Response<dynamic> response,
+    T Function(Map<String, dynamic>)? fromJson, {
+    bool useApiWrapper = false,
+  }) async {
+    if (response.statusCode != null && response.statusCode! >= 400) {
+      throw _createHttpException(response);
+    }
+
+    return _parser.parseResponse<T>(
+      response,
+      fromJson: fromJson,
+      useApiResponseWrapper: useApiWrapper,
+    );
   }
 
   /// Обработка ошибок

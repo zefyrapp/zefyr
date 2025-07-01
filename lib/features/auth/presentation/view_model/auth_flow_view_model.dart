@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_redundant_argument_values
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
@@ -143,6 +144,8 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
       await _authViewModel.register(
         state.formData.email!,
         state.formData.password!,
+        DateFormat('yyyy-MM-dd').format(state.formData.birthDate!),
+
         name,
       );
 

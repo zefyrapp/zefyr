@@ -21,6 +21,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
   final LogoutUser _logoutUser;
   final RegisterUser _registerUser;
   final LoginWithGoogle _loginWithGoogle;
+
   Future<void> login(String email, String password) async {
     state = const AuthLoading();
 
@@ -34,11 +35,21 @@ class AuthViewModel extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> register(String email, String password, String name) async {
+  Future<void> register(
+    String email,
+    String password,
+    String dateOfBirth,
+    String? name,
+  ) async {
     state = const AuthLoading();
 
     final result = await _registerUser(
-      RegisterParams(email: email, password: password, name: name),
+      RegisterParams(
+        email: email,
+        password: password,
+        dateOfBirth: dateOfBirth,
+        name: name,
+      ),
     );
 
     result.fold(
