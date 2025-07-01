@@ -159,6 +159,7 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
       } else if (authState is AuthAuthenticated) {
         state = state.copyWith(isLoading: false);
         // Успешная регистрация - навигация обрабатывается в основном приложении
+        
       }
     } catch (e) {
       state = state.copyWith(

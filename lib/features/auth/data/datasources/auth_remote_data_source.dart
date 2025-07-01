@@ -51,8 +51,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String dateOfBirth,
     String? name,
-  }) async => _handle<AuthResponse>(() async {
-    final response = await client.postWithApiResponse<AuthResponse>(
+  }) async => _handle<AuthResponse>(
+    () async => (await client.postWithApiResponse<AuthResponse>(
       '/api/auth/register/',
       data: {
         'email': email,
@@ -61,9 +61,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'nickname': name,
       },
       fromJson: AuthResponse.fromMap,
-    );
-    return response.data!;
-  });
+    )).data!,
+  );
 
   @override
   Future<AuthResponse> refresh({required String refreshToken}) async =>
@@ -79,9 +78,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     // Реализация выхода из системы
   }
 
-  T _handle<T>(Future<T> Function() f) {
+  Future<T> _handle<T>(Future<T> Function() f) async {
     try {
-      return f.call() as T;
+      return f.call();
     } catch (e) {
       throw _handleException(e);
     }

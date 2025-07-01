@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/services/redirect_service.dart';
 import 'package:zefyr/core/utils/fade_transition/fade_transition.dart';
+import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/presentation/view/auth_flow_view.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
 import 'package:zefyr/features/explore/presentation/view/explore_view.dart';
 import 'package:zefyr/features/home/presentation/view/home_view.dart';
@@ -19,14 +22,44 @@ part 'router.g.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
+class AuthNotifier extends ChangeNotifier {
+  AuthNotifier(this._stream) {
+    _subscription = _stream.listen((_) {
+      if (!_disposed) {
+        notifyListeners();
+      }
+    });
+  }
+  final Stream<dynamic> _stream;
+  late final StreamSubscription<dynamic> _subscription;
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   final shellNavigatorKey = GlobalKey<NavigatorState>();
+  final authStateStream = ref.watch(authStateChangesProvider.stream);
+  final authNotifier = AuthNotifier(authStateStream);
+
+  ref.onDispose(() {
+    authNotifier.dispose();
+  });
 
   final router = GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: true,
+
+    redirect: (context, state) =>
+        RedirectService().authRedirect(ref: ref, state: state),
+
     observers: [MyNavigatorObserver()],
     routes: [
       StatefulShellRoute.indexedStack(
@@ -144,5 +177,20 @@ class MyNavigatorObserver extends NavigatorObserver {
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     log('Replaced route: ${newRoute?.settings.name}');
+  }
+}
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }

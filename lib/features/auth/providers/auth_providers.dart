@@ -6,6 +6,7 @@ import 'package:zefyr/features/auth/data/datasources/auth_local_data_source.dart
 import 'package:zefyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/google_signIn_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
+import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:zefyr/features/auth/domain/repositories/auth_repository.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
@@ -71,3 +72,8 @@ final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>(
     loginWithGoogle: ref.read(loginWithGoogleProvider),
   ),
 );
+@riverpod
+Stream<UserModel?> authStateChanges(Ref ref) {
+  final authDataSource = ref.watch(authLocalDataSourceProvider);
+  return authDataSource.watchUserOnly();
+}

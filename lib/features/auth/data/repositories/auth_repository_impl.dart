@@ -50,8 +50,8 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       await localDataSource.cacheUser(user);
       return Right(user);
-    } on ServerException {
-      return const Left(ServerFailure());
+    }  catch (e) {
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 

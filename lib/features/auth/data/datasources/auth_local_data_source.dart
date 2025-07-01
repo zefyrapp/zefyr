@@ -11,6 +11,7 @@ abstract class AuthLocalDataSource {
   Future<String?> getRefreshToken();
   Future<bool> isAuthenticated();
   Future<void> updateTokens(AuthResponse authResponse);
+  Stream<UserModel?> watchUserOnly();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -58,4 +59,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       refreshToken: authResponse.refreshToken,
     );
   }
+
+  @override
+  Stream<UserModel?> watchUserOnly() => userDao.watchUserOnly();
 }

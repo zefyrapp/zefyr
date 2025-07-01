@@ -59,6 +59,13 @@ class UserDao {
     return row == null ? null : UserModel.fromDrift(row);
   }
 
+  /// Получает только данные пользователя без токенов
+  /// Стрим, отслеживающий изменения пользователя без токенов
+  Stream<UserModel?> watchUserOnly() => db
+        .select(db.users)
+        .watchSingleOrNull()
+        .map((row) => row == null ? null : UserModel.fromDrift(row));
+
   /// Получает только токены без данных пользователя
   Future<AuthToken?> getTokensOnly() async =>
       db.select(db.authTokens).getSingleOrNull();
