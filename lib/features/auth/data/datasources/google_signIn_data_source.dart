@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 const List<String> _scopes = <String>[
-  'email',
-  'profile',
+  'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/userinfo.email',
   'openid',
-  // Добавьте дополнительные scope, если нужно
 ];
 
 abstract class GoogleSignInDataSource {
@@ -24,9 +24,10 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
     await _signIn.initialize(
-      clientId: dotenv.get('GoogleClientID'),
+      //  clientId: dotenv.get('GoogleClientID'),
       serverClientId: dotenv.get('GoogleClientSecret'),
     );
+    await _signIn.signOut();
     // Можно подписаться на события, если нужно
     // _googleSignIn.authenticationEvents.listen(...);
     await _signIn.attemptLightweightAuthentication();
@@ -37,12 +38,28 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   Future<GoogleSignInAccount?> signIn() async {
     try {
       await _ensureInitialized();
-      await _signIn.signOut(); // всегда чистим предыдущую сессию
-      final account = await _signIn.authenticate(scopeHint: _scopes);
-      _currentUser = account;
-      return account;
+      await _signIn.signOut();
+      if (_signIn.supportsAuthenticate()) {
+        final account = await _signIn.authenticate(scopeHint: _scopes);
+        _currentUser = account;
+      } else {
+        _signIn.authenticationEvents.listen((event) async {
+          final GoogleSignInAccount? user = switch (event) {
+            GoogleSignInAuthenticationEventSignIn() => event.user,
+            GoogleSignInAuthenticationEventSignOut() => null,
+          };
+          _currentUser = user;
+          final GoogleSignInClientAuthorization? authorization = await user
+              ?.authorizationClient
+              .authorizationForScopes(_scopes);
+          if (authorization != null) {
+            log('Authorization successful: ${authorization.accessToken}');
+          }
+        });
+      }
+      return _currentUser;
     } catch (e) {
-      debugPrint('Google sign-in error: $e');
+      log('Google sign-in error: $e');
       return null;
     }
   }

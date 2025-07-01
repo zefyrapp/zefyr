@@ -22,7 +22,7 @@ class AuthView extends StatelessWidget {
       backgroundColor: color.backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
               const SizedBox(height: 194),

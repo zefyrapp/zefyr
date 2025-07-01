@@ -50,7 +50,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       await localDataSource.cacheUser(user);
       return Right(user);
-    }  catch (e) {
+    } catch (e) {
       return Left(AuthFailure(message: e.toString()));
     }
   }
@@ -86,17 +86,12 @@ class AuthRepositoryImpl implements AuthRepository {
       // Получите email пользователя через id_token или userinfo endpoint
       // Здесь пример получения id_token:
       final idToken = client.authentication.idToken;
-      // TODO: отправьте idToken на ваш backend для верификации и получения UserEntity
-      // Пример:
-      // final user = await remoteDataSource.loginWithGoogle(idToken);
-      // await localDataSource.cacheUser(user);
-      // return Right(user);
-      return const Left(
-        AuthFailure(
-          message:
-              'Google sign-in flow не завершён (добавьте backend обработку)',
-        ),
-      );
+      if (idToken == null) {
+        return const Left(AuthFailure(message: 'Failed to get ID token'));
+      }
+      final user = await remoteDataSource.googleSignIn(accessToken: idToken);
+      await localDataSource.cacheUser(user);
+      return Right(user);
     } catch (e) {
       return Left(AuthFailure(message: e.toString()));
     }
