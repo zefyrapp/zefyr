@@ -45,6 +45,7 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
     final local = context.localization;
     return Scaffold(
       backgroundColor: color.backgroundColor,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: color.backgroundColor,
         leading: IconButton(
@@ -157,22 +158,25 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
                 const SizedBox(height: 16),
 
                 // Кнопки с доменами почт
-                Row(
-                  spacing: 8,
-                  children: [
-                    _EmailDomainButton(
-                      domain: '@gmail.com',
-                      onTap: () => _appendEmailDomain('@gmail.com'),
-                    ),
-                    _EmailDomainButton(
-                      domain: '@hotmail.com',
-                      onTap: () => _appendEmailDomain('@hotmail.com'),
-                    ),
-                    _EmailDomainButton(
-                      domain: '@yahoo.com',
-                      onTap: () => _appendEmailDomain('@yahoo.com'),
-                    ),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      _EmailDomainButton(
+                        domain: '@gmail.com',
+                        onTap: () => _appendEmailDomain('@gmail.com'),
+                      ),
+                      _EmailDomainButton(
+                        domain: '@hotmail.com',
+                        onTap: () => _appendEmailDomain('@hotmail.com'),
+                      ),
+                      _EmailDomainButton(
+                        domain: '@yahoo.com',
+                        onTap: () => _appendEmailDomain('@yahoo.com'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -220,25 +224,24 @@ class _EmailDomainButton extends StatelessWidget {
 class _DotText extends StatelessWidget {
   const _DotText({required this.text, super.key});
   final String text;
+
   @override
   Widget build(BuildContext context) => Row(
-    spacing: 12,
     children: [
-      Container(
-        height: 5,
-        width: 5,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Color(0xff6B7280),
-        ),
+      const Text(
+        '•',
+        style: TextStyle(fontSize: 18, color: Color(0xff6B7280), height: 1.55),
       ),
-      Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.w400,
-          fontSize: 13,
-          height: 20 / 13,
-          color: Color(0xff9CA3AF),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 13,
+            height: 20 / 13,
+            color: Color(0xff9CA3AF),
+          ),
         ),
       ),
     ],

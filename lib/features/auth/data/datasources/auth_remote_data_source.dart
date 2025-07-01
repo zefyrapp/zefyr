@@ -39,10 +39,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
   }) async => _handle<AuthResponse>(
-    () async => client.post<AuthResponse>(
+    () async => (await client.postWithApiResponse<AuthResponse>(
       '/api/auth/login/',
       data: {'email': email, 'password': password},
-    ),
+      fromJson: AuthResponse.fromMap,
+    )).data!,
   );
 
   @override
