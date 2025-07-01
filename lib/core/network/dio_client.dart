@@ -418,9 +418,13 @@ class DioClient {
     }
 
     // Парсим через ResponseParser
+    // Указываем, что нужно использовать ApiResponse обертку
     final result = await _parser.parseResponse<ApiResponse<T>>(
       response,
-      fromJson: fromJson,
+      fromJson: fromJson != null
+          ? (Map<String, dynamic> json) =>
+                ApiResponse<T>.fromJson(json, fromJsonT: fromJson)
+          : null,
     );
 
     // Проверяем success в ApiResponse
@@ -441,9 +445,13 @@ class DioClient {
     }
 
     // Парсим через ResponseParser
+    // Указываем, что нужно использовать ApiResponse обертку
     final result = await _parser.parseResponse<ApiListResponse<T>>(
       response,
-      fromJson: ApiListResponse<T>.fromJson,
+      fromJson: fromJson != null
+          ? (Map<String, dynamic> json) =>
+                ApiListResponse<T>.fromJson(json, fromJsonT: fromJson)
+          : null,
     );
 
     // Проверяем success в ApiListResponse
