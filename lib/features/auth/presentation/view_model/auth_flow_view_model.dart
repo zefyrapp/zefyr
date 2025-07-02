@@ -69,17 +69,7 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
   void _navigateToStep(AuthStep step) {
     state = state.copyWith(currentStep: step, errorMessage: null);
     final pageIndex = _getPageIndex(step);
-    // Используем WidgetsBinding для отложенной навигации
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_pageController.hasClients) {
-        // _pageController.animateToPage(
-        //   pageIndex,
-        //   duration: const Duration(milliseconds: 100),
-        //   curve: Curves.easeInOut,
-        // );
-        _pageController.jumpToPage(pageIndex);
-      }
-    });
+    _pageController.jumpToPage(pageIndex);
   }
 
   // Получение индекса страницы для PageView
@@ -159,7 +149,6 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
       } else if (authState is AuthAuthenticated) {
         state = state.copyWith(isLoading: false);
         // Успешная регистрация - навигация обрабатывается в основном приложении
-        
       }
     } catch (e) {
       state = state.copyWith(
