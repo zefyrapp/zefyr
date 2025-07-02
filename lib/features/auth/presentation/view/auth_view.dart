@@ -109,7 +109,7 @@ class AuthView extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                           height: 24 / 16,
-                          color: Colors.red,
+                          color: Colors.red, 
                         ),
                       ),
                     ],
