@@ -63,7 +63,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAccount => 'Create account';
 
   @override
-  String get termsConditionsText => 'By continuing to use an account related to the ';
+  String get termsConditionsText =>
+      'By continuing to use an account related to the ';
 
   @override
   String get termsOfUse => 'Terms of Use ';
@@ -75,7 +76,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regionKazakhstan => 'Kazakhstan';
 
   @override
-  String get youAcceptAndConfirm => ', you accept and confirm that you have read the « ';
+  String get youAcceptAndConfirm =>
+      ', you accept and confirm that you have read the « ';
 
   @override
   String get privacyPolicy => 'Privacy Policy';
@@ -84,7 +86,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endQuote => '».';
 
   @override
-  String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy) {
+  String termsAndPrivacyFullText(
+    String termsOfUse,
+    String region,
+    String privacyPolicy,
+  ) {
     return 'By continuing to use an account related to the $termsOfUse for the region $region, you accept and confirm that you have read the « $privacyPolicy».';
   }
 
@@ -92,7 +98,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get birthDateTitle => 'When is your birthday?';
 
   @override
-  String get birthDateDescription => 'We won\'t show your birthday to other users.';
+  String get birthDateDescription =>
+      'We won\'t show your birthday to other users.';
 
   @override
   String get birthDateLabel => 'Birthday';
@@ -137,7 +144,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get december => 'December';
 
   @override
-  String get emailPasswordPrompt => 'Enter your email address and create a password';
+  String get emailPasswordPrompt =>
+      'Enter your email address and create a password';
 
   @override
   String get enterEmail => 'Enter email address';
@@ -152,7 +160,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordLength => '8 characters (no more than 20)';
 
   @override
-  String get passwordRequirements => '1 letter, 1 number, 1 special character (# ? ! @)';
+  String get passwordRequirements =>
+      '1 letter, 1 number, 1 special character (# ? ! @)';
 
   @override
   String get strongPassword => 'Strong password';
@@ -173,14 +182,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createNickname => 'Create a nickname';
 
   @override
-  String get nicknameDescription => 'Enter any nickname you like. If you skip this step, you will be automatically assigned a default nickname. You can change it later.';
+  String get nicknameDescription =>
+      'Enter any nickname you like. If you skip this step, you will be automatically assigned a default nickname. You can change it later.';
 
   @override
   String get enterNickname => 'Enter nickname';
 
   @override
-  String get passwordLengthError => 'Password must be between 8 and 20 characters';
+  String get passwordLengthError =>
+      'Password must be between 8 and 20 characters';
 
   @override
-  String get passwordShouldContainAll => 'Password must contain at least one letter, one number, and one special character';
+  String get passwordShouldContainAll =>
+      'Password must contain at least one letter, one number, and one special character';
+
+  @override
+  String get streamSetup => 'Stream Setup';
+
+  @override
+  String get streamTitle => 'Stream Title';
+
+  @override
+  String get enterStreamTitle => 'Enter stream title';
+
+  @override
+  String get enterStreamTitleError => 'Please enter stream title';
+
+  @override
+  String get streamDescription => 'Stream Description';
+
+  @override
+  String get enterStreamDescription => 'Describe your stream...';
+
+  @override
+  String get streamPreviewUrl => 'Preview URL';
+
+  @override
+  String get startStream => 'Start Stream';
 }

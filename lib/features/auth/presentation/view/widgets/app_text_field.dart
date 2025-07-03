@@ -9,6 +9,9 @@ class AppTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.controller,
+    this.focusNode,
+    this.maxLines,
+    this.onFieldSubmitted,
   }) : isPassword = false,
        isNickname = false;
   const AppTextField.email({
@@ -17,6 +20,9 @@ class AppTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.controller,
+    this.focusNode,
+    this.maxLines,
+    this.onFieldSubmitted,
   }) : keyboardType = TextInputType.emailAddress,
        isPassword = false,
        isNickname = false;
@@ -26,6 +32,9 @@ class AppTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.controller,
+    this.focusNode,
+    this.maxLines,
+    this.onFieldSubmitted,
   }) : keyboardType = TextInputType.visiblePassword,
        isPassword = true,
        isNickname = false;
@@ -35,6 +44,9 @@ class AppTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.controller,
+    this.focusNode,
+    this.maxLines,
+    this.onFieldSubmitted,
   }) : keyboardType = TextInputType.text,
        isPassword = false,
        isNickname = true;
@@ -45,6 +57,9 @@ class AppTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final bool isPassword;
   final bool isNickname;
+  final FocusNode? focusNode;
+  final int? maxLines;
+  final ValueChanged<String>? onFieldSubmitted;
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
@@ -78,19 +93,21 @@ class _AppTextFieldState extends State<AppTextField> {
       builder: (field) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 58,
+          DecoratedBox(
+            // height: 58,
             decoration: BoxDecoration(
               color: color.textFieldBackgroundColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: TextField(
+            child: TextFormField(
               controller: _controller,
               keyboardType: widget.keyboardType,
               style: TextStyle(color: color.white),
+              focusNode: widget.focusNode,
               obscureText: _obscureText,
               cursorHeight: 16,
               cursorWidth: 4,
+              maxLines: widget.maxLines ?? 1,
               maxLength: widget.isNickname ? _nicknameMaxLength : null,
               decoration: InputDecoration(
                 counterText: '',
@@ -137,6 +154,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 if (widget.isNickname) setState(() {});
                 widget.onChanged?.call(value);
               },
+              onFieldSubmitted: widget.onFieldSubmitted,
             ),
           ),
           if (field.errorText != null && field.errorText!.isNotEmpty)

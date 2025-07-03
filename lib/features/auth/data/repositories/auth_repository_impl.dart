@@ -5,7 +5,6 @@ import 'package:zefyr/features/auth/data/datasources/auth_local_data_source.dart
 import 'package:zefyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/google_signIn_data_source.dart';
 import 'package:zefyr/features/auth/data/models/auth_response.dart';
-import 'package:zefyr/features/auth/domain/entities/user.dart';
 import 'package:zefyr/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {

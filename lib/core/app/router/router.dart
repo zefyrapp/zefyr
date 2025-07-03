@@ -14,6 +14,7 @@ import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
 import 'package:zefyr/features/explore/presentation/view/explore_view.dart';
 import 'package:zefyr/features/home/presentation/view/home_view.dart';
 import 'package:zefyr/features/live/presentation/view/live_view.dart';
+import 'package:zefyr/features/live/presentation/view/on_air/on_air_view.dart';
 import 'package:zefyr/features/main_view.dart';
 import 'package:zefyr/features/mission/presentation/view/mission_view.dart';
 import 'package:zefyr/features/profile/presentation/view/profile_view.dart';
@@ -99,6 +100,15 @@ GoRouter router(Ref ref) {
                   key: state.pageKey,
                   child: const LiveView(),
                 ),
+                routes: [
+                  GoRoute(
+                    path: 'onAir',
+                    pageBuilder: (context, state) => FadeTransitionPage(
+                      key: state.pageKey,
+                      child: const OnAirView(),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -63,7 +63,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createAccount => 'Создать аккаунт';
 
   @override
-  String get termsConditionsText => 'Продолжая пользоваться аккаунтом, относящимся ';
+  String get termsConditionsText =>
+      'Продолжая пользоваться аккаунтом, относящимся ';
 
   @override
   String get termsOfUse => 'Условия использования ';
@@ -75,7 +76,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get regionKazakhstan => 'Казахстан';
 
   @override
-  String get youAcceptAndConfirm => ', вы принимаете и подтверждаете, что ознакомились с документом « ';
+  String get youAcceptAndConfirm =>
+      ', вы принимаете и подтверждаете, что ознакомились с документом « ';
 
   @override
   String get privacyPolicy => 'Политику конфиденциальности';
@@ -84,7 +86,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get endQuote => '».';
 
   @override
-  String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy) {
+  String termsAndPrivacyFullText(
+    String termsOfUse,
+    String region,
+    String privacyPolicy,
+  ) {
     return 'Продолжая пользоваться аккаунтом, относящимся $termsOfUse к региону $region, вы принимаете и подтверждаете, что ознакомились с документом « $privacyPolicy».';
   }
 
@@ -92,7 +98,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get birthDateTitle => 'Когда у вас день рождения?';
 
   @override
-  String get birthDateDescription => 'Мы не покажем ваш день рождения другим пользователям.';
+  String get birthDateDescription =>
+      'Мы не покажем ваш день рождения другим пользователям.';
 
   @override
   String get birthDateLabel => 'День рождения';
@@ -137,7 +144,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get december => 'Декабря';
 
   @override
-  String get emailPasswordPrompt => 'Введите адрес эл. почты и придумайте пароль';
+  String get emailPasswordPrompt =>
+      'Введите адрес эл. почты и придумайте пароль';
 
   @override
   String get enterEmail => 'Введите электронную почту';
@@ -152,7 +160,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get passwordLength => '8 символов (не более 20)';
 
   @override
-  String get passwordRequirements => '1 буква, 1 цифра, 1 специальный символ (# ? ! @)';
+  String get passwordRequirements =>
+      '1 буква, 1 цифра, 1 специальный символ (# ? ! @)';
 
   @override
   String get strongPassword => 'Надежный пароль';
@@ -173,7 +182,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createNickname => 'Создайте никнейм';
 
   @override
-  String get nicknameDescription => 'Укажите любой никнейм, который вам нравится. Если пропустить этот шаг, вам будет автоматически присвоен стандартный никнейм. Его можно будет изменить позже.';
+  String get nicknameDescription =>
+      'Укажите любой никнейм, который вам нравится. Если пропустить этот шаг, вам будет автоматически присвоен стандартный никнейм. Его можно будет изменить позже.';
 
   @override
   String get enterNickname => 'Введите никнейм';
@@ -182,5 +192,30 @@ class AppLocalizationsRu extends AppLocalizations {
   String get passwordLengthError => 'Пароль должен быть от 8 до 20 символов';
 
   @override
-  String get passwordShouldContainAll => 'Пароль должен содержать хотя бы одну букву, цифру и специальный символ';
+  String get passwordShouldContainAll =>
+      'Пароль должен содержать хотя бы одну букву, цифру и специальный символ';
+
+  @override
+  String get streamSetup => 'Настройка стрима';
+
+  @override
+  String get streamTitle => 'Название стрима';
+
+  @override
+  String get enterStreamTitle => 'Введите название стрима';
+
+  @override
+  String get enterStreamTitleError => 'Пожалуйста, введите название стрима';
+
+  @override
+  String get streamDescription => 'Описание';
+
+  @override
+  String get enterStreamDescription => 'Опишите ваш стрим...';
+
+  @override
+  String get streamPreviewUrl => 'URL превью';
+
+  @override
+  String get startStream => 'Начать стрим';
 }

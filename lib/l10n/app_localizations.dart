@@ -62,7 +62,8 @@ import 'app_localizations_ru.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('ru')
+    Locale('ru'),
   ];
 
   /// No description provided for @home.
@@ -249,7 +252,11 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'By continuing to use an account related to the {termsOfUse} for the region {region}, you accept and confirm that you have read the « {privacyPolicy}».'**
-  String termsAndPrivacyFullText(String termsOfUse, String region, String privacyPolicy);
+  String termsAndPrivacyFullText(
+    String termsOfUse,
+    String region,
+    String privacyPolicy,
+  );
 
   /// No description provided for @birthDateTitle.
   ///
@@ -442,9 +449,58 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must contain at least one letter, one number, and one special character'**
   String get passwordShouldContainAll;
+
+  /// No description provided for @streamSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Stream Setup'**
+  String get streamSetup;
+
+  /// No description provided for @streamTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stream Title'**
+  String get streamTitle;
+
+  /// No description provided for @enterStreamTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter stream title'**
+  String get enterStreamTitle;
+
+  /// No description provided for @enterStreamTitleError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter stream title'**
+  String get enterStreamTitleError;
+
+  /// No description provided for @streamDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Stream Description'**
+  String get streamDescription;
+
+  /// No description provided for @enterStreamDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your stream...'**
+  String get enterStreamDescription;
+
+  /// No description provided for @streamPreviewUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview URL'**
+  String get streamPreviewUrl;
+
+  /// No description provided for @startStream.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Stream'**
+  String get startStream;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -453,25 +509,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'ru'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'ru': return AppLocalizationsRu();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'ru':
+      return AppLocalizationsRu();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }
