@@ -29,10 +29,7 @@ class RetryInterceptor extends Interceptor {
             .copyWith(extra: extra)
             .request();
         return handler.resolve(response);
-      } catch (e) {
-        // Если повтор не удался, передаем исходную ошибку
-        handler.reject(err);
-      }
+      } catch (e) {}
     }
 
     handler.next(err);

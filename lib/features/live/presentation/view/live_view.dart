@@ -1,28 +1,20 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
+import 'package:zefyr/features/live/data/models/stream_create_response.dart';
+import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
+import 'package:zefyr/features/live/providers/stream_providers.dart';
 
-class StreamData {
-  StreamData({
-    required this.title,
-    required this.description,
-    required this.previewUrl,
-  });
-  String title;
-  String description;
-  String previewUrl;
-}
-
-class LiveView extends StatefulWidget {
+class LiveView extends ConsumerStatefulWidget {
   const LiveView({super.key});
 
   @override
-  State<LiveView> createState() => _LiveViewScreenState();
+  ConsumerState<LiveView> createState() => _LiveViewScreenState();
 }
 
-class _LiveViewScreenState extends State<LiveView> {
+class _LiveViewScreenState extends ConsumerState<LiveView> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -41,27 +33,66 @@ class _LiveViewScreenState extends State<LiveView> {
     super.dispose();
   }
 
-  void _goToStreamScreen() {
-    if (_formKey.currentState!.validate()) {
-      final streamData = StreamData(
-        title: _titleController.text,
-        description: _descriptionController.text,
-        previewUrl: _previewUrlController.text,
-      );
+  Future<void> _createStream() async {
+    // Обновляем состояние формы с текущими значениями
+    ref
+        .read(streamFormProvider.notifier)
+        .updateAll(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          previewUrl: _previewUrlController.text,
+        );
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StreamScreen(streamData: streamData),
-        ),
-      );
+    final formState = ref.read(streamFormProvider);
+
+    if (_formKey.currentState!.validate() && formState.canCreateStream) {
+      final request = formState.toRequest();
+      await ref.read(streamViewModelProvider.notifier).createNewStream(request);
     }
+  }
+
+  void _navigateToStreamScreen(StreamCreateResponse response) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StreamScreen(streamResponse: response),
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.grey)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = context.customTheme.overlayApp;
     final local = context.localization;
+    final streamState = ref.watch(streamViewModelProvider);
+    final formState = ref.watch(streamFormProvider);
+    // Слушаем изменения стейта для навигации и показа ошибок
+    ref.listen<StreamViewState>(streamViewModelProvider, (previous, next) {
+      if (next is StreamStateSuccess) {
+        // Сбрасываем форму после успешного создания стрима
+        ref.read(streamFormProvider.notifier).reset();
+        _navigateToStreamScreen(next.stream);
+      } else if (next is StreamStateError) {
+        _showErrorDialog(next.message);
+      }
+    });
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -152,17 +183,11 @@ class _LiveViewScreenState extends State<LiveView> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed:
-                      // authFlowState.isLoading
-                      //     ? null
-                      //     :
-                      _goToStreamScreen,
+                  onPressed: streamState.isLoading ? null : _createStream,
                   style: theme.elevatedStyle,
-                  child:
-                      //  authFlowState.isLoading
-                      //     ? const CircularProgressIndicator()
-                      //     :
-                      Text(local.startStream, style: theme.elevatedTextStyle),
+                  child: streamState.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(local.startStream, style: theme.elevatedTextStyle),
                 ),
               ),
             ],
@@ -174,8 +199,8 @@ class _LiveViewScreenState extends State<LiveView> {
 }
 
 class StreamScreen extends StatelessWidget {
-  const StreamScreen({required this.streamData, super.key});
-  final StreamData streamData;
+  const StreamScreen({required this.streamResponse, super.key});
+  final StreamCreateResponse streamResponse;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -209,7 +234,7 @@ class StreamScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        streamData.title,
+                        streamResponse.stream.title,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -217,9 +242,9 @@ class StreamScreen extends StatelessWidget {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (streamData.description.isNotEmpty)
+                      if (streamResponse.stream.description.isNotEmpty)
                         Text(
-                          streamData.description,
+                          streamResponse.stream.description,
                           style: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 14,

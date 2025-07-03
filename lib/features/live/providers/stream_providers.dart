@@ -4,6 +4,8 @@ import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/features/live/data/datasources/stream_data_source.dart';
 import 'package:zefyr/features/live/data/repositories/stream_repository_impl.dart';
 import 'package:zefyr/features/live/domain/entities/repositories/stream_repository.dart';
+import 'package:zefyr/features/live/presentation/view_model/stream_form_model.dart';
+import 'package:zefyr/features/live/presentation/view_model/stream_form_state.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
 import 'package:zefyr/features/live/usecases/create_stream.dart';
@@ -14,7 +16,7 @@ part 'stream_providers.g.dart';
 // DataSources
 @riverpod
 StreamDataSource streamDataSource(Ref ref) =>
-    StreamDataSourceImpl(ref.watch(dioClientProvider));
+    StreamDataSourceImpl(ref.watch(dioClientProvider), ref);
 
 // Repository
 @riverpod
@@ -35,4 +37,10 @@ final streamViewModelProvider =
         createStream: ref.read(createStreamProvider),
         endStream: ref.read(endStreamProvider),
       ),
+    );
+
+/// Провайдер состояния формы создания стрима
+final streamFormProvider =
+    StateNotifierProvider<StreamFormNotifier, StreamFormState>(
+      (ref) => StreamFormNotifier(),
     );

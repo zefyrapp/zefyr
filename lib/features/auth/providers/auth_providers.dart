@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/database/database.dart';
 import 'package:zefyr/core/network/dio_client.dart';
+import 'package:zefyr/core/services/token_manager.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/google_signIn_data_source.dart';
@@ -33,6 +34,8 @@ AppDatabase appDatabase(Ref ref) {
 @riverpod
 UserDao userDao(Ref ref) => UserDao(ref.watch(appDatabaseProvider));
 
+@riverpod
+TokenManager tokenManager(Ref ref) => TokenManager(ref.watch(userDaoProvider));
 @riverpod
 AuthLocalDataSource authLocalDataSource(Ref ref) =>
     AuthLocalDataSourceImpl(ref.watch(userDaoProvider));

@@ -59,6 +59,23 @@ final userDaoProvider = AutoDisposeProvider<UserDao>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UserDaoRef = AutoDisposeProviderRef<UserDao>;
+String _$tokenManagerHash() => r'2213be3ea204e758f5501235811f6f1bef9b92e8';
+
+/// See also [tokenManager].
+@ProviderFor(tokenManager)
+final tokenManagerProvider = AutoDisposeProvider<TokenManager>.internal(
+  tokenManager,
+  name: r'tokenManagerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$tokenManagerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TokenManagerRef = AutoDisposeProviderRef<TokenManager>;
 String _$authLocalDataSourceHash() =>
     r'f028234e90cb86381634289baf430f9c96aa6792';
 
