@@ -13,7 +13,9 @@ class AuthResponse {
   factory AuthResponse.fromMap(Map<String, dynamic> map) => AuthResponse(
     accessToken: map['access_token'] as String,
     refreshToken: map['refresh_token'] as String,
-    user: UserModel.fromJson(map['user'] as Map<String, dynamic>),
+    user: map['user'] != null
+        ? UserModel.fromJson(map['user'] as Map<String, dynamic>)
+        : null,
   );
 
   factory AuthResponse.fromJson(String source) =>

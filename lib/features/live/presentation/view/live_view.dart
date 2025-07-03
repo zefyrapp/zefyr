@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:toastification/toastification.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
@@ -52,28 +54,27 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
   }
 
   void _navigateToStreamScreen(StreamCreateResponse response) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => StreamScreen(streamResponse: response),
-      ),
+    context.push(
+      '${GoRouterState.of(context).fullPath}/onAir',
+      extra: response,
     );
   }
 
   void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
-        content: Text(message, style: const TextStyle(color: Colors.grey)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+    Toastification().show(
+      title: Text(
+        message,
+        style: const TextStyle(
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
+          height: 20 / 12,
+          color: Colors.white,
+        ),
       ),
+      type: ToastificationType.error,
+      style: ToastificationStyle.fillColored,
+      primaryColor: const Color(0x9E5B687B),
+      autoCloseDuration: const Duration(seconds: 3),
     );
   }
 

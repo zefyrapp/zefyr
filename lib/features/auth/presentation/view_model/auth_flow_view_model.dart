@@ -1,8 +1,7 @@
-// ignore_for_file: avoid_redundant_argument_values
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:toastification/toastification.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_view_model.dart';
@@ -26,7 +25,7 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
 
   // Устанавливаем тип потока (login/register) и переходим к вводу email
   void setFlowType(AuthFlowType type) {
-    state = state.copyWith(flowType: type, errorMessage: null);
+    state = state.copyWith(flowType: type, canResetError: true);
     _navigateToStep(
       type == AuthFlowType.login ? AuthStep.emailLogin : AuthStep.emailInput,
     );
@@ -34,7 +33,7 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
 
   // Обновляем данные формы
   void updateFormData(AuthFormData data) {
-    state = state.copyWith(formData: data, errorMessage: null);
+    state = state.copyWith(formData: data, canResetError: true);
   }
 
   // Переход к следующему шагу
@@ -67,7 +66,7 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
 
   // Навигация к определенному шагу
   void _navigateToStep(AuthStep step) {
-    state = state.copyWith(currentStep: step, errorMessage: null);
+    state = state.copyWith(currentStep: step, canResetError: true);
     final pageIndex = _getPageIndex(step);
     _pageController.jumpToPage(pageIndex);
   }
@@ -89,7 +88,7 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
       return;
     }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       await _authViewModel.login(
@@ -123,13 +122,13 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
       return;
     }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       // Используем nickname или email как имя, если nickname не указан
       final name = state.formData.nickname?.isNotEmpty ?? false
           ? state.formData.nickname!
-          : state.formData.email!.split('@').first;
+          : "${state.formData.email!.split('@').first}_${state.formData.email!.split('@').first.hashCode}";
 
       await _authViewModel.register(
         state.formData.email!,
@@ -155,6 +154,63 @@ class AuthFlowViewModel extends _$AuthFlowViewModel {
         isLoading: false,
         errorMessage: 'Произошла ошибка при регистрации',
       );
+    }
+  }
+
+  Future<bool> checkEmail(String email) async {
+    state = state.copyWith(isLoading: true, canResetError: true);
+    final authState = await ref
+        .read(authViewModelProvider.notifier)
+        .checkEmail(email);
+
+    if (authState is AuthError) {
+      // Если произошла ошибка при проверке email - отображаем ее
+      // и сбрасываем состояние загрузки
+      // и возращаем false
+      state = state.copyWith(isLoading: false, errorMessage: authState.message);
+      Toastification().show(
+        title: Text(
+          authState.message,
+          style: const TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            height: 20 / 12,
+            color: Colors.white,
+          ),
+        ),
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        primaryColor: const Color(0x9E5B687B),
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+      return true;
+    } else if (authState is AuthEmailExists) {
+      // Если email уже существует, отображаем сообщение и сбрасываем состояние загрузки
+      // Возвращаем true, если email существует, иначе false
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: !authState.exists ? authState.message : null,
+      );
+      Toastification().show(
+        title: Text(
+          authState.message,
+          style: const TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            height: 20 / 12,
+            color: Colors.white,
+          ),
+        ),
+        style: ToastificationStyle.fillColored,
+        type: ToastificationType.error,
+        primaryColor: const Color(0x9E5B687B),
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+      return !authState.exists;
+    } else {
+      state = state.copyWith(isLoading: false);
+
+      return false;
     }
   }
 

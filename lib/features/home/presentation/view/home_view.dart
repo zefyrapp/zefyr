@@ -13,7 +13,6 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = context.customTheme.overlayApp;
-
     return Scaffold(
       backgroundColor: color.black,
       body: CustomScrollView(

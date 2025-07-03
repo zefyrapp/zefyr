@@ -100,15 +100,6 @@ GoRouter router(Ref ref) {
                   key: state.pageKey,
                   child: const LiveView(),
                 ),
-                routes: [
-                  GoRoute(
-                    path: 'onAir',
-                    pageBuilder: (context, state) => FadeTransitionPage(
-                      key: state.pageKey,
-                      child: const OnAirView(),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
@@ -151,6 +142,11 @@ GoRouter router(Ref ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: 'onAir',
+        pageBuilder: (context, state) =>
+            FadeTransitionPage(key: state.pageKey, child: const OnAirView()),
       ),
       GoRoute(
         path: '/auth',

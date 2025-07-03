@@ -136,28 +136,28 @@ class GeneralFailure extends Failure {
 /// Утилита для преобразования исключений в ошибки
 class FailureMapper {
   static Failure mapExceptionToFailure(
-    Exception exception,
+    AppException exception,
   ) => switch (exception.runtimeType) {
-    const (ServerException) => ServerFailure(message: exception.toString()),
-    const (NetworkException) => NetworkFailure(message: exception.toString()),
-    const (CacheException) => CacheFailure(message: exception.toString()),
+    const (ServerException) => ServerFailure(message: exception.message),
+    const (NetworkException) => NetworkFailure(message: exception.message),
+    const (CacheException) => CacheFailure(message: exception.message),
     const (ValidationException) => ValidationFailure(
-      message: exception.toString(),
+      message: exception.message,
     ),
-    const (AuthException) => AuthFailure(message: exception.toString()),
+    const (AuthException) => AuthFailure(message: exception.message),
     const (PermissionException) => PermissionFailure(
-      message: exception.toString(),
+      message: exception.message,
     ),
-    const (TimeoutException) => TimeoutFailure(message: exception.toString()),
-    const (FormatException) => FormatFailure(message: exception.toString()),
-    const (NotFoundException) => NotFoundFailure(message: exception.toString()),
-    const (ConflictException) => ConflictFailure(message: exception.toString()),
+    const (TimeoutException) => TimeoutFailure(message: exception.message),
+    const (FormatException) => FormatFailure(message: exception.message),
+    const (NotFoundException) => NotFoundFailure(message: exception.message),
+    const (ConflictException) => ConflictFailure(message: exception.message),
     const (LimitExceededException) => LimitExceededFailure(
-      message: exception.toString(),
+      message: exception.message,
     ),
     const (ServiceUnavailableException) => ServiceUnavailableFailure(
-      message: exception.toString(),
+      message: exception.message,
     ),
-    _ => GeneralFailure(message: exception.toString()),
+    _ => GeneralFailure(message: exception.message),
   };
 }

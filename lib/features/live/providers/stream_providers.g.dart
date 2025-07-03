@@ -6,7 +6,7 @@ part of 'stream_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamDataSourceHash() => r'c3f1705dc34bc43f031f2d866aa0fe0bff186064';
+String _$streamDataSourceHash() => r'5abb196bca92bee44ab2bb57948e1f983862123e';
 
 /// See also [streamDataSource].
 @ProviderFor(streamDataSource)

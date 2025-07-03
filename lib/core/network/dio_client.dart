@@ -14,13 +14,18 @@ import 'package:zefyr/core/network/interceptors/retry_interceptor.dart';
 import 'package:zefyr/core/network/models/api_response.dart';
 import 'package:zefyr/core/network/network_info.dart';
 import 'package:zefyr/core/network/parsers/response_parser.dart';
+import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
 
 part 'dio_client.g.dart';
 
 /// Провайдер для DioClient
 @Riverpod(keepAlive: true)
-DioClient dioClient(Ref ref) =>
-    DioClient(networkInfo: ref.watch(networkInfoProvider));
+DioClient dioClient(Ref ref) => DioClient(
+  networkInfo: ref.watch(networkInfoProvider),
+  userDao: ref.watch(userDaoProvider),
+  ref: ref,
+);
 
 /// Провайдер для NetworkInfo
 @Riverpod(keepAlive: true)
@@ -30,11 +35,15 @@ NetworkInfo networkInfo(Ref ref) => NetworkInfoImpl(Connectivity());
 class DioClient {
   DioClient({
     required NetworkInfo networkInfo,
+    required UserDao userDao,
+    required Ref ref,
     String? baseUrl,
     Duration? connectTimeout,
     Duration? receiveTimeout,
     Duration? sendTimeout,
-  }) : _networkInfo = networkInfo {
+  }) : _networkInfo = networkInfo,
+       _userDao = userDao,
+       _ref = ref {
     _dio = Dio(
       BaseOptions(
         baseUrl:
@@ -55,13 +64,16 @@ class DioClient {
 
   late final Dio _dio;
   final NetworkInfo _networkInfo;
+  final UserDao _userDao;
+  final Ref _ref;
   final ResponseParser _parser = ResponseParser();
 
   /// Настройка интерцепторов
   void _setupInterceptors() {
     _dio.interceptors.addAll([
+      AuthInterceptor(userDao: _userDao, ref: _ref),
       NetworkInterceptor(_networkInfo),
-      AuthInterceptor(),
+
       RetryInterceptor(),
       if (kDebugMode) LoggingInterceptor(),
     ]);
@@ -565,12 +577,16 @@ class DioClient {
     try {
       final data = response.data;
       if (data is Map<String, dynamic>) {
-        return data['message'] as String? ??
-            data['error'] as String? ??
-            data['msg'] as String? ??
-            'Ошибка HTTP ${response.statusCode}';
+        if (data['errors'] != null) {
+          final resp = ApiResponse<dynamic>.fromJson(data);
+          return resp.firstValidationError ?? resp.message;
+        } else {
+          return data['message'] as String? ??
+              data['msg'] as String? ??
+              'Ошибка HTTP ${response.statusCode}';
+        }
       }
-      return data?.toString() ?? 'Ошибка HTTP ${response.statusCode}';
+      return data.toString();
     } catch (e) {
       return 'Ошибка HTTP ${response.statusCode}';
     }

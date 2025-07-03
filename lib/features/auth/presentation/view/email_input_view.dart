@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +8,7 @@ import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
 
 class EmailInputView extends ConsumerStatefulWidget {
   const EmailInputView({super.key});
@@ -135,15 +138,23 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
                   child: ElevatedButton(
                     onPressed: authFlowState.isLoading
                         ? null
-                        : () {
+                        : () async {
                             if (_formKey.currentState!.validate()) {
-                              authFlowViewModel.updateFormData(
-                                authFlowState.formData.copyWith(
-                                  email: _emailController.text.trim(),
-                                  password: _passwordController.text.trim(),
-                                ),
-                              );
-                              authFlowViewModel.nextStep();
+                              final isEmailExists = await authFlowViewModel
+                                  .checkEmail(_emailController.text.trim());
+                              if (isEmailExists) {
+                                return;
+                              } else {
+                                // Если email не существует, обновляем данные формы и переходим к следующему шагу
+                                authFlowViewModel.updateFormData(
+                                  authFlowState.formData.copyWith(
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text.trim(),
+                                  ),
+                                );
+
+                                authFlowViewModel.nextStep();
+                              }
                             }
                           },
                     style: color.elevatedStyle,

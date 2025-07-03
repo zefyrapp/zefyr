@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:zefyr/core/error/failures.dart';
+import 'package:zefyr/core/network/models/api_response.dart';
 import 'package:zefyr/core/usecases/usecases.dart';
 import 'package:zefyr/features/auth/domain/repositories/auth_repository.dart';
 
@@ -8,8 +9,9 @@ class CheckEmail implements UseCase<void, CheckEmailParams> {
   final AuthRepository repository;
 
   @override
-  Future<Either<Failure, bool>> call(CheckEmailParams params) async =>
-      repository.checkEmail(email: params.email);
+  Future<Either<Failure, ApiResponse<dynamic>>> call(
+    CheckEmailParams params,
+  ) async => repository.checkEmail(email: params.email);
 }
 
 class CheckEmailParams {

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:zefyr/common/exceptions/repository_helper.dart';
 import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/core/error/failures.dart';
 import 'package:zefyr/features/live/data/datasources/stream_data_source.dart';
@@ -13,22 +14,11 @@ class StreamRepositoryImpl implements StreamRepository {
   @override
   Future<Either<Failure, StreamCreateResponse>> createStream(
     StreamCreateRequest request,
-  ) async {
-    try {
-      final response = await dataSource.createStream(request: request);
-      return Right(response);
-    } on ServerException {
-      return const Left(ServerFailure());
-    }
-  }
+  ) async => RepositoryHelper.safeCall(
+    () async => dataSource.createStream(request: request),
+  );
 
   @override
-  Future<Either<Failure, void>> stopStream(String streamId) async {
-    try {
-      await dataSource.stopStream(streamId);
-      return const Right(null);
-    } on ServerException {
-      return const Left(ServerFailure());
-    }
-  }
+  Future<Either<Failure, void>> stopStream(String streamId) async =>
+      RepositoryHelper.safeCall(() async => dataSource.stopStream(streamId));
 }

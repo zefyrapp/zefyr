@@ -200,6 +200,23 @@ final loginWithGoogleProvider = AutoDisposeProvider<LoginWithGoogle>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LoginWithGoogleRef = AutoDisposeProviderRef<LoginWithGoogle>;
+String _$checkEmailHash() => r'803130868b456e3ff6b75c98d49d5d266736a958';
+
+/// See also [checkEmail].
+@ProviderFor(checkEmail)
+final checkEmailProvider = AutoDisposeProvider<CheckEmail>.internal(
+  checkEmail,
+  name: r'checkEmailProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$checkEmailHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CheckEmailRef = AutoDisposeProviderRef<CheckEmail>;
 String _$authStateChangesHash() => r'88e3f29762c8f4b0608caee92eecf63c874d4fd2';
 
 /// See also [authStateChanges].

@@ -12,6 +12,7 @@ import 'package:zefyr/features/auth/data/repositories/auth_repository_impl.dart'
 import 'package:zefyr/features/auth/domain/repositories/auth_repository.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:zefyr/features/auth/usecases/check_email.dart';
 import 'package:zefyr/features/auth/usecases/login_user.dart';
 import 'package:zefyr/features/auth/usecases/login_with_google.dart';
 import 'package:zefyr/features/auth/usecases/logout_user.dart';
@@ -67,12 +68,16 @@ RegisterUser registerUser(Ref ref) =>
 LoginWithGoogle loginWithGoogle(Ref ref) =>
     LoginWithGoogle(ref.watch(authRepositoryProvider));
 
+@riverpod
+CheckEmail checkEmail(Ref ref) => CheckEmail(ref.watch(authRepositoryProvider));
+
 final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>(
   (ref) => AuthViewModel(
     loginUser: ref.read(loginUserProvider),
     logoutUser: ref.read(logoutUserProvider),
     registerUser: ref.read(registerUserProvider),
     loginWithGoogle: ref.read(loginWithGoogleProvider),
+    checkEmail: ref.watch(checkEmailProvider),
   ),
 );
 @riverpod

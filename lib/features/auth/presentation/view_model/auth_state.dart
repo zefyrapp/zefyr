@@ -25,3 +25,9 @@ class AuthError extends AuthState {
   const AuthError(this.message);
   final String message;
 }
+
+class AuthEmailExists extends AuthState {
+  const AuthEmailExists({required this.exists, required this.message});
+  final bool exists;
+  final String message;
+}
