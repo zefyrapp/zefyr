@@ -32,7 +32,7 @@ CreateStream createStream(Ref ref) =>
 EndStream endStream(Ref ref) => EndStream(ref.watch(streamRepositoryProvider));
 
 final streamViewModelProvider =
-    StateNotifierProvider<StreamViewModel, StreamViewState>(
+    AutoDisposeStateNotifierProvider<StreamViewModel, StreamViewState>(
       (ref) => StreamViewModel(
         createStream: ref.read(createStreamProvider),
         endStream: ref.read(endStreamProvider),
@@ -41,6 +41,6 @@ final streamViewModelProvider =
 
 /// Провайдер состояния формы создания стрима
 final streamFormProvider =
-    StateNotifierProvider<StreamFormNotifier, StreamFormState>(
+    AutoDisposeStateNotifierProvider<StreamFormNotifier, StreamFormState>(
       (ref) => StreamFormNotifier(),
     );

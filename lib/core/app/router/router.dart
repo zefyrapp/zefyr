@@ -14,7 +14,9 @@ import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
 import 'package:zefyr/features/explore/presentation/view/explore_view.dart';
 import 'package:zefyr/features/home/presentation/view/home_view.dart';
 import 'package:zefyr/features/live/presentation/view/live_view.dart';
+import 'package:zefyr/features/live/presentation/view/local_participant/local_participan_view.dart';
 import 'package:zefyr/features/live/presentation/view/on_air/on_air_view.dart';
+import 'package:zefyr/features/live/presentation/view/remote_participant/remote_participant_view.dart';
 import 'package:zefyr/features/main_view.dart';
 import 'package:zefyr/features/mission/presentation/view/mission_view.dart';
 import 'package:zefyr/features/profile/presentation/view/profile_view.dart';
@@ -147,6 +149,22 @@ GoRouter router(Ref ref) {
         path: '/onAir',
         pageBuilder: (context, state) =>
             FadeTransitionPage(key: state.pageKey, child: const OnAirView()),
+        routes: [
+          GoRoute(
+            path: 'localParticipant',
+            pageBuilder: (context, state) => FadeTransitionPage(
+              key: state.pageKey,
+              child: const LocalParticipanView(),
+            ),
+          ),
+          GoRoute(
+            path: 'remoteParticipant',
+            pageBuilder: (context, state) => FadeTransitionPage(
+              key: state.pageKey,
+              child: const RemoteParticipantView(),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: '/auth',

@@ -1,8 +1,12 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/features/live/data/services/camera_service.dart';
+import 'package:zefyr/features/live/presentation/view_model/on_air_view_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
+import 'package:zefyr/features/live/providers/on_air_providers.dart';
 import 'package:zefyr/features/live/providers/stream_providers.dart';
 
 class OnAirView extends ConsumerStatefulWidget {
@@ -12,230 +16,73 @@ class OnAirView extends ConsumerStatefulWidget {
   ConsumerState<OnAirView> createState() => _OnAirViewState();
 }
 
-class _OnAirViewState extends ConsumerState<OnAirView> {
-  CameraController? _cameraController;
-  bool _isCameraInitialized = false;
-  bool _isPermissionGranted = false;
-  bool _isLoading = true;
-  String _errorMessage = '';
-
+class _OnAirViewState extends ConsumerState<OnAirView>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeOnAir();
+    });
   }
 
-  Future<void> _initializeCamera() async {
-    try {
-      // Запрашиваем разрешение на камеру
-      final cameraPermission = await Permission.camera.request();
-      final microphonePermission = await Permission.microphone.request();
+  void _initializeOnAir() {
+    // Инициализируем камеру
+    ref.read(onAirViewModelProvider.notifier).initializeCamera();
 
-      if (cameraPermission.isGranted && microphonePermission.isGranted) {
-        setState(() {
-          _isPermissionGranted = true;
-        });
+    // Получаем информацию о стриме из основного провайдера
+    final streamState = ref.read(streamViewModelProvider);
+    if (streamState is StreamStateSuccess) {
+      ref
+          .read(onAirViewModelProvider.notifier)
+          .setStreamResponse(streamState.stream);
+    }
+  }
 
-        // Получаем доступные камеры
-        final cameras = await availableCameras();
-        if (cameras.isNotEmpty) {
-          // Используем переднюю камеру, если доступна
-          final frontCamera = cameras.firstWhere(
-            (camera) => camera.lensDirection == CameraLensDirection.front,
-            orElse: () => cameras.first,
-          );
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final onAirPod = ref.read(onAirViewModelProvider);
+    if (onAirPod.cameraState.controller == null ||
+        !onAirPod.cameraState.controller!.value.isInitialized) {
+      return;
+    }
 
-          // Инициализируем контроллер камеры
-          _cameraController = CameraController(
-            frontCamera,
-            ResolutionPreset.medium,
-            enableAudio: true,
-          );
-
-          await _cameraController!.initialize();
-
-          setState(() {
-            _isCameraInitialized = true;
-            _isLoading = false;
-          });
-        } else {
-          setState(() {
-            _errorMessage = 'Камера не найдена';
-            _isLoading = false;
-          });
-        }
-      } else {
-        setState(() {
-          _errorMessage =
-              'Необходимо разрешение на использование камеры и микрофона';
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Ошибка инициализации камеры: $e';
-        _isLoading = false;
-      });
+    if (state == AppLifecycleState.inactive) {
+      ref.read(onAirViewModelProvider.notifier).disposeCamera();
+    } else if (state == AppLifecycleState.resumed) {
+      ref.read(onAirViewModelProvider.notifier).retryInitialization();
     }
   }
 
   @override
   void dispose() {
-    _cameraController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final model = ref.watch(streamViewModelProvider) as StreamStateSuccess;
+    final onAirState = ref.watch(onAirViewModelProvider);
+    final streamState = ref.watch(streamViewModelProvider);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
           // Основной контент стрима
-          _buildCameraPreview(),
+          _buildCameraPreview(onAirState.cameraState),
 
           // Верхняя панель с информацией о стриме
-          SafeArea(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          model.stream.stream.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          model.stream.stream.description,
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 14,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Статус LIVE или ГОТОВ
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _isCameraInitialized ? Colors.green : Colors.grey,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      _isCameraInitialized ? 'ГОТОВ' : 'НАСТРОЙКА',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildTopBar(context, streamState, onAirState),
 
-          // Нижняя панель с кнопкой "Выйти в эфир"
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Кнопка "Выйти в эфир"
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isCameraInitialized
-                            ? () {
-                                _showGoLiveDialog(context);
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isCameraInitialized
-                              ? Colors.purple
-                              : Colors.grey,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _isCameraInitialized
-                                  ? Icons.videocam
-                                  : Icons.videocam_off,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _isCameraInitialized
-                                  ? 'Выйти в эфир'
-                                  : 'Настройка камеры...',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Кнопка повтора инициализации при ошибке
-                    if (_errorMessage.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _isLoading = true;
-                            _errorMessage = '';
-                          });
-                          _initializeCamera();
-                        },
-                        child: const Text(
-                          'Повторить',
-                          style: TextStyle(color: Colors.purple),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Нижняя панель с кнопками управления
+          _buildBottomPanel(context, onAirState),
         ],
       ),
     );
   }
 
-  Widget _buildCameraPreview() {
-    if (_isLoading) {
+  Widget _buildCameraPreview(CameraState cameraState) {
+    if (cameraState.isInitializing) {
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -256,7 +103,9 @@ class _OnAirViewState extends ConsumerState<OnAirView> {
       );
     }
 
-    if (_errorMessage.isNotEmpty) {
+    if (cameraState.hasError ||
+        cameraState.hasNoPermission ||
+        cameraState.noCameraFound) {
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -265,19 +114,19 @@ class _OnAirViewState extends ConsumerState<OnAirView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 64),
+              Icon(_getErrorIcon(cameraState), color: Colors.red, size: 64),
               const SizedBox(height: 16),
               Text(
-                _errorMessage,
+                cameraState.errorMessage ?? 'Неизвестная ошибка',
                 style: const TextStyle(color: Colors.white, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              if (!_isPermissionGranted)
+              if (cameraState.hasNoPermission)
                 ElevatedButton(
-                  onPressed: () async {
-                    await openAppSettings();
-                  },
+                  onPressed: () => ref
+                      .read(onAirViewModelProvider.notifier)
+                      .openAppSettings(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple,
                   ),
@@ -292,8 +141,8 @@ class _OnAirViewState extends ConsumerState<OnAirView> {
       );
     }
 
-    if (_isCameraInitialized && _cameraController != null) {
-      return SizedBox.expand(child: CameraPreview(_cameraController!));
+    if (cameraState.isReady && cameraState.controller != null) {
+      return SizedBox.expand(child: CameraPreview(cameraState.controller!));
     }
 
     return Container(
@@ -304,6 +153,189 @@ class _OnAirViewState extends ConsumerState<OnAirView> {
         child: Icon(Icons.videocam_off, size: 100, color: Colors.grey),
       ),
     );
+  }
+
+  Widget _buildTopBar(
+    BuildContext context,
+    StreamViewState streamState,
+    OnAirState onAirState,
+  ) => SafeArea(
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          const SizedBox(width: 8),
+          if (streamState is StreamStateSuccess) ...[
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    streamState.stream.stream.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    streamState.stream.stream.description,
+                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+          // Статус стрима
+          _buildStatusBadge(onAirState),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildStatusBadge(OnAirState onAirState) {
+    String statusText;
+    Color statusColor;
+
+    if (onAirState.streamState.isLive) {
+      statusText = 'LIVE';
+      statusColor = Colors.red;
+    } else if (onAirState.canGoLive) {
+      statusText = 'ГОТОВ';
+      statusColor = Colors.green;
+    } else {
+      statusText = 'НАСТРОЙКА';
+      statusColor = Colors.grey;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: statusColor,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        statusText,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomPanel(
+    BuildContext context,
+    OnAirState onAirState,
+  ) => SafeArea(
+    child: Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Главная кнопка действия
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                onPressed: _getMainButtonAction(onAirState),
+                style: context.customTheme.overlayApp.elevatedStyle.copyWith(
+                  backgroundColor: WidgetStateColor.resolveWith((state) {
+                    if (!onAirState.canGoLive) return Colors.grey;
+                    return const Color(0xff9972F4);
+                  }),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _getMainButtonIcon(onAirState),
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _getMainButtonText(onAirState),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        height: 1,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Кнопка повтора при ошибке
+            if (onAirState.cameraState.hasError) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => ref
+                    .read(onAirViewModelProvider.notifier)
+                    .retryInitialization(),
+                child: const Text(
+                  'Повторить',
+                  style: TextStyle(color: Colors.purple),
+                ),
+              ),
+            ],
+
+            // Кнопка завершения стрима
+            if (onAirState.streamState.isLive) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => _showEndStreamDialog(context),
+                child: const Text(
+                  'Завершить стрим',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    ),
+  );
+
+  IconData _getErrorIcon(CameraState cameraState) {
+    if (cameraState.hasNoPermission) return Icons.security;
+    if (cameraState.noCameraFound) return Icons.videocam_off;
+    return Icons.error_outline;
+  }
+
+  VoidCallback? _getMainButtonAction(OnAirState onAirState) {
+    if (onAirState.streamState.isLive) return null;
+    if (onAirState.canGoLive) return () => _showGoLiveDialog(context);
+    if (onAirState.cameraState.hasError) {
+      return () =>
+          ref.read(onAirViewModelProvider.notifier).retryInitialization();
+    }
+    return null;
+  }
+
+  IconData _getMainButtonIcon(OnAirState onAirState) {
+    if (onAirState.streamState.isLive) return Icons.stop;
+    if (onAirState.canGoLive) return Icons.videocam;
+    return Icons.videocam_off;
+  }
+
+  String _getMainButtonText(OnAirState onAirState) {
+    if (onAirState.streamState.isLive) return 'В ЭФИРЕ';
+    if (onAirState.canGoLive) return 'Выйти в эфир';
+    if (onAirState.cameraState.hasError) return 'Повторить настройку';
+    return 'Настройка...';
   }
 
   void _showGoLiveDialog(BuildContext context) {
@@ -325,11 +357,7 @@ class _OnAirViewState extends ConsumerState<OnAirView> {
             child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // Здесь можно добавить логику начала стрима
-              _startStreaming();
-            },
+            onPressed: () => context.pushReplacement('/onAir/localParticipant'),
             child: const Text('Начать', style: TextStyle(color: Colors.purple)),
           ),
         ],
@@ -337,9 +365,34 @@ class _OnAirViewState extends ConsumerState<OnAirView> {
     );
   }
 
-  void _startStreaming() {
-    // Здесь будет логика начала стрима
-    // Например, начать запись или передачу видео на сервер
-    print('Стрим начат!');
+  void _showEndStreamDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          'Завершить стрим?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Вы уверены, что хотите завершить трансляцию?',
+          style: TextStyle(color: Colors.grey),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ref.read(onAirViewModelProvider.notifier).endStreaming();
+              Navigator.of(context).pop(); // Возвращаемся к предыдущему экрану
+            },
+            child: const Text('Завершить', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -71,15 +71,16 @@ LoginWithGoogle loginWithGoogle(Ref ref) =>
 @riverpod
 CheckEmail checkEmail(Ref ref) => CheckEmail(ref.watch(authRepositoryProvider));
 
-final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>(
-  (ref) => AuthViewModel(
-    loginUser: ref.read(loginUserProvider),
-    logoutUser: ref.read(logoutUserProvider),
-    registerUser: ref.read(registerUserProvider),
-    loginWithGoogle: ref.read(loginWithGoogleProvider),
-    checkEmail: ref.watch(checkEmailProvider),
-  ),
-);
+final authViewModelProvider =
+    AutoDisposeStateNotifierProvider<AuthViewModel, AuthState>(
+      (ref) => AuthViewModel(
+        loginUser: ref.read(loginUserProvider),
+        logoutUser: ref.read(logoutUserProvider),
+        registerUser: ref.read(registerUserProvider),
+        loginWithGoogle: ref.read(loginWithGoogleProvider),
+        checkEmail: ref.watch(checkEmailProvider),
+      ),
+    );
 @riverpod
 Stream<UserModel?> authStateChanges(Ref ref) {
   final authDataSource = ref.watch(authLocalDataSourceProvider);

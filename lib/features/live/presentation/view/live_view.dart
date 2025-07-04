@@ -37,25 +37,24 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
 
   Future<void> _createStream() async {
     // Обновляем состояние формы с текущими значениями
-    // ref
-    //     .read(streamFormProvider.notifier)
-    //     .updateAll(
-    //       title: _titleController.text,
-    //       description: _descriptionController.text,
-    //       previewUrl: _previewUrlController.text,
-    //     );
+    ref
+        .read(streamFormProvider.notifier)
+        .updateAll(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          previewUrl: _previewUrlController.text,
+        );
 
-    // final formState = ref.read(streamFormProvider);
+    final formState = ref.read(streamFormProvider);
 
-    // if (_formKey.currentState!.validate() && formState.canCreateStream) {
-    //   final request = formState.toRequest();
-    //   await ref.read(streamViewModelProvider.notifier).createNewStream(request);
-    // }
-    _navigateToStreamScreen();
+    if (_formKey.currentState!.validate() && formState.canCreateStream) {
+      final request = formState.toRequest();
+      await ref.read(streamViewModelProvider.notifier).createNewStream(request);
+    }
   }
 
   void _navigateToStreamScreen() {
-    context.push('/onAir');
+    context.push('/onAir',);
   }
 
   void _showErrorDialog(String message) {
@@ -82,16 +81,16 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
     final local = context.localization;
     final streamState = ref.watch(streamViewModelProvider);
     final formState = ref.watch(streamFormProvider);
-    // // Слушаем изменения стейта для навигации и показа ошибок
-    // ref.listen<StreamViewState>(streamViewModelProvider, (previous, next) {
-    //   if (next is StreamStateSuccess) {
-    //     // Сбрасываем форму после успешного создания стрима
-    //     ref.read(streamFormProvider.notifier).reset();
-    //     _navigateToStreamScreen(next.stream);
-    //   } else if (next is StreamStateError) {
-    //     _showErrorDialog(next.message);
-    //   }
-    // });
+    // Слушаем изменения стейта для навигации и показа ошибок
+    ref.listen<StreamViewState>(streamViewModelProvider, (previous, next) {
+      if (next is StreamStateSuccess) {
+        // Сбрасываем форму после успешного создания стрима
+        ref.read(streamFormProvider.notifier).reset();
+        _navigateToStreamScreen();
+      } else if (next is StreamStateError) {
+        _showErrorDialog(next.message);
+      }
+    });
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
