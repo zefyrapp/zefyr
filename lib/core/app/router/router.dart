@@ -144,7 +144,7 @@ GoRouter router(Ref ref) {
         ],
       ),
       GoRoute(
-        path: 'onAir',
+        path: '/onAir',
         pageBuilder: (context, state) =>
             FadeTransitionPage(key: state.pageKey, child: const OnAirView()),
       ),

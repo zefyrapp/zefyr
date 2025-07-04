@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/features/live/data/datasources/stream_data_source.dart';
 import 'package:zefyr/features/live/data/repositories/stream_repository_impl.dart';
-import 'package:zefyr/features/live/domain/entities/repositories/stream_repository.dart';
+import 'package:zefyr/features/live/domain/repositories/stream_repository.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_form_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_form_state.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_model.dart';

@@ -9,10 +9,10 @@ class StreamModel {
     required this.status,
     required this.viewersCount,
     required this.coinsCount,
-    required this.startedAt,
     required this.owner,
     required this.ownerNickname,
     required this.createdAt,
+    this.startedAt,
     this.endedAt,
   });
 
@@ -24,13 +24,15 @@ class StreamModel {
     status: map['status'] as String,
     viewersCount: map['viewers_count'] as int,
     coinsCount: map['coins_count'] as int,
-    startedAt: DateTime.fromMillisecondsSinceEpoch(map['started_at'] as int),
+    startedAt: map['ended_at'] != null
+        ? DateTime.parse(map['started_at'] as String)
+        : null,
     endedAt: map['ended_at'] != null
-        ? DateTime.fromMillisecondsSinceEpoch(map['ended_at'] as int)
+        ? DateTime.parse(map['ended_at'] as String)
         : null,
     owner: map['owner'] as String,
     ownerNickname: map['owner_nickname'] as String,
-    createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+    createdAt: DateTime.parse(map['created_at'] as String),
   );
 
   factory StreamModel.fromJson(String source) =>
@@ -42,7 +44,7 @@ class StreamModel {
   final String status;
   final int viewersCount;
   final int coinsCount;
-  final DateTime startedAt;
+  final DateTime? startedAt;
   final DateTime? endedAt;
 
   final String owner;
@@ -85,11 +87,11 @@ class StreamModel {
     'status': status,
     'viewers_count': viewersCount,
     'coins_count': coinsCount,
-    'started_at': startedAt.millisecondsSinceEpoch,
-    'ended_at': endedAt?.millisecondsSinceEpoch,
+    'started_at': startedAt,
+    'ended_at': endedAt,
     'owner': owner,
     'owner_nickname': ownerNickname,
-    'created_at': createdAt.millisecondsSinceEpoch,
+    'created_at': createdAt,
   };
 
   String toJson() => json.encode(toMap());

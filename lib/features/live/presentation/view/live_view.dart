@@ -37,27 +37,25 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
 
   Future<void> _createStream() async {
     // Обновляем состояние формы с текущими значениями
-    ref
-        .read(streamFormProvider.notifier)
-        .updateAll(
-          title: _titleController.text,
-          description: _descriptionController.text,
-          previewUrl: _previewUrlController.text,
-        );
+    // ref
+    //     .read(streamFormProvider.notifier)
+    //     .updateAll(
+    //       title: _titleController.text,
+    //       description: _descriptionController.text,
+    //       previewUrl: _previewUrlController.text,
+    //     );
 
-    final formState = ref.read(streamFormProvider);
+    // final formState = ref.read(streamFormProvider);
 
-    if (_formKey.currentState!.validate() && formState.canCreateStream) {
-      final request = formState.toRequest();
-      await ref.read(streamViewModelProvider.notifier).createNewStream(request);
-    }
+    // if (_formKey.currentState!.validate() && formState.canCreateStream) {
+    //   final request = formState.toRequest();
+    //   await ref.read(streamViewModelProvider.notifier).createNewStream(request);
+    // }
+    _navigateToStreamScreen();
   }
 
-  void _navigateToStreamScreen(StreamCreateResponse response) {
-    context.push(
-      '${GoRouterState.of(context).fullPath}/onAir',
-      extra: response,
-    );
+  void _navigateToStreamScreen() {
+    context.push('/onAir');
   }
 
   void _showErrorDialog(String message) {
@@ -84,16 +82,16 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
     final local = context.localization;
     final streamState = ref.watch(streamViewModelProvider);
     final formState = ref.watch(streamFormProvider);
-    // Слушаем изменения стейта для навигации и показа ошибок
-    ref.listen<StreamViewState>(streamViewModelProvider, (previous, next) {
-      if (next is StreamStateSuccess) {
-        // Сбрасываем форму после успешного создания стрима
-        ref.read(streamFormProvider.notifier).reset();
-        _navigateToStreamScreen(next.stream);
-      } else if (next is StreamStateError) {
-        _showErrorDialog(next.message);
-      }
-    });
+    // // Слушаем изменения стейта для навигации и показа ошибок
+    // ref.listen<StreamViewState>(streamViewModelProvider, (previous, next) {
+    //   if (next is StreamStateSuccess) {
+    //     // Сбрасываем форму после успешного создания стрима
+    //     ref.read(streamFormProvider.notifier).reset();
+    //     _navigateToStreamScreen(next.stream);
+    //   } else if (next is StreamStateError) {
+    //     _showErrorDialog(next.message);
+    //   }
+    // });
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -194,199 +192,6 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class StreamScreen extends StatelessWidget {
-  const StreamScreen({required this.streamResponse, super.key});
-  final StreamCreateResponse streamResponse;
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.black,
-    body: Stack(
-      children: [
-        // Основной контент стрима (здесь будет камера)
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Colors.black,
-          child: const Center(
-            child: Icon(Icons.videocam, size: 100, color: Colors.grey),
-          ),
-        ),
-
-        // Верхняя панель с информацией о стриме
-        SafeArea(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        streamResponse.stream.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (streamResponse.stream.description.isNotEmpty)
-                        Text(
-                          streamResponse.stream.description,
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 14,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
-                  ),
-                ),
-                // Статус LIVE
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'LIVE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // Нижняя панель с кнопкой "Выйти в эфир"
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Статистика стрима
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildStatItem(Icons.visibility, '2.5K'),
-                    _buildStatItem(Icons.favorite, '100'),
-                    _buildStatItem(Icons.chat, '45'),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Кнопка "Выйти в эфир"
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showEndStreamDialog(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.videocam, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Выйти в эфир',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildStatItem(IconData icon, String value) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    decoration: BoxDecoration(
-      color: Colors.black.withOpacity(0.6),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white, size: 16),
-        const SizedBox(width: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  void _showEndStreamDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text(
-          'Завершить стрим?',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: const Text(
-          'Вы уверены, что хотите завершить стрим?',
-          style: TextStyle(color: Colors.grey),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            },
-            child: const Text('Завершить', style: TextStyle(color: Colors.red)),
-          ),
-        ],
       ),
     );
   }

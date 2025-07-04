@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+<string>Приложению нужен доступ к камере для стрима</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>Приложению нужен доступ к микрофону для стрима</string>
 </dict>
 </plist>
