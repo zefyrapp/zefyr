@@ -54,4 +54,3 @@ class StreamCreateResponse {
   @override
   int get hashCode => stream.hashCode ^ token.hashCode ^ url.hashCode;
 }
-
