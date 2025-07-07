@@ -4,21 +4,23 @@ import 'package:zefyr/features/live/domain/entities/stream_model.dart';
 
 class StreamCreateResponse {
   const StreamCreateResponse({
-    required this.stream,
     required this.token,
     required this.url,
+    this.stream,
   });
 
   factory StreamCreateResponse.fromMap(Map<String, dynamic> map) =>
       StreamCreateResponse(
-        stream: StreamModel.fromMap(map['stream'] as Map<String, dynamic>),
+        stream: map['stream'] != null
+            ? StreamModel.fromMap(map['stream'] as Map<String, dynamic>)
+            : null,
         token: map['token'] as String,
         url: map['url'] as String,
       );
 
   factory StreamCreateResponse.fromJson(String source) =>
       StreamCreateResponse.fromMap(json.decode(source) as Map<String, dynamic>);
-  final StreamModel stream;
+  final StreamModel? stream;
   final String token;
   final String url;
 
@@ -33,7 +35,7 @@ class StreamCreateResponse {
   );
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-    'stream': stream.toMap(),
+    'stream': stream?.toMap(),
     'token': token,
     'url': url,
   };

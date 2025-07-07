@@ -116,12 +116,13 @@ class _StreamingListViewState extends ConsumerState<StreamingListView> {
     );
   }
 
-  void _onStreamTap(String streamId, String username) {
+  Future<void> _onStreamTap(String streamId, String username) async {
     log('$username stream tapped');
     // Get stream token and navigate to stream view
-    ref.read(homeStreamViewModelProvider.notifier).getStreamToken(streamId);
-    // Navigate to stream view
-    context.push('/stream/$streamId');
+    await ref
+        .read(homeStreamViewModelProvider.notifier)
+        .getStreamToken(streamId)
+        .whenComplete(() => context.push('/remoteParticipant',));
   }
 }
 

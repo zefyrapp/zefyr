@@ -176,7 +176,7 @@ class _OnAirViewState extends ConsumerState<OnAirView>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    streamState.stream.stream.title,
+                    streamState.stream.stream?.title ?? '',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -185,7 +185,7 @@ class _OnAirViewState extends ConsumerState<OnAirView>
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    streamState.stream.stream.description,
+                    streamState.stream.stream?.description ?? '',
                     style: TextStyle(color: Colors.grey[400], fontSize: 14),
                     overflow: TextOverflow.ellipsis,
                   ),

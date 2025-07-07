@@ -76,6 +76,7 @@ class HomeStreamViewModel extends StateNotifier<HomeStreamViewState> {
         state = state.copyWith(
           isTokenLoading: false,
           streamToken: response.token,
+          streamUrl: response.url,
         );
       },
     );
@@ -89,27 +90,8 @@ class HomeStreamViewModel extends StateNotifier<HomeStreamViewState> {
     state = state.copyWith(tokenError: null);
   }
 
-  List<StreamModel> _mapResponseToEntities(StreamListApiWrapper response) {
-    // Assuming the response has a streams field with stream data
-    // You'll need to adjust this based on your actual response structure
-    return response.results;
-    // return response.stream
-    //         ?.map(
-    //           (streamData) => StreamEntity(
-    //             id: streamData['id'] ?? '',
-    //             username: streamData['username'] ?? '',
-    //             activity: streamData['activity'] ?? '',
-    //             viewCount: streamData['viewCount'] ?? 0,
-    //             avatarUrl: streamData['avatarUrl'] ?? '',
-    //             backgroundImageUrl: streamData['backgroundImageUrl'] ?? '',
-    //             isLive: streamData['isLive'] ?? false,
-    //             categoryId: streamData['categoryId'],
-    //             category: streamData['category'],
-    //           ),
-    //         )
-    //         .toList() ??
-    //     [];
-  }
+  List<StreamModel> _mapResponseToEntities(StreamListApiWrapper response) =>
+      response.results;
 }
 
 class HomeStreamViewState {
@@ -122,6 +104,7 @@ class HomeStreamViewState {
     this.isTokenLoading = false,
     this.tokenError,
     this.streamToken,
+    this.streamUrl,
   });
 
   final List<StreamModel> streams;
@@ -132,6 +115,7 @@ class HomeStreamViewState {
   final bool isTokenLoading;
   final String? tokenError;
   final String? streamToken;
+  final String? streamUrl;
 
   HomeStreamViewState copyWith({
     List<StreamModel>? streams,
@@ -142,6 +126,7 @@ class HomeStreamViewState {
     bool? isTokenLoading,
     String? tokenError,
     String? streamToken,
+    String? streamUrl,
   }) => HomeStreamViewState(
     streams: streams ?? this.streams,
     isLoading: isLoading ?? this.isLoading,
@@ -151,5 +136,6 @@ class HomeStreamViewState {
     isTokenLoading: isTokenLoading ?? this.isTokenLoading,
     tokenError: tokenError,
     streamToken: streamToken ?? this.streamToken,
+    streamUrl: streamUrl ?? this.streamUrl,
   );
 }
