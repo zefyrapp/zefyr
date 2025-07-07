@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,6 @@ import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
 import 'package:zefyr/features/auth/usecases/enums/auth_sign_enum.dart';
-import 'package:collection/collection.dart';
 import 'package:zefyr/features/auth/usecases/privacy_text.dart';
 
 class AuthView extends StatelessWidget {

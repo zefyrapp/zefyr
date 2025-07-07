@@ -22,7 +22,7 @@ class RetryInterceptor extends Interceptor {
     if (retries < maxRetries && _shouldRetry(err)) {
       extra['retries'] = retries + 1;
 
-      await Future.delayed(retryDelay * (retries + 1));
+      await Future<void>.delayed(retryDelay * (retries + 1));
 
       try {
         final response = await err.requestOptions

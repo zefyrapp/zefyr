@@ -17,6 +17,8 @@
 ///         License:   Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
 ///         Homepage:  https://design.google.com/icons/
 ///
+library;
+
 import 'package:flutter/widgets.dart';
 
 class AppIcons {
@@ -24,72 +26,21 @@ class AppIcons {
 
   static const _kFontFam = 'AppIcons';
 
-  static const IconData archive = IconData(
-    0xe800,
-    fontFamily: _kFontFam,
-  );
-  static const IconData time = IconData(
-    0xe802,
-    fontFamily: _kFontFam,
-  );
-  static const IconData message = IconData(
-    0xe803,
-    fontFamily: _kFontFam,
-  );
-  static const IconData spectators = IconData(
-    0xe804,
-    fontFamily: _kFontFam,
-  );
-  static const IconData gift = IconData(
-    0xe805,
-    fontFamily: _kFontFam,
-  );
-  static const IconData ask = IconData(
-    0xe806,
-    fontFamily: _kFontFam,
-  );
-  static const IconData left_shefron = IconData(
-    0xe808,
-    fontFamily: _kFontFam,
-  );
-  static const IconData menu = IconData(
-    0xe809,
-    fontFamily: _kFontFam,
-  );
-  static const IconData star_7 = IconData(
-    0xe80a,
-    fontFamily: _kFontFam,
-  );
-  static const IconData left_shefron_2 = IconData(
-    0xe80b,
-    fontFamily: _kFontFam,
-  );
-  static const IconData ask2 = IconData(
-    0xe80c,
-    fontFamily: _kFontFam,
-  );
-  static const IconData mission = IconData(
-    0xe80d,
-    fontFamily: _kFontFam,
-  );
-  static const IconData compas = IconData(
-    0xe80e,
-    fontFamily: _kFontFam,
-  );
-  static const IconData share = IconData(
-    0xe80f,
-    fontFamily: _kFontFam,
-  );
-  static const IconData stream = IconData(
-    0xe810,
-    fontFamily: _kFontFam,
-  );
-  static const IconData missions = IconData(
-    0xe811,
-    fontFamily: _kFontFam,
-  );
-  static const IconData home = IconData(
-    0xe812,
-    fontFamily: _kFontFam,
-  );
+  static const IconData archive = IconData(0xe800, fontFamily: _kFontFam);
+  static const IconData time = IconData(0xe802, fontFamily: _kFontFam);
+  static const IconData message = IconData(0xe803, fontFamily: _kFontFam);
+  static const IconData spectators = IconData(0xe804, fontFamily: _kFontFam);
+  static const IconData gift = IconData(0xe805, fontFamily: _kFontFam);
+  static const IconData ask = IconData(0xe806, fontFamily: _kFontFam);
+  static const IconData leftShefron = IconData(0xe808, fontFamily: _kFontFam);
+  static const IconData menu = IconData(0xe809, fontFamily: _kFontFam);
+  static const IconData star_7 = IconData(0xe80a, fontFamily: _kFontFam);
+  static const IconData leftShefron2 = IconData(0xe80b, fontFamily: _kFontFam);
+  static const IconData ask2 = IconData(0xe80c, fontFamily: _kFontFam);
+  static const IconData mission = IconData(0xe80d, fontFamily: _kFontFam);
+  static const IconData compas = IconData(0xe80e, fontFamily: _kFontFam);
+  static const IconData share = IconData(0xe80f, fontFamily: _kFontFam);
+  static const IconData stream = IconData(0xe810, fontFamily: _kFontFam);
+  static const IconData missions = IconData(0xe811, fontFamily: _kFontFam);
+  static const IconData home = IconData(0xe812, fontFamily: _kFontFam);
 }

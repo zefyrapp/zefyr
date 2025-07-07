@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 
-import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:livekit_client/livekit_client.dart';
 
 enum LiveKitConnectionStatus {
   disconnected,
@@ -172,7 +173,7 @@ class LiveKitServiceImpl implements LiveKitService {
       );
 
       _localVideoTrack = await LocalVideoTrack.createCameraTrack(
-        _captureOptions!,
+        _captureOptions,
       );
       await _room!.localParticipant!.publishVideoTrack(_localVideoTrack!);
 
@@ -208,36 +209,36 @@ class LiveKitServiceImpl implements LiveKitService {
       ..on<RoomRecordingStatusChanged>(_onRecordingStatusChanged);
   }
 
-  void _onRoomConnected(RoomConnectedEvent event) async {
-    print('Подключились к комнате');
+  Future<void> _onRoomConnected(RoomConnectedEvent event) async {
+    log('Подключились к комнате');
   }
 
   void _onRoomDisconnected(RoomDisconnectedEvent event) {
-    print('Отключились от комнаты');
+    log('Отключились от комнаты');
   }
 
   void _onParticipantConnected(ParticipantConnectedEvent event) {
-    print('Участник подключился: ${event.participant.identity}');
+    log('Участник подключился: ${event.participant.identity}');
   }
 
   void _onParticipantDisconnected(ParticipantDisconnectedEvent event) {
-    print('Участник отключился: ${event.participant.identity}');
+    log('Участник отключился: ${event.participant.identity}');
   }
 
   void _onTrackSubscribed(TrackSubscribedEvent event) {
-    print('Подписались на трек: ${event.track.sid}');
+    log('Подписались на трек: ${event.track.sid}');
   }
 
   void _onTrackUnsubscribed(TrackUnsubscribedEvent event) {
-    print('Отписались от трека: ${event.track.sid}');
+    log('Отписались от трека: ${event.track.sid}');
   }
 
   void _onLocalTrackPublished(LocalTrackPublishedEvent event) {
-    print('Локальный трек опубликован: ${event.publication.sid}');
+    log('Локальный трек опубликован: ${event.publication.sid}');
   }
 
   void _onRecordingStatusChanged(RoomRecordingStatusChanged event) {
-    print('Статус записи изменился: ${event.activeRecording}');
+    log('Статус записи изменился: ${event.activeRecording}');
   }
 
   @override
@@ -269,7 +270,7 @@ class LiveKitServiceImpl implements LiveKitService {
     try {
       if (_localVideoTrack == null) {
         _localVideoTrack = await LocalVideoTrack.createCameraTrack(
-          _captureOptions!,
+          _captureOptions,
         );
         await _room!.localParticipant!.publishVideoTrack(_localVideoTrack!);
       } else {

@@ -121,7 +121,7 @@ class UseCaseUtils {
       if (!shouldContinue) break;
 
       if (attempt < maxRetries) {
-        await Future.delayed(delay);
+        await Future<void>.delayed(delay);
       }
     }
 

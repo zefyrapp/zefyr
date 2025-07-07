@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:zefyr/features/live/data/services/livekit_service.dart';
@@ -79,7 +81,7 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
 
   Future<void> connectAsViewer() async {
     if (state.streamUrl == null || state.streamToken == null) {
-      print('Ошибка: URL или токен стрима не найдены');
+     log('Ошибка: URL или токен стрима не найдены');
       return;
     }
 
@@ -93,10 +95,10 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
       state = state.copyWith(liveKitState: liveKitState);
 
       if (liveKitState.isConnected) {
-        print('Успешно подключились к стриму как зритель');
+       log('Успешно подключились к стриму как зритель');
       }
     } catch (e) {
-      print('Ошибка подключения к стриму: $e');
+     log('Ошибка подключения к стриму: $e');
     }
   }
 
@@ -108,9 +110,9 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
           status: LiveKitConnectionStatus.disconnected,
         ),
       );
-      print('Отключились от стрима');
+     log('Отключились от стрима');
     } catch (e) {
-      print('Ошибка отключения от стрима: $e');
+     log('Ошибка отключения от стрима: $e');
     }
   }
 

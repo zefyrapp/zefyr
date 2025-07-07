@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/features/live/data/models/stream_create_response.dart';
 import 'package:zefyr/features/live/data/services/camera_service.dart';
@@ -71,8 +73,8 @@ class OnAirViewModel extends StateNotifier<OnAirState> {
 
     // Здесь можно добавить логику начала стрима
     // например, начать передачу видео на сервер
-    print('Стрим начат с токеном: ${state.streamState.streamResponse?.token}');
-    print('URL для стрима: ${state.streamState.streamResponse?.url}');
+    log('Стрим начат с токеном: ${state.streamState.streamResponse?.token}');
+    log('URL для стрима: ${state.streamState.streamResponse?.url}');
   }
 
   Future<void> endStreaming() async {

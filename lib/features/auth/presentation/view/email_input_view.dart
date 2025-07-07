@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +6,6 @@ import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
-import 'package:zefyr/features/auth/providers/auth_providers.dart';
 
 class EmailInputView extends ConsumerStatefulWidget {
   const EmailInputView({super.key});
@@ -52,7 +49,7 @@ class _EmailInputPageState extends ConsumerState<EmailInputView> {
       appBar: AppBar(
         backgroundColor: color.backgroundColor,
         leading: IconButton(
-          icon: const Icon(AppIcons.left_shefron, size: 20),
+          icon: const Icon(AppIcons.leftShefron, size: 20),
           onPressed: authFlowViewModel.previousStep,
           color: color.white,
         ),

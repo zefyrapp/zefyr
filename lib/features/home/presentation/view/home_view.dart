@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/widgets/gradient_border_image.dart';
-import 'package:zefyr/features/home/presentation/view/streaming/streamin_list_view.dart';
+import 'package:zefyr/features/home/presentation/view/streaming/streaming_list_view.dart';
 import 'package:zefyr/features/home/presentation/view/widgets/stream_category_chips.dart';
 import 'package:zefyr/features/home/presentation/widgets/money_chip.dart';
 

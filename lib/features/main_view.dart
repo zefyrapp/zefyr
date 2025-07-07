@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/widgets/custom_convex_bottom_bar.dart';
 import 'package:zefyr/core/constants/navigation_enum.dart';
-import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
 
 class MainView extends StatelessWidget {
   const MainView({required this.navigationShell, super.key});

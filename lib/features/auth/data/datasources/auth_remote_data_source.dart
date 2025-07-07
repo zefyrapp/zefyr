@@ -2,7 +2,6 @@ import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/core/network/models/api_response.dart';
 import 'package:zefyr/features/auth/data/models/auth_response.dart';
-import 'package:zefyr/features/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<ApiResponse<void>> checkEmail({required String email});

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/features/live/data/models/stream_create_response.dart';
 import 'package:zefyr/features/live/data/services/livekit_service.dart';
@@ -61,7 +63,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
 
   Future<void> connectAndStartStream() async {
     if (state.streamResponse == null) {
-      print('Ошибка: StreamCreateResponse не найден');
+     log('Ошибка: StreamCreateResponse не найден');
       return;
     }
 
@@ -74,10 +76,10 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
 
       if (liveKitState.isConnected) {
         state = state.copyWith(liveKitState: liveKitState, isStreaming: true);
-        print('Стрим успешно начат');
+       log('Стрим успешно начат');
       }
     } catch (e) {
-      print('Ошибка начала стрима: $e');
+     log('Ошибка начала стрима: $e');
     }
   }
 
@@ -90,9 +92,9 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
           status: LiveKitConnectionStatus.disconnected,
         ),
       );
-      print('Стрим остановлен');
+     log('Стрим остановлен');
     } catch (e) {
-      print('Ошибка остановки стрима: $e');
+     log('Ошибка остановки стрима: $e');
     }
   }
 
@@ -107,7 +109,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
         isCameraEnabled: !state.isCameraEnabled,
       );
     } catch (e) {
-      print('Ошибка переключения камеры: $e');
+     log('Ошибка переключения камеры: $e');
     }
   }
 
@@ -122,7 +124,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
         isMicrophoneEnabled: !state.isMicrophoneEnabled,
       );
     } catch (e) {
-      print('Ошибка переключения микрофона: $e');
+     log('Ошибка переключения микрофона: $e');
     }
   }
 
@@ -131,7 +133,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
       final newState = await _liveKitService.switchCamera();
       state = state.copyWith(liveKitState: newState);
     } catch (e) {
-      print('Ошибка переключения камеры: $e');
+     log('Ошибка переключения камеры: $e');
     }
   }
 

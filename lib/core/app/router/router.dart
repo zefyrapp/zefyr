@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/services/redirect_service.dart';
 import 'package:zefyr/core/utils/fade_transition/fade_transition.dart';
-import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/presentation/view/auth_flow_view.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
@@ -170,7 +169,6 @@ GoRouter router(Ref ref) {
         path: '/auth',
         pageBuilder: (context, state) =>
             FadeTransitionPage(key: state.pageKey, child: const AuthFlowView()),
-        routes: [],
       ),
     ],
   );

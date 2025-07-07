@@ -64,7 +64,7 @@ extension ConnectivityResultExtension on ConnectivityResult {
   };
 }
 
-/// Расширения для List<ConnectivityResult>
+/// Расширения для [List<ConnectivityResult>]
 extension ConnectivityResultListExtension on List<ConnectivityResult> {
   bool get isConnected => isNotEmpty && !contains(ConnectivityResult.none);
 
@@ -142,7 +142,7 @@ class NetworkUtils {
       if (await networkInfo.hasInternetAccess()) {
         return true;
       }
-      await Future.delayed(checkInterval);
+      await Future<void>.delayed(checkInterval);
     }
 
     return false;

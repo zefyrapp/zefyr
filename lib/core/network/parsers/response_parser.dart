@@ -153,12 +153,12 @@ class ResponseParser {
           fromJson,
         );
         // Возвращаем только данные из ApiListResponse
-        return (listResponse as ApiListResponse<T>).data as T;
+        return listResponse.data as T;
       } else {
         // Это объект, парсим как ApiResponse и возвращаем данные
         final apiResponse = await _parseApiResponseInCompute<T>(data, fromJson);
         // Возвращаем только данные из ApiResponse
-        return (apiResponse as ApiResponse<T>).data as T;
+        return apiResponse.data as T;
       }
     }
   }

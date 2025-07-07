@@ -34,7 +34,7 @@ class _EmailLoginState extends ConsumerState<EmailLogin> {
       appBar: AppBar(
         backgroundColor: color.backgroundColor,
         leading: IconButton(
-          icon: const Icon(AppIcons.left_shefron, size: 20),
+          icon: const Icon(AppIcons.leftShefron, size: 20),
           onPressed: authFlowViewModel.previousStep,
           color: color.white,
         ),

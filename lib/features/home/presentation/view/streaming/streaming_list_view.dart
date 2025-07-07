@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:zefyr/features/home/presentation/view/streaming/stream_short_card.dart';
 
@@ -67,7 +69,7 @@ class StreamingListView extends StatelessWidget {
           viewCount: data['viewCount']!,
           avatarUrl: data['avatarUrl']!,
           backgroundImageUrl: data['backgroundImageUrl']!,
-          onTap: () => print('${data['username']} card tapped'),
+          onTap: () =>log('${data['username']} card tapped'),
         );
       }, childCount: streamData.length),
     ),
