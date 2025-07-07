@@ -50,6 +50,12 @@ class StreamModel {
   final String owner;
   final String ownerNickname;
   final DateTime createdAt;
+  String get formattedViewCount {
+    if (viewersCount >= 1000) {
+      return '${(viewersCount / 1000).toStringAsFixed(1)}K';
+    }
+    return viewersCount.toString();
+  }
 
   StreamModel copyWith({
     String? id,

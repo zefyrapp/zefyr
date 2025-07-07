@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zefyr/common/exceptions/repository_helper.dart';
 import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
+import 'package:zefyr/features/home/domain/entities/stream_list_api_wrapper.dart';
 import 'package:zefyr/features/live/data/models/stream_create_response.dart';
 
 abstract class HomeStreamDataSource {
-  Future<StreamCreateResponse> getStreams({
+  Future<StreamListApiWrapper> getStreams({
     required int page,
     required int pageSize,
   });
@@ -44,7 +44,7 @@ class HomeStreamDataSourceImpl implements HomeStreamDataSource {
   }) async {
     final token = await ref.read(tokenManagerProvider).getAccessToken();
     if (token != null) client.setAuthToken(token);
-    return (await client.postWithApiResponse<StreamCreateResponse>(
+    return (await client.getWithApiResponse<StreamCreateResponse>(
       '/api/streaming/streams/$streamId/token',
       queryParameters: {"device_id": deviceId},
       fromJson: StreamCreateResponse.fromMap,
@@ -52,16 +52,16 @@ class HomeStreamDataSourceImpl implements HomeStreamDataSource {
   }
 
   @override
-  Future<StreamCreateResponse> getStreams({
+  Future<StreamListApiWrapper> getStreams({
     required int page,
     required int pageSize,
   }) async {
     final token = await ref.read(tokenManagerProvider).getAccessToken();
     if (token != null) client.setAuthToken(token);
-    return (await client.postWithApiResponse<StreamCreateResponse>(
+    return client.get<StreamListApiWrapper>(
       '/api/streaming/streams',
       queryParameters: {"page": page, "page_size": pageSize},
-      fromJson: StreamCreateResponse.fromMap,
-    )).data!;
+      fromJson: StreamListApiWrapper.fromMap,
+    );
   }
 }
