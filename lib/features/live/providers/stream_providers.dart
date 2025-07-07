@@ -4,10 +4,13 @@ import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/features/live/data/datasources/stream_data_source.dart';
 import 'package:zefyr/features/live/data/repositories/stream_repository_impl.dart';
 import 'package:zefyr/features/live/domain/repositories/stream_repository.dart';
+import 'package:zefyr/features/live/presentation/view/remote_participant/remote_participant_view.dart';
+import 'package:zefyr/features/live/presentation/view_model/remote_participant_view_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_form_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_form_state.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
+import 'package:zefyr/features/live/providers/livekit_providers.dart';
 import 'package:zefyr/features/live/usecases/create_stream.dart';
 import 'package:zefyr/features/live/usecases/end_stream.dart';
 
@@ -44,3 +47,17 @@ final streamFormProvider =
     AutoDisposeStateNotifierProvider<StreamFormNotifier, StreamFormState>(
       (ref) => StreamFormNotifier(),
     );
+final remoteParticipantViewModelProvider =
+    StateNotifierProvider.family<
+      RemoteParticipantViewModel,
+      RemoteParticipantState,
+      RemoteParticipantViewModelParams
+    >((ref, params) {
+      final liveKitService = ref.watch(liveKitServiceProvider);
+
+      return RemoteParticipantViewModel(
+        liveKitService: liveKitService,
+        streamUrl: params.streamUrl,
+        streamToken: params.streamToken,
+      );
+    });

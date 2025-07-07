@@ -122,7 +122,7 @@ class _StreamingListViewState extends ConsumerState<StreamingListView> {
     await ref
         .read(homeStreamViewModelProvider.notifier)
         .getStreamToken(streamId)
-        .whenComplete(() => context.push('/remoteParticipant',));
+        .whenComplete(() => context.push('/onAir/remoteParticipant'));
   }
 }
 
