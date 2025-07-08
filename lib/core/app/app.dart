@@ -14,10 +14,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     return ToastificationWrapper(
-      config: const ToastificationConfig(
-        
-       
-      ),
+      config: const ToastificationConfig(),
       child: MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
         child: MaterialApp.router(

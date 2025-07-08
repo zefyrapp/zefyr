@@ -1,210 +1,162 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zefyr/core/network/models/api_response.dart';
+import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
 import 'package:zefyr/features/auth/data/models/auth_response.dart';
 
-/// Интерцептор для авторизации
+/// Интерцептор для управления токенами авторизации и автоматического их обновления.
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor({required this.userDao, required this.ref});
+  AuthInterceptor({
+    required this.userDao,
+    required this.dio,
+    required this.ref,
+  });
 
   final UserDao userDao;
+  final Dio dio;
   final Ref ref;
 
-  // Флаг для отслеживания обработки токена
-  bool _isRefreshing = false;
-  final List<VoidCallback> _failedQueue = [];
+  Future<String?>? _refreshFuture;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // TODO: Добавить логику получения токена из AuthRepository или SecureStorage
-    // final token = getAuthToken();
-    // if (token != null) {
-    //   options.headers['Authorization'] = 'Bearer $token';
-    // }
-    handler.next(options);
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    if (options.path.contains('auth/refresh')) {
+      return handler.next(options);
+    }
+    final tokens = await userDao.getTokensOnly();
+    if (tokens?.accessToken != null) {
+      options.headers['Authorization'] = 'Bearer ${tokens!.accessToken}';
+    }
+    return handler.next(options);
   }
 
+  /// Этот метод будет перехватывать успешные ответы.
+  /// Если код ответа 401, мы не считаем его "успешным" и перенаправляем в onError.
   @override
   Future<void> onResponse(
-    Response<dynamic> response,
+    Response response,
     ResponseInterceptorHandler handler,
   ) async {
-    // Если не 401, просто продолжаем
-    if (response.statusCode != 401) {
-      return handler.next(response);
+    if (response.statusCode == 401) {
+      log('Received 401 in onResponse. Rejecting to trigger onError logic.');
+      // Отклоняем ответ, превращая его в ошибку DioException.
+      // Это автоматически вызовет следующий в цепочке `onError`.
+      return handler.reject(
+        DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          error: 'Unauthorized',
+          type: DioExceptionType.badResponse,
+        ),
+      );
     }
-
-    // Обрабатываем 401 ошибку
-    bool handlerCalled = false;
-
-    await _handle401Error(
-      requestOptions: response.requestOptions,
-      onSuccess: (newToken) async {
-        if (handlerCalled) return;
-        handlerCalled = true;
-
-        // Повторяем запрос с новым токеном
-        final dio = Dio();
-        response.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-
-        try {
-          final retryResponse = await dio.fetch<Response<dynamic>>(
-            response.requestOptions,
-          );
-          handler.resolve(retryResponse);
-        } catch (e) {
-          handler.next(response);
-        }
-      },
-      onFailure: () {
-        if (handlerCalled) return;
-        handlerCalled = true;
-
-        // Если не удалось обновить токен, возвращаем оригинальный ответ
-        handler.next(response);
-      },
-    );
+    return handler.next(response);
   }
 
+  /// Вся основная логика обновления токена сосредоточена здесь.
   @override
   Future<void> onError(
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    log('Error AuthInterceptor: ${err.message}');
-
-    // Если не 401, просто продолжаем
+    // Обрабатываем только ошибки 401 (Unauthorized).
+    // Сюда попадут как "настоящие" ошибки, так и ответы, отклоненные из onResponse.
     if (err.response?.statusCode != 401) {
       return handler.next(err);
     }
 
-    // Обрабатываем 401 ошибку
-    bool handlerCalled = false;
+    // Избегаем бесконечного цикла, если сам запрос на обновление токена вернул 401.
+    if (err.requestOptions.path.contains('auth/refresh')) {
+      log('Refresh token is invalid or expired. Logging out.');
+      await _handleLogout();
+      return handler.next(err);
+    }
 
-    await _handle401Error(
-      requestOptions: err.requestOptions,
-      onSuccess: (newToken) async {
-        if (handlerCalled) return;
-        handlerCalled = true;
+    log('Caught 401 error. Attempting to refresh token...');
 
-        // Повторяем запрос с новым токеном
-        final dio = Dio();
-        err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+    try {
+      // Получаем новый токен. Эта функция гарантирует, что refresh будет вызван только один раз.
+      final newAccessToken = await _getRefreshedToken();
 
-        try {
-          final retryResponse = await dio.fetch<Response<dynamic>>(
-            err.requestOptions,
-          );
-          handler.resolve(retryResponse);
-        } catch (e) {
-          handler.next(err);
-        }
-      },
-      onFailure: () {
-        if (handlerCalled) return;
-        handlerCalled = true;
+      // Повторяем изначальный запрос с новым токеном.
+      final response = await _retryRequest(err.requestOptions, newAccessToken);
 
-        // Если не удалось обновить токен, возвращаем оригинальную ошибку
-        handler.next(err);
+      // Завершаем обработку, возвращая успешный ответ.
+      return handler.resolve(response);
+    } catch (e) {
+      log('Failed to refresh token or retry request: $e');
+      // Если обновление не удалось, разлогиниваем пользователя и передаем ОРИГИНАЛЬНУЮ ошибку дальше.
+      await _handleLogout();
+      return handler.next(err);
+    }
+  }
+
+  // --- Вспомогательные методы (остаются без изменений) ---
+
+  Future<String> _getRefreshedToken() async {
+    _refreshFuture ??= _performRefresh();
+    try {
+      final newToken = await _refreshFuture;
+      if (newToken == null) {
+        throw const AuthException('Failed to refresh token: new token is null.');
+      }
+      return newToken;
+    } finally {
+      _refreshFuture = null;
+    }
+  }
+
+  Future<String?> _performRefresh() async {
+    final oldTokens = await userDao.getTokensOnly();
+    final refreshToken = oldTokens?.refreshToken;
+    if (refreshToken == null) {
+      log('No refresh token available for renewal.');
+      return null;
+    }
+    try {
+      final refreshDio = Dio();
+      final response = await refreshDio.post<Map<String, dynamic>>(
+        'https://back.tanysu.net/api/auth/refresh/',
+        data: {'refresh': refreshToken},
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        final authResponse = AuthResponse.fromMap(response.data!);
+        await userDao.updateTokens(
+          accessToken: authResponse.accessToken,
+          refreshToken: authResponse.refreshToken,
+        );
+        log('Token successfully refreshed.');
+        return authResponse.accessToken;
+      }
+    } on DioException catch (e) {
+      log('Error refreshing token API call: ${e.response?.data}');
+    } catch (e) {
+      log('An unexpected error occurred during token refresh: $e');
+    }
+    return null;
+  }
+
+  Future<Response<dynamic>> _retryRequest(
+    RequestOptions requestOptions,
+    String newAccessToken,
+  ) async {
+    log('Retrying request to: ${requestOptions.path}');
+    final options = requestOptions.copyWith(
+      headers: {
+        ...requestOptions.headers,
+        'Authorization': 'Bearer $newAccessToken',
       },
     );
+    return dio.fetch(options);
   }
 
-  /// Общая логика обработки 401 ошибки
-  Future<void> _handle401Error({
-    required RequestOptions requestOptions,
-    required ValueChanged<String> onSuccess,
-    required VoidCallback onFailure,
-  }) async {
-    // Если уже идет процесс обновления токена, добавляем в очередь
-    if (_isRefreshing) {
-      _failedQueue.add(() async {
-        final auth = await userDao.getTokensOnly();
-        if (auth?.accessToken != null) {
-          onSuccess(auth!.accessToken);
-        } else {
-          onFailure();
-        }
-      });
-      return;
-    }
-
-    _isRefreshing = true;
-
-    try {
-      final auth = await userDao.getTokensOnly();
-
-      if (auth == null) {
-        // Нет токенов, выходим из системы
-        //?TODO: реализация выхода из системы
-        onFailure();
-        return;
-      }
-
-      final newAccessToken = await _refreshToken(auth.refreshToken);
-
-      if (newAccessToken != null) {
-        onSuccess(newAccessToken);
-        // Обрабатываем очередь ожидающих запросов
-        _processFailedQueue(newAccessToken);
-      } else {
-        // Не удалось обновить токен, выходим из системы
-        //?TODO: реализация выхода из системы
-        onFailure();
-        _processFailedQueue(null);
-      }
-    } finally {
-      _isRefreshing = false;
-    }
-  }
-
-  /// Обрабатывает очередь отложенных запросов
-  void _processFailedQueue(String? token) {
-    for (final callback in _failedQueue) {
-      callback();
-    }
-    _failedQueue.clear();
-  }
-
-  /// Обновляет токен с использованием refresh token
-  Future<String?> _refreshToken(String refreshToken) async {
-    try {
-      // Создаем новый Dio instance для refresh запроса
-      // чтобы избежать циклических вызовов интерцептора
-      final dio = Dio();
-
-      final response = await dio.post<Map<String, dynamic>>(
-        'https://back.tanysu.net/api/auth/refresh/',
-        data: {'refresh_token': refreshToken},
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200 && response.data != null) {
-        final authResponse = ApiResponse.fromJson(
-          response.data!,
-          fromJsonT: AuthResponse.fromMap,
-        );
-
-        // Сохраняем новые токены в базе данных
-        await userDao.updateTokens(
-          accessToken: authResponse.data!.accessToken,
-          refreshToken: authResponse.data!.refreshToken,
-        );
-
-        return authResponse.data!.accessToken;
-      }
-    } catch (e) {
-      log('Error refreshing token: $e');
-    }
-
-    return null;
+  Future<void> _handleLogout() async {
+    await userDao.clearUser();
+    // ref.read(authNotifierProvider.notifier).logout();
+    log('User logged out due to authentication failure.');
   }
 }

@@ -3,14 +3,15 @@ import 'package:zefyr/core/network/dio_client.dart';
 
 /// Интерцептор для повтора запросов
 class RetryInterceptor extends Interceptor {
-  RetryInterceptor({
+  RetryInterceptor(
+    this.dio, {
     this.maxRetries = 3,
     this.retryDelay = const Duration(seconds: 1),
   });
 
   final int maxRetries;
   final Duration retryDelay;
-
+  final Dio dio;
   @override
   Future<void> onError(
     DioException err,
@@ -27,7 +28,7 @@ class RetryInterceptor extends Interceptor {
       try {
         final response = await err.requestOptions
             .copyWith(extra: extra)
-            .request();
+            .request(dio);
         return handler.resolve(response);
       } catch (e) {}
     }

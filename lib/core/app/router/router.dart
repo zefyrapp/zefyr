@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/services/redirect_service.dart';
 import 'package:zefyr/core/utils/fade_transition/fade_transition.dart';
+import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/presentation/view/auth_flow_view.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
@@ -25,34 +26,60 @@ part 'router.g.dart';
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class AuthNotifier extends ChangeNotifier {
-  AuthNotifier(this._stream) {
-    _subscription = _stream.listen((_) {
+  AuthNotifier(this.ref) {
+    ref.watch(authStateChangesProvider).whenData((data) {
       if (!_disposed) {
         notifyListeners();
       }
     });
   }
-  final Stream<dynamic> _stream;
-  late final StreamSubscription<dynamic> _subscription;
+  late final Ref ref;
+
   bool _disposed = false;
 
   @override
   void dispose() {
     _disposed = true;
-    _subscription.cancel();
+
+    super.dispose();
+  }
+}
+
+class AuthRefreshListenable extends ChangeNotifier {
+  AuthRefreshListenable(Ref ref) {
+    // Listen to AuthNotifier's state changes
+    _subscription = ref.listen<AsyncValue<UserModel?>>(
+      authStateChangesProvider,
+      (_, __) {
+        notifyListeners();
+      },
+    );
+  }
+  late final ProviderSubscription<AsyncValue<UserModel?>> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.close();
     super.dispose();
   }
 }
 
 @Riverpod(keepAlive: true)
+Raw<AuthRefreshListenable> authRefreshListenable(Ref ref) {
+  final listenable = AuthRefreshListenable(ref);
+  ref.onDispose(() => listenable.dispose());
+  return listenable;
+}
+
+@riverpod
 GoRouter router(Ref ref) {
   final shellNavigatorKey = GlobalKey<NavigatorState>();
-  final authStateStream = ref.watch(authStateChangesProvider.stream);
-  final authNotifier = AuthNotifier(authStateStream);
 
-  ref.onDispose(() {
-    authNotifier.dispose();
-  });
+   final refreshListenable = ref.watch(authRefreshListenableProvider);
+
+  // ref.onDispose(() {
+  //   authNotifier.dispose();
+  // });
 
   final router = GoRouter(
     navigatorKey: navigatorKey,
@@ -61,7 +88,7 @@ GoRouter router(Ref ref) {
 
     redirect: (context, state) =>
         RedirectService().authRedirect(ref: ref, state: state),
-
+   refreshListenable: refreshListenable,
     observers: [MyNavigatorObserver()],
     routes: [
       StatefulShellRoute.indexedStack(

@@ -55,7 +55,8 @@ class DioClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        validateStatus: (status) => status != null && status < 500,
+        // validateStatus: (status) =>
+        //     status != 401 || status != null && status < 500,
       ),
     );
 
@@ -71,10 +72,10 @@ class DioClient {
   /// Настройка интерцепторов
   void _setupInterceptors() {
     _dio.interceptors.addAll([
-      AuthInterceptor(userDao: _userDao, ref: _ref),
+      AuthInterceptor(userDao: _userDao, ref: _ref, dio: _dio),
       NetworkInterceptor(_networkInfo),
 
-      RetryInterceptor(),
+      RetryInterceptor(_dio),
       if (kDebugMode) LoggingInterceptor(),
     ]);
   }
@@ -668,31 +669,28 @@ extension RequestOptionsExtension on RequestOptions {
     responseDecoder: responseDecoder ?? this.responseDecoder,
   );
 
-  Future<Response<T>> request<T>() async {
-    final dio = Dio();
-    return dio.request<T>(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      cancelToken: cancelToken,
-      options: Options(
-        method: method,
-        sendTimeout: sendTimeout,
-        receiveTimeout: receiveTimeout,
-        extra: extra,
-        headers: headers,
-        responseType: responseType,
-        contentType: contentType,
-        validateStatus: validateStatus,
-        receiveDataWhenStatusError: receiveDataWhenStatusError,
-        followRedirects: followRedirects,
-        maxRedirects: maxRedirects,
-        requestEncoder: requestEncoder,
-        responseDecoder: responseDecoder,
-        listFormat: listFormat,
-      ),
-      onSendProgress: onSendProgress,
-      onReceiveProgress: onReceiveProgress,
-    );
-  }
+  Future<Response<T>> request<T>(Dio dio) async => dio.request<T>(
+    path,
+    data: data,
+    queryParameters: queryParameters,
+    cancelToken: cancelToken,
+    options: Options(
+      method: method,
+      sendTimeout: sendTimeout,
+      receiveTimeout: receiveTimeout,
+      extra: extra,
+      headers: headers,
+      responseType: responseType,
+      contentType: contentType,
+      validateStatus: validateStatus,
+      receiveDataWhenStatusError: receiveDataWhenStatusError,
+      followRedirects: followRedirects,
+      maxRedirects: maxRedirects,
+      requestEncoder: requestEncoder,
+      responseDecoder: responseDecoder,
+      listFormat: listFormat,
+    ),
+    onSendProgress: onSendProgress,
+    onReceiveProgress: onReceiveProgress,
+  );
 }
