@@ -6,7 +6,7 @@ class RedirectService {
   /// Выполняет редирект в зависимости от статуса аутентификации.
   /// Возвращает маршрут для редиректа или `null`, если редирект не требуется.
   String? authRedirect({required Ref ref, required GoRouterState state}) {
-    const publicRoutes = ['/auth', '/home',  '/','/onAir/remoteParticipant'];
+    const publicRoutes = ['/auth', '/home', '/', '/onAir/remoteParticipant'];
     final user = ref.watch(authStateChangesProvider).valueOrNull;
     final isLoggedIn = user != null;
 
@@ -21,7 +21,7 @@ class RedirectService {
 
     // Если пользователь залогинен и случайно попал на /auth - редирект домой или откуда пришел.
     if (isLoggedIn && isGoingToPublicRoute) {
-      return state.uri.queryParameters['from'] ?? '/';
+      return state.uri.queryParameters['from'] ?? state.fullPath;
     }
 
     // В остальных случаях редирект не нужен.

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:zefyr/common/extensions/invert_color.dart';
-import 'package:zefyr/core/utils/icons/app_asset_icon.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
-import 'package:zefyr/features/live/presentation/view_model/remote_participant_view_model.dart';
-import 'package:zefyr/features/live/providers/livekit_providers.dart';
 import 'package:zefyr/features/home/providers/home_stream_providers.dart';
+import 'package:zefyr/features/live/presentation/view_model/remote_participant_view_model.dart';
 import 'package:zefyr/features/live/providers/stream_providers.dart';
 
 class RemoteParticipantView extends ConsumerStatefulWidget {
@@ -80,7 +77,14 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
         ),
       ),
     );
-
+    final remotePod = ref.read(
+      remoteParticipantViewModelProvider(
+        RemoteParticipantViewModelParams(
+          streamUrl: homeStreamState.streamUrl!,
+          streamToken: homeStreamState.streamToken!,
+        ),
+      ).notifier,
+    );
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -129,18 +133,8 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () {
-                        ref
-                            .read(
-                              remoteParticipantViewModelProvider(
-                                RemoteParticipantViewModelParams(
-                                  streamUrl: homeStreamState.streamUrl!,
-                                  streamToken: homeStreamState.streamToken!,
-                                ),
-                              ).notifier,
-                            )
-                            .connectAsViewer();
-                      },
+                      onPressed: remotePod.connectAsViewer,
+
                       child: const Text('Retry'),
                     ),
                   ],
@@ -151,11 +145,7 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
           // Виджеты в шапке
           _buildTopBar(context, state),
 
-          // Виджет с информацией о стримере
-          _buildStreamerInfo(state),
-
-          // Виджет для написания сообщения
-          _buildChatPanel(),
+          _buildAnimatedBottomWidget(state, remotePod),
         ],
       ),
     );
@@ -227,79 +217,18 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
     );
   }
 
-  Widget _buildTopBar(
-    BuildContext context,
-    RemoteParticipantState state,
-  ) => SafeArea(
-    child: Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildTopBar(BuildContext context, RemoteParticipantState state) =>
+      SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Индикатор Live
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'LIVE',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Статус подключения
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: state.isConnected ? Colors.green : Colors.grey,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    // Кнопка звука
-                    InkWell(
-                      onTap: () {
-                        ref
-                            .read(
-                              remoteParticipantViewModelProvider(
-                                RemoteParticipantViewModelParams(
-                                  streamUrl: state.streamUrl!,
-                                  streamToken: state.streamToken!,
-                                ),
-                              ).notifier,
-                            )
-                            .toggleAudio();
-                      },
-                      child: Icon(
-                        state.isAudioEnabled
-                            ? Icons.volume_up
-                            : Icons.volume_off,
-                        color: Colors.white.invertColor(),
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Кнопка закрытия
                     InkWell(
                       onTap: () {
                         ref
@@ -314,62 +243,39 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
                             .disconnect();
                         context.pop();
                       },
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.white.invertColor(),
-                        size: 24,
+                      child: const Icon(
+                        Icons.arrow_back_outlined,
+                        color: Colors.white,
+                        size: 22,
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Информация о зрителях и донатах
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.remove_red_eye_outlined,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      state.remoteParticipants.length.toString(),
-                      style: TextStyle(
-                        color: Colors.white.invertColor(),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        // Поделиться стримом
-                      },
-                      child: Icon(
-                        AppIcons.share,
-                        color: Colors.white.invertColor(),
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
+
                     Row(
                       children: [
-                        Image.asset(AppAssetIcon.money, height: 18, width: 18),
+                        const Icon(
+                          Icons.remove_red_eye_outlined,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          '100',
-                          style: TextStyle(
-                            color: Colors.white.invertColor(),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                          state.remoteParticipants.length.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 11),
+                        InkWell(
+                          onTap: () {
+                            // Поделиться стримом
+                          },
+                          child: const Icon(
+                            AppIcons.share,
+                            color: Colors.white,
+                            size: 16,
                           ),
                         ),
                       ],
@@ -378,143 +284,221 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
+      );
+  Widget _buildAnimatedBottomWidget(
+    RemoteParticipantState state,
+    RemoteParticipantViewModel remotePod,
+  ) => Align(
+    alignment: Alignment.bottomCenter,
+    child: AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeInOut,
+      switchOutCurve: Curves.easeInOut,
+      transitionBuilder: (Widget child, Animation<double> animation) =>
+          SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+                .animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                ),
+            child: FadeTransition(opacity: animation, child: child),
+          ),
+      child: state.isChat
+          ? _buildChatPanel()
+          : _buildStreamerInfo(state, remotePod),
     ),
   );
 
-  Widget _buildStreamerInfo(RemoteParticipantState state) {
+  Widget _buildStreamerInfo(
+    RemoteParticipantState state,
+    RemoteParticipantViewModel remotePod,
+  ) {
     final primaryStreamer = state.primaryStreamer;
+    const backgroundColor = Colors.black;
 
-    return Positioned(
-      bottom: MediaQuery.of(context).padding.bottom + 64 + 18,
-      left: 0,
-      right: 0,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Row(
-            children: [
-              // Аватар стримера
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.green, width: 2),
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    'https://placebeard.it/640/480',
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[600],
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
+    // Рассчитываем итоговый цвет кнопки с учетом прозрачности
+    final buttonBackgroundColor = Colors.white.withValues(alpha: .45);
+    final effectiveButtonColor = buttonBackgroundColor.withBackground(
+      backgroundColor,
+    );
+
+    // Получаем контрастный цвет для иконки
+    final iconColor = effectiveButtonColor.getContrastingColor();
+    return SafeArea(
+      key: const ValueKey('streamer_info'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Row(
+          spacing: 6,
+          children: [
+            Material(
+              color: buttonBackgroundColor,
+              borderRadius: BorderRadius.circular(22),
+              child: InkWell(
+                onTap: remotePod.toggleChat,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 17,
+                    vertical: 15,
                   ),
+                  child: Icon(Icons.chat, color: iconColor),
                 ),
               ),
-              const SizedBox(width: 12),
-              // Информация о стримере
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            // Аватар стримера
+            Material(
+              color: buttonBackgroundColor,
+              borderRadius: BorderRadius.circular(22),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 19.0,
+                  top: 10,
+                  bottom: 10,
+                  right: 9,
+                ),
+                child: Row(
+                  spacing: 12,
                   children: [
-                    Text(
-                      primaryStreamer?.identity ?? 'Unknown Streamer',
-                      style: TextStyle(
-                        color: Colors.white.invertColor(),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.green, width: 2),
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          'https://placebeard.it/640/480',
+                          width: 32,
+                          height: 32,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Colors.grey[600],
+                                child: const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                        ),
                       ),
                     ),
-                    Text(
-                      state.isConnected ? 'Live streaming' : 'Offline',
-                      style: TextStyle(
-                        color: Colors.white.invertColor().withOpacity(0.7),
-                        fontSize: 12,
+                    SizedBox(
+                      width: 52,
+                      child: Text(
+                        primaryStreamer?.identity ?? 'Unknown Streamer',
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          height: 20 / 14,
+
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      label: const Text(
+                        'follow',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      style: const ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(
+                          Color(0xff9972F4),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(22),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 17, vertical: 15),
+                child: Icon(Icons.card_giftcard, color: Colors.black),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildChatPanel() => Align(
-    alignment: Alignment.bottomCenter,
-    child: Container(
-      width: double.infinity,
-      decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.8)),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xff1E1E1E),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: TextField(
-                    controller: _messageController,
-                    cursorHeight: 14,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      isCollapsed: true,
-                      constraints: BoxConstraints(minHeight: 40),
-                      hintText: 'Say something...',
-                      hintStyle: TextStyle(
-                        color: Color(0xffADAEBC),
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      suffixIcon: Icon(
-                        Icons.emoji_emotions_outlined,
-                        size: 16,
-                        color: Color(0xff9CA3AF),
-                      ),
+  Widget _buildChatPanel() => Container(
+    key: const ValueKey('chat_panel'),
+    width: double.infinity,
+    decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.8)),
+    child: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xff1E1E1E),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  cursorHeight: 14,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    style: const TextStyle(color: Colors.white),
-                    onSubmitted: _sendMessage,
+                    isCollapsed: true,
+                    constraints: BoxConstraints(minHeight: 40),
+                    hintText: 'Say something...',
+                    hintStyle: TextStyle(
+                      color: Color(0xffADAEBC),
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    suffixIcon: Icon(
+                      Icons.emoji_emotions_outlined,
+                      size: 16,
+                      color: Color(0xff9CA3AF),
+                    ),
                   ),
+                  style: const TextStyle(color: Colors.white),
+                  onSubmitted: _sendMessage,
                 ),
               ),
-              const SizedBox(width: 8),
-              DecoratedBox(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFFB18CFE),
-                ),
-                child: IconButton(
-                  style: const ButtonStyle(
-                    fixedSize: WidgetStatePropertyAll(Size(40, 40)),
-                  ),
-                  icon: const Icon(Icons.send, size: 16, color: Colors.white),
-                  onPressed: () => _sendMessage(_messageController.text),
-                ),
+            ),
+            const SizedBox(width: 8),
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFFB18CFE),
               ),
-            ],
-          ),
+              child: IconButton(
+                style: const ButtonStyle(
+                  fixedSize: WidgetStatePropertyAll(Size(40, 40)),
+                ),
+                icon: const Icon(Icons.send, size: 16, color: Colors.white),
+                onPressed: () => _sendMessage(_messageController.text),
+              ),
+            ),
+          ],
         ),
       ),
     ),
@@ -523,8 +507,7 @@ class _RemoteParticipantViewState extends ConsumerState<RemoteParticipantView> {
   void _sendMessage(String message) {
     if (message.trim().isEmpty) return;
 
-    // Здесь можно добавить логику отправки сообщения через LiveKit
-    // Например, отправка data message
+    //!TODO отправка сообщения через LiveKit либо через функционал отправки сообщения
 
     _messageController.clear();
   }

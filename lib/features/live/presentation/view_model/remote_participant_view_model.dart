@@ -11,6 +11,7 @@ class RemoteParticipantState {
     this.streamToken,
     this.isAudioEnabled = true,
     this.selectedRemoteParticipant,
+    this.isChat = false,
   });
 
   final LiveKitState liveKitState;
@@ -18,7 +19,7 @@ class RemoteParticipantState {
   final String? streamToken;
   final bool isAudioEnabled;
   final RemoteParticipant? selectedRemoteParticipant;
-
+  final bool isChat;
   bool get isConnected => liveKitState.isConnected;
   bool get isConnecting => liveKitState.isConnecting;
   bool get hasError => liveKitState.hasError;
@@ -46,6 +47,7 @@ class RemoteParticipantState {
     String? streamToken,
     bool? isAudioEnabled,
     RemoteParticipant? selectedRemoteParticipant,
+    bool? isChat,
   }) => RemoteParticipantState(
     liveKitState: liveKitState ?? this.liveKitState,
     streamUrl: streamUrl ?? this.streamUrl,
@@ -53,6 +55,7 @@ class RemoteParticipantState {
     isAudioEnabled: isAudioEnabled ?? this.isAudioEnabled,
     selectedRemoteParticipant:
         selectedRemoteParticipant ?? this.selectedRemoteParticipant,
+    isChat: isChat ?? this.isChat,
   );
 }
 
@@ -81,7 +84,7 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
 
   Future<void> connectAsViewer() async {
     if (state.streamUrl == null || state.streamToken == null) {
-     log('Ошибка: URL или токен стрима не найдены');
+      log('Ошибка: URL или токен стрима не найдены');
       return;
     }
 
@@ -95,10 +98,10 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
       state = state.copyWith(liveKitState: liveKitState);
 
       if (liveKitState.isConnected) {
-       log('Успешно подключились к стриму как зритель');
+        log('Успешно подключились к стриму как зритель');
       }
     } catch (e) {
-     log('Ошибка подключения к стриму: $e');
+      log('Ошибка подключения к стриму: $e');
     }
   }
 
@@ -110,9 +113,9 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
           status: LiveKitConnectionStatus.disconnected,
         ),
       );
-     log('Отключились от стрима');
+      log('Отключились от стрима');
     } catch (e) {
-     log('Ошибка отключения от стрима: $e');
+      log('Ошибка отключения от стрима: $e');
     }
   }
 
@@ -132,6 +135,10 @@ class RemoteParticipantViewModel extends StateNotifier<RemoteParticipantState> {
 
   void selectParticipant(RemoteParticipant participant) {
     state = state.copyWith(selectedRemoteParticipant: participant);
+  }
+
+  void toggleChat() {
+    state = state.copyWith(isChat: !state.isChat);
   }
 
   @override
