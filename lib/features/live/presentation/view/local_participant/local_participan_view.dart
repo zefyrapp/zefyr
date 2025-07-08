@@ -38,8 +38,8 @@ class _LocalParticipanViewState extends ConsumerState<LocalParticipanView> {
           /// Виджеты в шапке
           _buildToolBar(context, state),
 
-          /// Виджет с аватаром и текстком
-          _buildAvatarPanel(),
+          // /// Виджет с аватаром и текстком
+          // _buildAvatarPanel(),
 
           /// Виджет с для написания сообщения
           _buildBottomPanel(),
@@ -163,126 +163,185 @@ class _LocalParticipanViewState extends ConsumerState<LocalParticipanView> {
         ),
       );
 
-  Widget _buildAvatarPanel() => Positioned(
-    bottom: MediaQuery.of(context).padding.bottom + 64 + 18,
+  // Widget _buildAvatarPanel() => Positioned(
+  //   bottom: View.of(context).viewInsets.bottom + 64 + 32,
+  //   child: SafeArea(
+  //     child: Padding(
+  //       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+  //       child: Row(
+  //         children: [
+  //           Container(
+  //             width: 34,
+  //             height: 34,
+  //             decoration: BoxDecoration(
+  //               shape: BoxShape.circle,
+  //               border: Border.all(color: Colors.green, width: 2),
+  //             ),
+  //             child: ClipOval(
+  //               child: Image.network(
+  //                 'https://placebeard.it/640/480',
+  //                 width: 32,
+  //                 height: 32,
+  //                 fit: BoxFit.cover,
+  //                 errorBuilder: (context, error, stackTrace) => Container(
+  //                   color: Colors.grey[600],
+  //                   child: const Icon(
+  //                     Icons.person,
+  //                     color: Colors.white,
+  //                     size: 20,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(width: 12),
+  //           Text(
+  //             'Вы ведете прямую трансляцию',
+  //             style: TextStyle(
+  //               fontFamily: 'Poppins',
+  //               fontWeight: FontWeight.w400,
+  //               fontSize: 12,
+  //               height: 16 / 12,
+  //               letterSpacing: 0,
+  //               color: Colors.white.invertColor(),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   ),
+  // );
+
+  Widget _buildBottomPanel() => Positioned(
+    bottom: 0,
+    left: 0,
+    right: 0,
     child: SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Row(
-          children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.green, width: 2),
-              ),
-              child: ClipOval(
-                child: Image.network(
-                  'https://placebeard.it/640/480',
-                  width: 32,
-                  height: 32,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[600],
-                    child: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 20,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18),
+            child: Row(
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.green, width: 2),
+                  ),
+                  child: ClipOval(
+                    child: Image.network(
+                      'https://placebeard.it/640/480',
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[600],
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'Вы ведете прямую трансляцию',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w400,
-                fontSize: 12,
-                height: 16 / 12,
-                letterSpacing: 0,
-                color: Colors.white.invertColor(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-
-  Widget _buildBottomPanel() => Align(
-    alignment: Alignment.bottomCenter,
-    child: Container(
-      // height: 64,
-      width: double.infinity,
-      decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.8)),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xff1E1E1E),
-                    borderRadius: BorderRadius.circular(999),
+                const SizedBox(width: 12),
+                Text(
+                  'Вы ведете прямую трансляцию',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    height: 16 / 12,
+                    letterSpacing: 0,
+                    color: Colors.white.invertColor(),
                   ),
-                  child: TextField(
-                    cursorHeight: 14,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            // height: 64,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.8),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: const Color(0xff1E1E1E),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: TextField(
+                          cursorHeight: 14,
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            isCollapsed: true,
+                            constraints: const BoxConstraints(minHeight: 40),
+                            hintText: 'Say something...',
+                            hintStyle: const TextStyle(
+                              color: Color(0xffADAEBC),
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                            ),
+                            border: InputBorder.none,
+                            suffixIcon: IconButton(
+                              icon: const Icon(
+                                Icons.emoji_emotions_outlined,
+                                size: 16,
+                                color: Color(0xff9CA3AF),
+                              ),
+                              onPressed: () {
+                                // open emoji picker
+                              },
+                            ),
+                          ),
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       ),
-                      isCollapsed: true,
-                      constraints: const BoxConstraints(minHeight: 40),
-                      hintText: 'Say something...',
-                      hintStyle: const TextStyle(
-                        color: Color(0xffADAEBC),
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
+                    ),
+
+                    const SizedBox(width: 8),
+                    DecoratedBox(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(
+                          0xFFB18CFE,
+                        ), // сиреневый цвет как на картинке
                       ),
-                      border: InputBorder.none,
-                      suffixIcon: IconButton(
+                      child: IconButton(
+                        style: const ButtonStyle(
+                          fixedSize: WidgetStatePropertyAll(Size(40, 40)),
+                        ),
                         icon: const Icon(
-                          Icons.emoji_emotions_outlined,
+                          Icons.send,
                           size: 16,
-                          color: Color(0xff9CA3AF),
+                          color: Colors.white,
                         ),
                         onPressed: () {
-                          // open emoji picker
+                          // send message
                         },
                       ),
                     ),
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                  ],
                 ),
               ),
-
-              const SizedBox(width: 8),
-              DecoratedBox(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFFB18CFE), // сиреневый цвет как на картинке
-                ),
-                child: IconButton(
-                  style: const ButtonStyle(
-                    fixedSize: WidgetStatePropertyAll(Size(40, 40)),
-                  ),
-                  icon: const Icon(Icons.send, size: 16, color: Colors.white),
-                  onPressed: () {
-                    // send message
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     ),
   );
