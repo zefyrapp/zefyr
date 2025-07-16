@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/invert_color.dart';
 import 'package:zefyr/common/extensions/localization.dart';
@@ -147,7 +148,7 @@ class ProfileView extends StatelessWidget {
                             ),
                             if (isMe) ...[
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () => context.push('/profile/edit'),
                                 style: ButtonStyle(
                                   shape: WidgetStatePropertyAll(
                                     RoundedRectangleBorder(
@@ -263,7 +264,13 @@ class ProfileView extends StatelessWidget {
                     // Balance
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      height: 61,
+                      padding: const EdgeInsets.only(
+                        left: 25,
+                        right: 8,
+                        top: 10,
+                        bottom: 14,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(17, 24, 39, .8),
                         borderRadius: BorderRadius.circular(16),

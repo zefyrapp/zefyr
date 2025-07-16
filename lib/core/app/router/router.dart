@@ -19,6 +19,7 @@ import 'package:zefyr/features/live/presentation/view/on_air/on_air_view.dart';
 import 'package:zefyr/features/live/presentation/view/remote_participant/remote_participant_view.dart';
 import 'package:zefyr/features/main_view.dart';
 import 'package:zefyr/features/mission/presentation/view/mission_view.dart';
+import 'package:zefyr/features/profile/presentation/view/edit_profile_view.dart';
 import 'package:zefyr/features/profile/presentation/view/profile_view.dart';
 
 part 'router.g.dart';
@@ -199,6 +200,18 @@ GoRouter router(Ref ref) {
         path: '/auth',
         pageBuilder: (context, state) =>
             FadeTransitionPage(key: state.pageKey, child: const AuthFlowView()),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+
+        redirect: (context, state) =>
+            RedirectService().authRedirect(ref: ref, state: state),
+        pageBuilder: (context, state) => FadeTransitionPage(
+          key: state.pageKey,
+          child: EditProfileView(
+            //state.extra?['isMe'] as bool
+          ),
+        ),
       ),
     ],
   );
