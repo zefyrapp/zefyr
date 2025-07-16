@@ -75,7 +75,7 @@ Raw<AuthRefreshListenable> authRefreshListenable(Ref ref) {
 GoRouter router(Ref ref) {
   final shellNavigatorKey = GlobalKey<NavigatorState>();
 
-   final refreshListenable = ref.watch(authRefreshListenableProvider);
+  final refreshListenable = ref.watch(authRefreshListenableProvider);
 
   // ref.onDispose(() {
   //   authNotifier.dispose();
@@ -88,7 +88,7 @@ GoRouter router(Ref ref) {
 
     redirect: (context, state) =>
         RedirectService().authRedirect(ref: ref, state: state),
-   refreshListenable: refreshListenable,
+    refreshListenable: refreshListenable,
     observers: [MyNavigatorObserver()],
     routes: [
       StatefulShellRoute.indexedStack(
@@ -164,7 +164,10 @@ GoRouter router(Ref ref) {
                     RedirectService().authRedirect(ref: ref, state: state),
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
-                  child: const ProfileView(),
+                  child: ProfileView(
+                    isMe: true,
+                    //state.extra?['isMe'] as bool
+                  ),
                 ),
               ),
             ],

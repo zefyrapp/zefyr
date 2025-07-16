@@ -23,26 +23,25 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   late final GoogleSignIn _signIn = GoogleSignIn.instance;
   GoogleSignInAccount? _currentUser;
   bool _isAuthorized = false;
-  bool _initialized = false;
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
 
-  Future<void> _ensureInitialized() async {
-    if (_initialized) return;
+  void _ensureInitialized() {
+    unawaited(
+      _signIn
+          .initialize(
+            clientId: dotenv.get('GoogleClientID'),
+            serverClientId: dotenv.get('GoogleClientSecret'),
+          )
+          .then((_) {
+            // Подписываемся на события аутентификации
+            _authSubscription = _signIn.authenticationEvents.listen(
+              _handleAuthenticationEvent,
+            )..onError(_handleAuthenticationError);
 
-    await _signIn.initialize(
-      clientId: dotenv.get('GoogleClientID'),
-      serverClientId: dotenv.get('GoogleClientSecret'),
+            // Попытка легкой аутентификации при инициализации
+            _signIn.attemptLightweightAuthentication();
+          }),
     );
-
-    // Подписываемся на события аутентификации
-    _authSubscription = _signIn.authenticationEvents.listen(
-      _handleAuthenticationEvent,
-    )..onError(_handleAuthenticationError);
-
-    // Попытка легкой аутентификации при инициализации
-    await _signIn.attemptLightweightAuthentication();
-
-    _initialized = true;
   }
 
   Future<void> _handleAuthenticationEvent(
@@ -63,6 +62,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
 
     if (user != null && authorization != null) {
       log('User authenticated and authorized: ${user.email}');
+      unawaited(_getContact(user));
     }
   }
 
@@ -78,29 +78,29 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   @override
   Future<GoogleSignInAccount?> signIn() async {
     try {
-      await _ensureInitialized();
-
-      final account = await _signIn.authenticate();
-
-      // Проверяем авторизацию для требуемых скоупов
-      final authorization = await account.authorizationClient
-          .authorizationForScopes(_scopes);
-
-      if (authorization == null) {
-        // Если нет авторизации, запрашиваем её
-        await account.authorizationClient.authorizeScopes(_scopes);
-      }
-
-      return account;
+      _ensureInitialized();
     } catch (e) {
       log('Google sign-in error: $e');
       return null;
     }
   }
 
+  Future<GoogleSignInAccount?> _getContact(GoogleSignInAccount user) async {
+    final authorization = await user.authorizationClient.authorizationForScopes(
+      _scopes,
+    );
+
+    if (authorization == null) {
+      // Если нет авторизации, запрашиваем её
+      await user.authorizationClient.authorizeScopes(_scopes);
+    }
+
+    return user;
+  }
+
   @override
   Future<void> signOut() async {
-    await _ensureInitialized();
+    _ensureInitialized();
     // Используем disconnect для полного выхода, как в примере
     await _signIn.disconnect();
     _currentUser = null;
@@ -116,7 +116,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   /// Запрос авторизации для дополнительных скоупов
   Future<bool> authorizeScopes(List<String> scopes) async {
     try {
-      await _ensureInitialized();
+      _ensureInitialized();
       final user = _currentUser;
       if (user == null) return false;
 
@@ -130,7 +130,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
 
   /// Получение заголовков авторизации для API запросов
   Future<Map<String, String>?> getAuthorizationHeaders() async {
-    await _ensureInitialized();
+    _ensureInitialized();
     final user = _currentUser;
     if (user == null || !_isAuthorized) return null;
 
@@ -140,7 +140,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   /// Получение server auth code
   Future<String?> getServerAuthCode() async {
     try {
-      await _ensureInitialized();
+      _ensureInitialized();
       final user = _currentUser;
       if (user == null) return null;
 
