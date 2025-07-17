@@ -41,27 +41,19 @@ class HomeStreamDataSourceImpl implements HomeStreamDataSource {
   Future<StreamCreateResponse> getStreamToken({
     required String streamId,
     String? deviceId,
-  }) async {
-    final token = await ref.read(tokenManagerProvider).getAccessToken();
-    if (token != null) client.setAuthToken(token);
-    return (await client.getWithApiResponse<StreamCreateResponse>(
-      '/api/streaming/streams/$streamId/token',
-      queryParameters: {"device_id": deviceId},
-      fromJson: StreamCreateResponse.fromMap,
-    )).data!;
-  }
+  }) async => (await client.getWithApiResponse<StreamCreateResponse>(
+    '/api/streaming/streams/$streamId/token',
+    queryParameters: {"device_id": deviceId},
+    fromJson: StreamCreateResponse.fromMap,
+  )).data!;
 
   @override
   Future<StreamListApiWrapper> getStreams({
     required int page,
     required int pageSize,
-  }) async {
-    final token = await ref.read(tokenManagerProvider).getAccessToken();
-    if (token != null) client.setAuthToken(token);
-    return client.get<StreamListApiWrapper>(
-      '/api/streaming/streams',
-      queryParameters: {"page": page, "page_size": pageSize},
-      fromJson: StreamListApiWrapper.fromMap,
-    );
-  }
+  }) async => client.get<StreamListApiWrapper>(
+    '/api/streaming/streams',
+    queryParameters: {"page": page, "page_size": pageSize},
+    fromJson: StreamListApiWrapper.fromMap,
+  );
 }

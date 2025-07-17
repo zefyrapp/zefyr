@@ -218,4 +218,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get startStream => 'Начать стрим';
+
+  @override
+  String get save => 'Сохранить';
 }

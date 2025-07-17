@@ -1,30 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
-import 'package:zefyr/common/extensions/invert_color.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/common/widgets/gradient_border_image.dart';
 import 'package:zefyr/common/widgets/gradient_button.dart';
 import 'package:zefyr/core/utils/icons/app_asset_icon.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
+import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
+import 'package:zefyr/features/profile/presentation/view_model/edit_profile_view_model.dart';
+import 'package:zefyr/features/profile/providers/profile_providers.dart';
+
+class ProfileViewWrapper extends ConsumerWidget {
+  const ProfileViewWrapper({this.nickname, super.key});
+  final String? nickname;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isMe = nickname == null;
+    final asyncValue = isMe
+        ? ref.watch(myProfileNotifierProvider)
+        : ref.watch(userProfileNotifierProvider(nickname!));
+    return asyncValue.when(
+      data: (profile) => ProfileView(profile: profile),
+      error: (e, s) => ErrorView(message: e.toString()),
+      loading: () => const Skeletonizer(child: ProfileView()),
+    );
+  }
+}
 
 /// Экран профиля
-class ProfileView extends StatelessWidget {
-  const ProfileView({required this.isMe, super.key});
-  final bool isMe;
+class ProfileView extends ConsumerWidget {
+  const ProfileView({this.profile, super.key});
+  final ProfileEntity? profile;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = context.customTheme.overlayApp;
     final local = context.localization;
+    final localUser = ref.watch(authStateChangesProvider).valueOrNull;
+    final isMe = profile?.user.email == localUser?.email;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         surfaceTintColor: Colors.black,
         leading: const BackButton(color: Colors.white),
-        title: const Text(
-          '@alexstream',
-          style: TextStyle(
+        title: Text(
+          profile?.nickname ?? '',
+          style: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w400,
             fontSize: 14,
@@ -65,22 +90,16 @@ class ProfileView extends StatelessWidget {
                           children: [
                             GradientBorderImage(
                               size: 84,
-                              child: Image.network(
-                                'https://example.com/avatar.jpg',
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                      width: 84,
-                                      height: 84,
-                                      color: Colors.grey[800],
-                                      child: const Icon(
-                                        Icons.person,
-                                        color: Colors.white,
-                                        size: 40,
-                                      ),
-                                    ),
-                              ),
+                              child: profile?.avatar != null
+                                  ? Image.network(
+                                      profile!.avatar!,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              _buildDefaultAvatar(),
+                                    )
+                                  : _buildDefaultAvatar(),
                             ),
-                            if (!isMe)
+                            if (profile?.isLive ?? false)
                               Positioned(
                                 bottom: 0,
                                 left: 14,
@@ -109,79 +128,64 @@ class ProfileView extends StatelessWidget {
                           ],
                         ),
 
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Name and rating
-                            const Row(
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 36),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Алексей Стримов',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 20,
-                                    height: 1,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(
-                                  AppIcons.star_7,
-                                  color: Colors.amber,
-                                  size: 16,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  '4.7',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: ' Inter',
-                                    fontWeight: FontWeight.w400,
-
-                                    fontSize: 14,
-                                    height: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (isMe) ...[
-                              ElevatedButton(
-                                onPressed: () => context.push('/profile/edit'),
-                                style: ButtonStyle(
-                                  shape: WidgetStatePropertyAll(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(999),
-                                      side: BorderSide(
-                                        color: color.indicatorColor,
+                                // Name and rating
+                                Row(
+                                  spacing: 8,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        profile?.name ?? '',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 20,
+                                          height: 1,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  minimumSize: const WidgetStatePropertyAll(
-                                    Size(180, 34),
-                                  ),
-                                  backgroundColor: const WidgetStatePropertyAll(
-                                    Colors.black,
-                                  ),
+
+                                    Row(
+                                      spacing: 4,
+                                      children: [
+                                        const Icon(
+                                          AppIcons.star_7,
+                                          color: Colors.amber,
+                                          size: 16,
+                                        ),
+
+                                        Text(
+                                          profile?.rating.rating
+                                                  .toStringAsFixed(1) ??
+                                              '0.0',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: ' Inter',
+                                            fontWeight: FontWeight.w400,
+
+                                            fontSize: 14,
+                                            height: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                child: Text(
-                                  'Редактировать профиль',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 12,
-                                    height: 1,
-                                    color: color.white,
-                                  ),
-                                ),
-                              ),
-                            ] else ...[
-                              Row(
-                                spacing: 8,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () {},
+                                if (isMe) ...[
+                                  ElevatedButton(
+                                    onPressed: () => context.push(
+                                      '/profile/edit',
+                                      extra: profile,
+                                    ),
                                     style: ButtonStyle(
                                       shape: WidgetStatePropertyAll(
                                         RoundedRectangleBorder(
@@ -194,20 +198,15 @@ class ProfileView extends StatelessWidget {
                                         ),
                                       ),
                                       minimumSize: const WidgetStatePropertyAll(
-                                        Size(150, 34),
+                                        Size(180, 34),
                                       ),
                                       backgroundColor:
                                           const WidgetStatePropertyAll(
                                             Colors.black,
                                           ),
                                     ),
-                                    icon: Icon(
-                                      Icons.person_add_alt_1,
-                                      color: color.indicatorColor,
-                                      size: 14,
-                                    ),
-                                    label: Text(
-                                      'Подписаться',
+                                    child: Text(
+                                      'Редактировать профиль',
                                       style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w800,
@@ -217,19 +216,64 @@ class ProfileView extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  IconCircleButton(
-                                    icon: AppIcons.ask2,
-                                    onPressed: () {},
-                                  ),
+                                ] else ...[
+                                  Row(
+                                    spacing: 8,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        onPressed: () {},
+                                        style: ButtonStyle(
+                                          shape: WidgetStatePropertyAll(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                              side: BorderSide(
+                                                color: color.indicatorColor,
+                                              ),
+                                            ),
+                                          ),
+                                          minimumSize:
+                                              const WidgetStatePropertyAll(
+                                                Size(150, 34),
+                                              ),
+                                          backgroundColor:
+                                              const WidgetStatePropertyAll(
+                                                Colors.black,
+                                              ),
+                                        ),
+                                        icon: Icon(
+                                          profile?.isFollowing ?? false
+                                              ? Icons.person_remove
+                                              : Icons.person_add_alt_1,
+                                          color: color.indicatorColor,
+                                          size: 14,
+                                        ),
+                                        label: Text(
+                                          'Подписаться',
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 12,
+                                            height: 1,
+                                            color: color.white,
+                                          ),
+                                        ),
+                                      ),
+                                      IconCircleButton(
+                                        icon: AppIcons.ask2,
+                                        onPressed: () {},
+                                      ),
 
-                                  IconCircleButton(
-                                    icon: AppIcons.gift,
-                                    onPressed: () {},
+                                      IconCircleButton(
+                                        icon: AppIcons.gift,
+                                        onPressed: () {},
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                            ],
-                          ],
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -237,9 +281,9 @@ class ProfileView extends StatelessWidget {
 
                   const SizedBox(height: 18),
                   // Description
-                  const Text(
-                    'IRL стример и путешественник 🚀 Выполняю любые миссии в реальном мире!',
-                    style: TextStyle(
+                  Text(
+                    profile?.bio ?? '',
+                    style: const TextStyle(
                       color: Color(0xffD1D5DB),
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
@@ -253,14 +297,26 @@ class ProfileView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildStatItem('57', 'Миссий'),
-                      _buildStatItem('12,5K', 'Подписчики'),
-                      _buildStatItem('342', 'Подписки'),
-                      _buildStatItem('30', 'Фаны'),
+                      _buildStatItem(
+                        profile?.missionsCount.toString() ?? '0',
+                        'Миссий',
+                      ),
+                      _buildStatItem(
+                        _formatCount(profile?.followersCount ?? 0),
+                        'Подписчики',
+                      ),
+                      _buildStatItem(
+                        profile?.followingCount.toString() ?? '0',
+                        'Подписки',
+                      ),
+                      _buildStatItem(
+                        profile?.fansCount.toString() ?? '0',
+                        'Фаны',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  if (isMe) ...[
+                  if (isMe && profile?.balance != null) ...[
                     // Balance
                     Container(
                       width: double.infinity,
@@ -307,9 +363,9 @@ class ProfileView extends StatelessWidget {
                                     width: 21,
                                   ),
 
-                                  const Text(
-                                    '100',
-                                    style: TextStyle(
+                                  Text(
+                                    profile!.balance!.toStringAsFixed(0),
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -386,6 +442,21 @@ class ProfileView extends StatelessWidget {
     );
   }
 
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
+  }
+
+  Widget _buildDefaultAvatar() => Container(
+    width: 84,
+    height: 84,
+    color: Colors.grey[800],
+    child: const Icon(Icons.person, color: Colors.white, size: 40),
+  );
   Widget _buildStatItem(String value, String label) => Column(
     children: [
       Text(
@@ -637,5 +708,15 @@ class IconCircleButton extends StatelessWidget {
         child: Center(child: Icon(icon, size: 16, color: Colors.white)),
       ),
     ),
+  );
+}
+
+class ErrorView extends StatelessWidget {
+  const ErrorView({required this.message, super.key});
+  final String message;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(leading: const BackButton()),
+    body: Center(child: Text(message)),
   );
 }

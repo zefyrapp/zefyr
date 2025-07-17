@@ -7,7 +7,7 @@ part of 'edit_profile_view_model.dart';
 // **************************************************************************
 
 String _$editProfileViewModelHash() =>
-    r'1a93c5f2d05be5b64eb6f96e80755c86a13e0e69';
+    r'df5a6bc9c2dc7ee9ea2a316967975bf568ae29cb';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -32,9 +32,9 @@ class _SystemHash {
 
 abstract class _$EditProfileViewModel
     extends BuildlessAutoDisposeNotifier<EditProfileState> {
-  late final EditProfileRequest request;
+  late final ProfileEntity profile;
 
-  EditProfileState build(EditProfileRequest request);
+  EditProfileState build(ProfileEntity profile);
 }
 
 /// See also [EditProfileViewModel].
@@ -47,15 +47,15 @@ class EditProfileViewModelFamily extends Family<EditProfileState> {
   const EditProfileViewModelFamily();
 
   /// See also [EditProfileViewModel].
-  EditProfileViewModelProvider call(EditProfileRequest request) {
-    return EditProfileViewModelProvider(request);
+  EditProfileViewModelProvider call(ProfileEntity profile) {
+    return EditProfileViewModelProvider(profile);
   }
 
   @override
   EditProfileViewModelProvider getProviderOverride(
     covariant EditProfileViewModelProvider provider,
   ) {
-    return call(provider.request);
+    return call(provider.profile);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -81,9 +81,9 @@ class EditProfileViewModelProvider
           EditProfileState
         > {
   /// See also [EditProfileViewModel].
-  EditProfileViewModelProvider(EditProfileRequest request)
+  EditProfileViewModelProvider(ProfileEntity profile)
     : this._internal(
-        () => EditProfileViewModel()..request = request,
+        () => EditProfileViewModel()..profile = profile,
         from: editProfileViewModelProvider,
         name: r'editProfileViewModelProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -92,7 +92,7 @@ class EditProfileViewModelProvider
         dependencies: EditProfileViewModelFamily._dependencies,
         allTransitiveDependencies:
             EditProfileViewModelFamily._allTransitiveDependencies,
-        request: request,
+        profile: profile,
       );
 
   EditProfileViewModelProvider._internal(
@@ -102,14 +102,14 @@ class EditProfileViewModelProvider
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.request,
+    required this.profile,
   }) : super.internal();
 
-  final EditProfileRequest request;
+  final ProfileEntity profile;
 
   @override
   EditProfileState runNotifierBuild(covariant EditProfileViewModel notifier) {
-    return notifier.build(request);
+    return notifier.build(profile);
   }
 
   @override
@@ -117,13 +117,13 @@ class EditProfileViewModelProvider
     return ProviderOverride(
       origin: this,
       override: EditProfileViewModelProvider._internal(
-        () => create()..request = request,
+        () => create()..profile = profile,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        request: request,
+        profile: profile,
       ),
     );
   }
@@ -136,13 +136,13 @@ class EditProfileViewModelProvider
 
   @override
   bool operator ==(Object other) {
-    return other is EditProfileViewModelProvider && other.request == request;
+    return other is EditProfileViewModelProvider && other.profile == profile;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, request.hashCode);
+    hash = _SystemHash.combine(hash, profile.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -152,8 +152,8 @@ class EditProfileViewModelProvider
 // ignore: unused_element
 mixin EditProfileViewModelRef
     on AutoDisposeNotifierProviderRef<EditProfileState> {
-  /// The parameter `request` of this provider.
-  EditProfileRequest get request;
+  /// The parameter `profile` of this provider.
+  ProfileEntity get profile;
 }
 
 class _EditProfileViewModelProviderElement
@@ -166,8 +166,7 @@ class _EditProfileViewModelProviderElement
   _EditProfileViewModelProviderElement(super.provider);
 
   @override
-  EditProfileRequest get request =>
-      (origin as EditProfileViewModelProvider).request;
+  ProfileEntity get profile => (origin as EditProfileViewModelProvider).profile;
 }
 
 // ignore_for_file: type=lint

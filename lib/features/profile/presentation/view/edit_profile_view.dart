@@ -1,39 +1,38 @@
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flutter/material.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/common/widgets/animated_error_message.dart';
+import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
+import 'package:zefyr/features/profile/presentation/view_model/edit_profile_state.dart';
+import 'package:zefyr/features/profile/presentation/view_model/edit_profile_view_model.dart';
 
-class EditProfileView extends StatefulWidget {
-  const EditProfileView({super.key});
-
+class EditProfileView extends ConsumerStatefulWidget {
+  const EditProfileView({required this.profile, super.key});
+  final ProfileEntity profile;
   @override
-  State<EditProfileView> createState() => _EditProfileScreenState();
+  ConsumerState<EditProfileView> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileView> {
+class _EditProfileScreenState extends ConsumerState<EditProfileView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-
-  // Изначальные значения
-  final String _initialName = 'Алексей Стримов';
-  final String _initialNickname = '@alexstream';
-  final String _initialBio =
-      'IRL стример и путешественник 🌍 Выполняю любые миссии в реальном мире!';
-
+  late final EditProfileState editProfile;
   bool _hasChanges = false;
   bool _showError = false;
   bool _isPressed = false;
   @override
   void initState() {
     super.initState();
-    _nameController.text = _initialName;
-    _nicknameController.text = _initialNickname;
-    _bioController.text = _initialBio;
+    editProfile = ref.read(editProfileViewModelProvider(widget.profile));
+    _nameController.text = editProfile.name ?? '';
+    _nicknameController.text = editProfile.nickname ?? '';
+    _bioController.text = editProfile.bio ?? '';
 
     // Слушаем изменения во всех полях
     _nameController.addListener(_checkForChanges);
@@ -44,9 +43,9 @@ class _EditProfileScreenState extends State<EditProfileView> {
   void _checkForChanges() {
     setState(() {
       _hasChanges =
-          _nameController.text != _initialName ||
-          _nicknameController.text != _initialNickname ||
-          _bioController.text != _initialBio;
+          _nameController.text != editProfile.name ||
+          _nicknameController.text != editProfile.nickname ||
+          _bioController.text != editProfile.bio;
       _showError = false;
     });
   }
@@ -224,10 +223,7 @@ class _EditProfileScreenState extends State<EditProfileView> {
                   style: color.elevatedStyle,
                   child: _isPressed
                       ? const CircularProgressIndicator()
-                      : Text(
-                          local.continueButton,
-                          style: color.elevatedTextStyle,
-                        ),
+                      : Text(local.save, style: color.elevatedTextStyle),
                 ),
               ),
             ),

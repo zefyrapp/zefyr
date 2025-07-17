@@ -219,4 +219,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startStream => 'Start Stream';
+
+  @override
+  String get save => 'Save';
 }

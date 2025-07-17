@@ -77,5 +77,6 @@
   "streamDescription": "Описание",
   "enterStreamDescription": "Опишите ваш стрим...",
   "streamPreviewUrl": "URL превью",
-  "startStream": "Начать стрим"
+  "startStream": "Начать стрим",
+  "save": "Сохранить"
 }

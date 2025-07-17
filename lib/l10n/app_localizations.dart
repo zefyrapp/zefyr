@@ -497,6 +497,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start Stream'**
   String get startStream;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
 }
 
 class _AppLocalizationsDelegate

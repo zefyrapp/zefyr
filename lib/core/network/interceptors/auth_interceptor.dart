@@ -38,7 +38,7 @@ class AuthInterceptor extends Interceptor {
   /// Если код ответа 401, мы не считаем его "успешным" и перенаправляем в onError.
   @override
   Future<void> onResponse(
-    Response response,
+    Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) async {
     if (response.statusCode == 401) {
@@ -102,7 +102,9 @@ class AuthInterceptor extends Interceptor {
     try {
       final newToken = await _refreshFuture;
       if (newToken == null) {
-        throw const AuthException('Failed to refresh token: new token is null.');
+        throw const AuthException(
+          'Failed to refresh token: new token is null.',
+        );
       }
       return newToken;
     } finally {

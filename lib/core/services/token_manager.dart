@@ -41,14 +41,14 @@ class TokenManager {
 
   /// Получает текущий access token
   Future<String?> getAccessToken() async {
-    final authData = await getAuthData();
-    return authData?.accessToken;
+    final tokens = await _userDao.getTokensOnly();
+    return tokens?.accessToken;
   }
 
   /// Получает текущий refresh token
   Future<String?> getRefreshToken() async {
-    final authData = await getAuthData();
-    return authData?.refreshToken;
+    final tokens = await _userDao.getTokensOnly();
+    return tokens?.refreshToken;
   }
 
   /// Очищает все данные аутентификации

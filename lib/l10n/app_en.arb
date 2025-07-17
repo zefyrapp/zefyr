@@ -77,5 +77,6 @@
   "streamDescription": "Stream Description",
   "enterStreamDescription": "Describe your stream...",
   "streamPreviewUrl": "Preview URL",
-  "startStream": "Start Stream"
+  "startStream": "Start Stream",
+  "save": "Save"
 }
