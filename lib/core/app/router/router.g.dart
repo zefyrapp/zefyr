@@ -25,7 +25,7 @@ final authRefreshListenableProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthRefreshListenableRef = ProviderRef<Raw<AuthRefreshListenable>>;
-String _$routerHash() => r'0a7f458b3df712f34c3fd3a684d5b4296a8af463';
+String _$routerHash() => r'04535c57225b40fbc153d7389811f88778a011da';
 
 /// See also [router].
 @ProviderFor(router)

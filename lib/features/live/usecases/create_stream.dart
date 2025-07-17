@@ -7,7 +7,7 @@ import 'package:zefyr/features/live/domain/repositories/stream_repository.dart';
 
 class CreateStream extends UseCase<StreamCreateResponse, StreamCreateRequest>
     with UseCaseLogging<StreamCreateResponse, StreamCreateRequest> {
-  CreateStream(this.repository);
+   CreateStream(this.repository);
   final StreamRepository repository;
 
   @override
