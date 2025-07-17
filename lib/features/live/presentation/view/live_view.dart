@@ -5,7 +5,6 @@ import 'package:toastification/toastification.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
-import 'package:zefyr/features/live/data/models/stream_create_response.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
 import 'package:zefyr/features/live/providers/stream_providers.dart';
 
@@ -54,7 +53,7 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
   }
 
   void _navigateToStreamScreen() {
-    context.push('/onAir',);
+    context.pop();
   }
 
   void _showErrorDialog(String message) {
@@ -94,6 +93,7 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: const BackButton(color: Colors.white),
         backgroundColor: Colors.black,
         elevation: 0,
 
@@ -185,7 +185,7 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
                   style: theme.elevatedStyle,
                   child: streamState.isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(local.startStream, style: theme.elevatedTextStyle),
+                      : Text(local.save, style: theme.elevatedTextStyle),
                 ),
               ),
             ],

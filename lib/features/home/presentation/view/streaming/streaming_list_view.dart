@@ -100,12 +100,12 @@ class _StreamingListViewState extends ConsumerState<StreamingListView> {
 
                   final stream = state.streams[index];
                   return StreamShortCard(
-                    username: stream.ownerNickname,
+                    username: stream.owner,
                     activity: stream.status,
                     viewCount: stream.formattedViewCount,
                     avatarUrl: stream.previewUrl,
                     backgroundImageUrl: '',
-                    onTap: () => _onStreamTap(stream.id, stream.ownerNickname),
+                    onTap: () => _onStreamTap(stream.id, stream.owner),
                   );
                 },
                 childCount:

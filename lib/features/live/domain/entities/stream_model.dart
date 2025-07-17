@@ -10,7 +10,6 @@ class StreamModel {
     required this.viewersCount,
     required this.coinsCount,
     required this.owner,
-    required this.ownerNickname,
     required this.createdAt,
     this.startedAt,
     this.endedAt,
@@ -24,14 +23,14 @@ class StreamModel {
     status: map['status'] as String,
     viewersCount: map['viewers_count'] as int,
     coinsCount: map['coins_count'] as int,
-    startedAt: map['ended_at'] != null
+    startedAt: map['started_at'] != null
         ? DateTime.parse(map['started_at'] as String)
         : null,
     endedAt: map['ended_at'] != null
         ? DateTime.parse(map['ended_at'] as String)
         : null,
     owner: map['owner'] as String,
-    ownerNickname: map['owner_nickname'] as String,
+
     createdAt: DateTime.parse(map['created_at'] as String),
   );
 
@@ -48,7 +47,7 @@ class StreamModel {
   final DateTime? endedAt;
 
   final String owner;
-  final String ownerNickname;
+
   final DateTime createdAt;
   String get formattedViewCount {
     if (viewersCount >= 1000) {
@@ -68,7 +67,7 @@ class StreamModel {
     DateTime? startedAt,
     DateTime? endedAt,
     String? owner,
-    String? ownerNickname,
+
     DateTime? createdAt,
   }) => StreamModel(
     id: id ?? this.id,
@@ -81,7 +80,7 @@ class StreamModel {
     startedAt: startedAt ?? this.startedAt,
     endedAt: endedAt ?? this.endedAt,
     owner: owner ?? this.owner,
-    ownerNickname: ownerNickname ?? this.ownerNickname,
+
     createdAt: createdAt ?? this.createdAt,
   );
 
@@ -96,7 +95,6 @@ class StreamModel {
     'started_at': startedAt,
     'ended_at': endedAt,
     'owner': owner,
-    'owner_nickname': ownerNickname,
     'created_at': createdAt,
   };
 
@@ -104,7 +102,7 @@ class StreamModel {
 
   @override
   String toString() =>
-      'StreamModel(id: $id, title: $title, description: $description, previewUrl: $previewUrl, status: $status, viewersCount: $viewersCount, coinsCount: $coinsCount, startedAt: $startedAt, endedAt: $endedAt, owner: $owner, ownerNickname: $ownerNickname, createdAt: $createdAt)';
+      'StreamModel(id: $id, title: $title, description: $description, previewUrl: $previewUrl, status: $status, viewersCount: $viewersCount, coinsCount: $coinsCount, startedAt: $startedAt, endedAt: $endedAt, owner: $owner,  createdAt: $createdAt)';
 
   @override
   bool operator ==(covariant StreamModel other) {
@@ -120,7 +118,6 @@ class StreamModel {
         other.startedAt == startedAt &&
         other.endedAt == endedAt &&
         other.owner == owner &&
-        other.ownerNickname == ownerNickname &&
         other.createdAt == createdAt;
   }
 
@@ -136,6 +133,5 @@ class StreamModel {
       startedAt.hashCode ^
       endedAt.hashCode ^
       owner.hashCode ^
-      ownerNickname.hashCode ^
       createdAt.hashCode;
 }

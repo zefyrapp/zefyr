@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/common/extensions/media_query.dart';
 import 'package:zefyr/features/live/data/services/camera_service.dart';
 import 'package:zefyr/features/live/presentation/view_model/on_air_view_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
@@ -161,40 +162,55 @@ class _OnAirViewState extends ConsumerState<OnAirView>
     OnAirState onAirState,
   ) => SafeArea(
     child: Container(
+      width: context.width,
       padding: const EdgeInsets.all(16),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          const SizedBox(width: 8),
-          if (streamState is StreamStateSuccess) ...[
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    streamState.stream.stream?.title ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    streamState.stream.stream?.description ?? '',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-          // Статус стрима
-          _buildStatusBadge(onAirState),
+
+          // Row(
+          //   children: [
+          //     IconButton(
+          //       icon: const Icon(Icons.arrow_back, color: Colors.white),
+          //       onPressed: () => Navigator.pop(context),
+          //     ),
+          //     const SizedBox(width: 8),
+          //     if (streamState is StreamStateSuccess) ...[
+          //       Expanded(
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           mainAxisSize: MainAxisSize.min,
+          //           children: [
+          //             Text(
+          //               streamState.stream.stream?.title ?? '',
+          //               style: const TextStyle(
+          //                 color: Colors.white,
+          //                 fontSize: 16,
+          //                 fontWeight: FontWeight.w600,
+          //               ),
+          //               overflow: TextOverflow.ellipsis,
+          //             ),
+          //             Text(
+          //               streamState.stream.stream?.description ?? '',
+          //               style: TextStyle(color: Colors.grey[400], fontSize: 14),
+          //               overflow: TextOverflow.ellipsis,
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ],
+          //     // Статус стрима
+          //     _buildStatusBadge(onAirState),
+          //   ],
+          // ),
+          InkWell(
+            child: const Icon(Icons.settings, color: Colors.white),
+            onTap: () => context.push('/live/settings'),
+          ),
         ],
       ),
     ),
