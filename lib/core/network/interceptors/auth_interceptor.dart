@@ -27,9 +27,13 @@ class AuthInterceptor extends Interceptor {
     if (options.path.contains('auth/refresh')) {
       return handler.next(options);
     }
-    final tokens = await userDao.getTokensOnly();
-    if (tokens?.accessToken != null) {
-      options.headers['Authorization'] = 'Bearer ${tokens!.accessToken}';
+    try {
+      final tokens = await userDao.getTokensOnly();
+      if (tokens?.accessToken != null) {
+        options.headers['Authorization'] = 'Bearer ${tokens!.accessToken}';
+      }
+    } catch (e) {
+      log(e.toString());
     }
     return handler.next(options);
   }

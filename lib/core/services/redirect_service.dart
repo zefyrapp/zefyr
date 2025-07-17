@@ -1,14 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zefyr/features/auth/providers/auth_providers.dart';
 
 class RedirectService {
   /// Выполняет редирект в зависимости от статуса аутентификации.
   /// Возвращает маршрут для редиректа или `null`, если редирект не требуется.
-  String? authRedirect({required Ref ref, required GoRouterState state}) {
-    const publicRoutes = ['/auth', '/home', '/', '/onAir/remoteParticipant'];
-    final user = ref.watch(authStateChangesProvider).valueOrNull;
-    final isLoggedIn = user != null;
+  String? authRedirect({required bool isAuth, required GoRouterState state}) {
+    const publicRoutes = ['/auth', '/home','/', '/onAir/remoteParticipant'];
+
+    final isLoggedIn = isAuth;
 
     final location = state.matchedLocation;
     final isGoingToPublicRoute = publicRoutes.contains(location);
@@ -21,7 +19,13 @@ class RedirectService {
 
     // Если пользователь залогинен и случайно попал на /auth - редирект домой или откуда пришел.
     if (isLoggedIn && isGoingToPublicRoute) {
-      return state.uri.queryParameters['from'] ?? state.fullPath;
+      final from = state.uri.queryParameters['from'];
+      if (from != null && from != location) return from;
+
+      // не редиректим, если уже на нужной странице
+      if (from == null || from == location) return null;
+
+      return from;
     }
 
     // В остальных случаях редирект не нужен.

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +14,10 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    log('🏗️ MyApp build called');
+
     final router = ref.watch(routerProvider);
+    log('🏗️ Router obtained: ${router.hashCode}');
     return ToastificationWrapper(
       config: const ToastificationConfig(),
       child: MediaQuery(

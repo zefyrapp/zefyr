@@ -16,11 +16,13 @@ class Users extends Table {
 
 // Таблица для хранения токенов аутентификации
 class AuthTokens extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  IntColumn get id => integer().withDefault(const Constant(1))();
   IntColumn get userId =>
       integer().references(Users, #id, onDelete: KeyAction.cascade)();
   TextColumn get accessToken => text()();
   TextColumn get refreshToken => text()();
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 @DriftDatabase(tables: [Users, AuthTokens])

@@ -8,29 +8,31 @@ class UserDao {
   final AppDatabase db;
 
   // Сохраняет/обновляет данные аутентификации (пользователь + токены)
-  Future<void> insertOrUpdateUser(AuthResponse authResponse) async {
-    await db.transaction(() async {
-      // Сначала сохраняем/обновляем пользователя
-      final user = authResponse.user;
-      if (user != null) {
-        await db.into(db.users).insertOnConflictUpdate(user.toUsersCompanion());
+  Future<void> insertOrUpdateUser(AuthResponse authResponse) async =>
+      db.transaction(() async {
+        // Сначала сохраняем/обновляем пользователя
+        final user = authResponse.user;
+        if (user != null) {
+          await db
+              .into(db.users)
+              .insertOnConflictUpdate(user.toUsersCompanion());
 
-        // Получаем ID пользователя
-        final userId = int.tryParse(user.id) ?? 0;
+          // Получаем ID пользователя
+          final userId = int.tryParse(user.id) ?? 0;
 
-        // Затем сохраняем/обновляем токены
-        await db
-            .into(db.authTokens)
-            .insertOnConflictUpdate(
-              AuthTokensCompanion(
-                userId: Value(userId),
-                accessToken: Value(authResponse.accessToken),
-                refreshToken: Value(authResponse.refreshToken),
-              ),
-            );
-      }
-    });
-  }
+          // Затем сохраняем/обновляем токены
+          await db
+              .into(db.authTokens)
+              .insertOnConflictUpdate(
+                AuthTokensCompanion(
+                  userId: Value(userId),
+                  accessToken: Value(authResponse.accessToken),
+                  refreshToken: Value(authResponse.refreshToken),
+                  id: const Value(1),
+                ),
+              );
+        }
+      });
 
   /// Получает полные данные аутентификации
   Future<AuthResponse?> getUser() async {
@@ -62,9 +64,9 @@ class UserDao {
   /// Получает только данные пользователя без токенов
   /// Стрим, отслеживающий изменения пользователя без токенов
   Stream<UserModel?> watchUserOnly() => db
-        .select(db.users)
-        .watchSingleOrNull()
-        .map((row) => row == null ? null : UserModel.fromDrift(row));
+      .select(db.users)
+      .watchSingleOrNull()
+      .map((row) => row == null ? null : UserModel.fromDrift(row));
 
   /// Получает только токены без данных пользователя
   Future<AuthToken?> getTokensOnly() async =>

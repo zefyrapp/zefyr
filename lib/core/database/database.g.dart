@@ -319,12 +319,9 @@ class $AuthTokensTable extends AuthTokens
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override

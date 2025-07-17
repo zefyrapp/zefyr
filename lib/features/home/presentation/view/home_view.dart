@@ -58,6 +58,7 @@ class AvatarHomeSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateChangesProvider).valueOrNull;
     final color = context.customTheme.overlayApp;
+ //  ref.read(userDaoProvider).clearUser();
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 16,
@@ -79,7 +80,7 @@ class AvatarHomeSection extends ConsumerWidget {
           : Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
-                onPressed: () => context.push('/auth'),
+                onPressed: () => context.go('/auth?from=/'),
                 style: ButtonStyle(
                   shape: WidgetStatePropertyAll(
                     RoundedRectangleBorder(

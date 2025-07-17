@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/services/redirect_service.dart';
 import 'package:zefyr/core/utils/fade_transition/fade_transition.dart';
-import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/presentation/view/auth_flow_view.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/chat/presentation/view/chat_view.dart';
@@ -27,70 +26,34 @@ part 'router.g.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-class AuthNotifier extends ChangeNotifier {
-  AuthNotifier(this.ref) {
-    ref.watch(authStateChangesProvider).whenData((data) {
-      if (!_disposed) {
-        notifyListeners();
-      }
-    });
-  }
-  late final Ref ref;
-
-  bool _disposed = false;
-
-  @override
-  void dispose() {
-    _disposed = true;
-
-    super.dispose();
-  }
-}
-
-class AuthRefreshListenable extends ChangeNotifier {
-  AuthRefreshListenable(Ref ref) {
-    // Listen to AuthNotifier's state changes
-    _subscription = ref.listen<AsyncValue<UserModel?>>(
-      authStateChangesProvider,
-      (_, __) {
-        notifyListeners();
-      },
-    );
-  }
-  late final ProviderSubscription<AsyncValue<UserModel?>> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.close();
-    super.dispose();
-  }
-}
-
 @Riverpod(keepAlive: true)
-Raw<AuthRefreshListenable> authRefreshListenable(Ref ref) {
-  final listenable = AuthRefreshListenable(ref);
-  ref.onDispose(() => listenable.dispose());
-  return listenable;
-}
-
-@riverpod
 GoRouter router(Ref ref) {
+  log('🚀 router provider called');
+
   final shellNavigatorKey = GlobalKey<NavigatorState>();
-
-  final refreshListenable = ref.watch(authRefreshListenableProvider);
-
-  // ref.onDispose(() {
-  //   authNotifier.dispose();
-  // });
-
+  final isAuth = ValueNotifier<AsyncValue<bool>>(const AsyncLoading());
+  ref
+    ..onDispose(isAuth.dispose)
+    ..listen(
+      authStateChangesProvider.select(
+        (value) => value.whenData((value) => value != null),
+      ),
+      (_, next) => isAuth.value = next,
+    );
   final router = GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: true,
-
-    redirect: (context, state) =>
-        RedirectService().authRedirect(ref: ref, state: state),
-    refreshListenable: refreshListenable,
+    redirect: (context, state) {
+      log('🔄 Router redirect called for: ${state.fullPath}');
+      final path = RedirectService().authRedirect(
+        state: state,
+        isAuth: isAuth.value.value ?? false,
+      );
+      log('🔄 Redirect path: $path');
+      return path;
+    },
+    refreshListenable: isAuth,
     observers: [MyNavigatorObserver()],
     routes: [
       StatefulShellRoute.indexedStack(
@@ -113,8 +76,10 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/mission',
-                redirect: (context, state) =>
-                    RedirectService().authRedirect(ref: ref, state: state),
+                redirect: (context, state) => RedirectService().authRedirect(
+                  isAuth: isAuth.value.value ?? false,
+                  state: state,
+                ),
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const MissionView(),
@@ -158,8 +123,10 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/chat',
-                redirect: (context, state) =>
-                    RedirectService().authRedirect(ref: ref, state: state),
+                redirect: (context, state) => RedirectService().authRedirect(
+                  isAuth: isAuth.value.value ?? false,
+                  state: state,
+                ),
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: const ChatView(),
@@ -171,8 +138,10 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/profile',
-                redirect: (context, state) =>
-                    RedirectService().authRedirect(ref: ref, state: state),
+                redirect: (context, state) => RedirectService().authRedirect(
+                  isAuth: isAuth.value.value ?? false,
+                  state: state,
+                ),
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
                   child: ProfileViewWrapper(
@@ -215,8 +184,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/profile/edit',
 
-        redirect: (context, state) =>
-            RedirectService().authRedirect(ref: ref, state: state),
+        redirect: (context, state) => RedirectService().authRedirect(
+          isAuth: isAuth.value.value ?? false,
+          state: state,
+        ),
         pageBuilder: (context, state) => FadeTransitionPage(
           key: state.pageKey,
           child: EditProfileView(profile: state.extra! as ProfileEntity),
@@ -224,7 +195,11 @@ GoRouter router(Ref ref) {
       ),
     ],
   );
-  ref.onDispose(router.dispose);
+  ref.onDispose(() {
+    log('🚀 router disposed');
+    router.dispose();
+  });
+
   return router;
 }
 
@@ -232,25 +207,25 @@ class MyNavigatorObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
-    log('Pushed route: ${route.settings.name}');
+    log('📍 Pushed route: ${route.settings.name}');
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
-    log('Popped route: ${route.settings.name}');
+    log('📍 Popped route: ${route.settings.name}');
   }
 
   @override
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didRemove(route, previousRoute);
-    log('Removed route: ${route.settings.name}');
+    log('📍 Removed route: ${route.settings.name}');
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-    log('Replaced route: ${newRoute?.settings.name}');
+    log('📍 Replaced route: ${newRoute?.settings.name}');
   }
 }
 
