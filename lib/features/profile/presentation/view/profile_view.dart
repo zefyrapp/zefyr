@@ -10,7 +10,6 @@ import 'package:zefyr/core/utils/icons/app_asset_icon.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
-import 'package:zefyr/features/profile/presentation/view_model/edit_profile_view_model.dart';
 import 'package:zefyr/features/profile/providers/profile_providers.dart';
 
 class ProfileViewWrapper extends ConsumerWidget {

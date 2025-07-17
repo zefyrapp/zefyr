@@ -2,7 +2,6 @@ import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/core/utils/handler/handler.dart';
 import 'package:zefyr/features/profile/data/models/edit_profile_request.dart';
 import 'package:zefyr/features/profile/data/models/profile_model.dart';
-import 'package:zefyr/features/profile/data/models/profile_response.dart';
 
 /// Интерфейс для работы с профилем пользователя
 abstract class RemoteProfileDataSource {

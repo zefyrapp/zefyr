@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zefyr/features/home/domain/entities/stream_entity.dart';
 import 'package:zefyr/features/home/domain/entities/stream_list_api_wrapper.dart';
 import 'package:zefyr/features/home/usecases/get_stream_token.dart';
 import 'package:zefyr/features/home/usecases/get_streams.dart';

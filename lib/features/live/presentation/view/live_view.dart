@@ -5,6 +5,8 @@ import 'package:toastification/toastification.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
+import 'package:zefyr/features/live/data/models/stream_create_response.dart';
+import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
 import 'package:zefyr/features/live/providers/stream_providers.dart';
 
 class LiveView extends ConsumerStatefulWidget {
@@ -22,21 +24,6 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
   final _titleNode = FocusNode();
   final _descriptionNode = FocusNode();
   final _previewUrlNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    // Заполняем поля текущими значениями из стейта
-    _loadCurrentValues();
-  }
-
-  void _loadCurrentValues() {
-    final formState = ref.read(streamFormProvider);
-    _titleController.text = formState.title;
-    _descriptionController.text = formState.description;
-    _previewUrlController.text = formState.previewUrl;
-  }
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -48,44 +35,29 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
     super.dispose();
   }
 
-  void _saveSettings() {
-    if (_formKey.currentState!.validate()) {
-      // Обновляем стейт с новыми значениями
-      ref
-          .read(streamFormProvider.notifier)
-          .updateAll(
-            title: _titleController.text,
-            description: _descriptionController.text,
-            previewUrl: _previewUrlController.text,
-          );
+  Future<void> _createStream() async {
+    // Обновляем состояние формы с текущими значениями
+    ref
+        .read(streamFormProvider.notifier)
+        .updateAll(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          previewUrl: _previewUrlController.text,
+        );
 
-      // Показываем уведомление об успешном сохранении
-      _showSuccessToast();
+    final formState = ref.read(streamFormProvider);
 
-      // Возвращаемся к экрану OnAir
-      context.pop();
+    if (_formKey.currentState!.validate() && formState.canCreateStream) {
+      final request = formState.toRequest();
+      await ref.read(streamViewModelProvider.notifier).createNewStream(request);
     }
   }
 
-  void _showSuccessToast() {
-    Toastification().show(
-      title: const Text(
-        'Настройки сохранены',
-        style: TextStyle(
-          fontWeight: FontWeight.w400,
-          fontSize: 12,
-          height: 20 / 12,
-          color: Colors.white,
-        ),
-      ),
-      type: ToastificationType.success,
-      style: ToastificationStyle.fillColored,
-      primaryColor: Colors.green,
-      autoCloseDuration: const Duration(seconds: 2),
-    );
+  void _navigateToStreamScreen() {
+    context.push('/onAir');
   }
 
-  void _showErrorToast(String message) {
+  void _showErrorDialog(String message) {
     Toastification().show(
       title: Text(
         message,
@@ -107,14 +79,24 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
   Widget build(BuildContext context) {
     final theme = context.customTheme.overlayApp;
     final local = context.localization;
+    final streamState = ref.watch(streamViewModelProvider);
     final formState = ref.watch(streamFormProvider);
-
+    // Слушаем изменения стейта для навигации и показа ошибок
+    ref.listen<StreamViewState>(streamViewModelProvider, (previous, next) {
+      if (next is StreamStateSuccess) {
+        // Сбрасываем форму после успешного создания стрима
+        ref.read(streamFormProvider.notifier).reset();
+        _navigateToStreamScreen();
+      } else if (next is StreamStateError) {
+        _showErrorDialog(next.message);
+      }
+    });
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: const BackButton(color: Colors.white),
         backgroundColor: Colors.black,
         elevation: 0,
+
         title: Text(
           local.streamSetup,
           style: const TextStyle(color: Colors.white),
@@ -169,6 +151,7 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
                 focusNode: _descriptionNode,
                 hintText: local.enterStreamDescription,
                 maxLines: 3,
+
                 onFieldSubmitted: (_) => _previewUrlNode.requestFocus(),
               ),
 
@@ -188,78 +171,21 @@ class _LiveViewScreenState extends ConsumerState<LiveView> {
                 controller: _previewUrlController,
                 focusNode: _previewUrlNode,
                 hintText: 'https://example.com/preview.jpg',
-                validator: (value) {
-                  if (value != null && value.isNotEmpty) {
-                    final uri = Uri.tryParse(value);
-                    if (uri == null || !uri.hasScheme) {
-                      return 'Введите корректный URL';
-                    }
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              // Информация о текущем состоянии формы
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Статус настройки стрима:',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          formState.canCreateStream
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color: formState.canCreateStream
-                              ? Colors.green
-                              : Colors.orange,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          formState.canCreateStream
-                              ? 'Готов к созданию стрима'
-                              : 'Требуется заполнить название',
-                          style: TextStyle(
-                            color: formState.canCreateStream
-                                ? Colors.green
-                                : Colors.orange,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
               ),
 
               const Spacer(),
 
-              // Кнопка "Сохранить"
+              // Кнопка "Войти в стрим"
               Container(
                 margin: const EdgeInsets.only(bottom: 20),
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _saveSettings,
+                  onPressed: streamState.isLoading ? null : _createStream,
                   style: theme.elevatedStyle,
-                  child: Text(local.save, style: theme.elevatedTextStyle),
+                  child: streamState.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(local.startStream, style: theme.elevatedTextStyle),
                 ),
               ),
             ],

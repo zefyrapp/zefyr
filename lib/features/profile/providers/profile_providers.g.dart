@@ -272,23 +272,6 @@ class _UserProfileProviderElement
   String get userId => (origin as UserProfileProvider).userId;
 }
 
-String _$ediHash() => r'50993eb0ed5e59819385446ce845d16a0b09ceac';
-
-/// See also [Edi].
-@ProviderFor(Edi)
-final ediProvider = AutoDisposeProvider<Object?>.internal(
-  Edi,
-  name: r'ediProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$ediHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef EdiRef = AutoDisposeProviderRef<Object?>;
 String _$myProfileNotifierHash() => r'33aba2ef2530732d75ed076c5ccb0ea5f62a0924';
 
 /// See also [MyProfileNotifier].

@@ -126,7 +126,3 @@ Future<ProfileEntity?> userProfile(Ref ref, String userId) async {
   );
 }
 
-@riverpod
-Edi (Ref ref) {
-  return ;
-}

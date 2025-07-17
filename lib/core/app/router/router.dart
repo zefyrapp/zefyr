@@ -93,17 +93,8 @@ GoRouter router(Ref ref) {
                 path: '/live',
                 pageBuilder: (context, state) => FadeTransitionPage(
                   key: state.pageKey,
-                  child: const OnAirView(),
+                  child: const LiveView(),
                 ),
-                routes: [
-                  GoRoute(
-                    path: 'settings',
-                    pageBuilder: (context, state) => FadeTransitionPage(
-                      key: state.pageKey,
-                      child: const LiveView(),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

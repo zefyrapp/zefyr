@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/core/network/dio_client.dart';
-import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/home/domain/entities/stream_list_api_wrapper.dart';
 import 'package:zefyr/features/live/data/models/stream_create_response.dart';
 
