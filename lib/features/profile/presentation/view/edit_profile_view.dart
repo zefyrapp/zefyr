@@ -1,14 +1,14 @@
-import 'dart:math';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/common/widgets/animated_error_message.dart';
 import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
-import 'package:zefyr/features/profile/presentation/view_model/edit_profile_state.dart';
 import 'package:zefyr/features/profile/presentation/view_model/edit_profile_view_model.dart';
 
 class EditProfileView extends ConsumerStatefulWidget {
@@ -22,52 +22,39 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-  late final EditProfileState editProfile;
-  bool _hasChanges = false;
-  bool _showError = false;
-  bool _isPressed = false;
+  late final EditProfileViewModel viewModel;
   @override
   void initState() {
     super.initState();
-    editProfile = ref.read(editProfileViewModelProvider(widget.profile));
-    _nameController.text = editProfile.name ?? '';
-    _nicknameController.text = editProfile.nickname ?? '';
-    _bioController.text = editProfile.bio ?? '';
+    viewModel = ref.read(editProfileViewModelProvider(widget.profile).notifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = ref.read(editProfileViewModelProvider(widget.profile));
 
-    // Слушаем изменения во всех полях
-    _nameController.addListener(_checkForChanges);
-    _nicknameController.addListener(_checkForChanges);
-    _bioController.addListener(_checkForChanges);
-  }
+      _nameController.text = state.name ?? '';
+      _nicknameController.text = state.nickname ?? '';
+      _bioController.text = state.bio ?? '';
+    });
 
-  void _checkForChanges() {
-    setState(() {
-      _hasChanges =
-          _nameController.text != editProfile.name ||
-          _nicknameController.text != editProfile.nickname ||
-          _bioController.text != editProfile.bio;
-      _showError = false;
+    // Слушаем изменения в полях и обновляем ViewModel
+    _nameController.addListener(() {
+      viewModel.updateName(_nameController.text);
+    });
+
+    _nicknameController.addListener(() {
+      viewModel.updateNickname(_nicknameController.text);
+    });
+
+    _bioController.addListener(() {
+      viewModel.updateBio(_bioController.text);
     });
   }
 
-  void _saveProfile() {
-    setState(() {
-      _isPressed = true;
-    });
-    // Имитация ошибки валидации
-    if (_nicknameController.text.isEmpty ||
-        !_nicknameController.text.startsWith('@')) {
-      setState(() {
-        _showError = true;
-      });
+  Future<void> _saveProfile() async {
+    final success = await viewModel.saveProfile();
+
+    if (success && mounted) {
+      context.pop();
     }
-    Future.delayed(Duration(seconds: 3), () {
-      setState(() {
-        _isPressed = false;
-      });
-    });
-    // // Здесь была бы логика сохранения
-    // Navigator.pop(context);
   }
 
   @override
@@ -82,6 +69,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
   Widget build(BuildContext context) {
     final color = context.customTheme.overlayApp;
     final local = context.localization;
+    final viewModel = ref.read(
+      editProfileViewModelProvider(widget.profile).notifier,
+    );
+    final state = ref.watch(editProfileViewModelProvider(widget.profile));
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
@@ -124,30 +115,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
                             width: 80,
                             height: 80,
                             child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: 'imageUrl',
+                              child: state.avatar != null
+                                  ? Image.file(File(state.avatar!))
+                                  : CachedNetworkImage(
+                                      imageUrl:
+                                          state.avatar ?? state.avatarUrl ?? '',
 
-                                placeholder: (context, url) => Container(
-                                  width: 80,
-                                  height: 80,
-                                  color: Colors.grey[800],
-                                  child: const Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 40,
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  width: 80,
-                                  height: 80,
-                                  color: Colors.grey[800],
-                                  child: const Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 40,
-                                  ),
-                                ),
-                              ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                            width: 80,
+                                            height: 80,
+                                            color: Colors.grey[800],
+                                            child: const Icon(
+                                              Icons.person,
+                                              color: Colors.white,
+                                              size: 40,
+                                            ),
+                                          ),
+                                    ),
                             ),
                           ),
                         ],
@@ -156,9 +141,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
 
                       // Кнопка изменить фото
                       TextButton(
-                        onPressed: () {
-                          // Логика изменения фото
-                        },
+                        onPressed: viewModel.selectPick,
                         child: const Text(
                           'Изменить фото',
                           style: TextStyle(
@@ -193,18 +176,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
                       ),
 
                       const SizedBox(height: 24),
-
-                      AnimatedErrorMessage(
-                        message:
-                            'Пользователь с таким именем существует. Попробуйте другое',
-                        show: _showError,
-                        autoHideDuration: const Duration(seconds: 3),
-                        onHide: () {
-                          setState(() {
-                            _showError = false;
-                          });
-                        },
-                      ),
+                      if (state.errorMessage != null)
+                        AnimatedErrorMessage(
+                          message: state.errorMessage!,
+                          show: state.errorMessage != null,
+                          autoHideDuration: const Duration(seconds: 3),
+                          onHide: viewModel.clearError,
+                        ),
                     ],
                   ),
                 ),
@@ -219,9 +197,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
                 height: 50,
 
                 child: ElevatedButton(
-                  onPressed: _hasChanges ? _saveProfile : null,
+                  onPressed: viewModel.hasChanges && !state.isLoading
+                      ? _saveProfile
+                      : null,
                   style: color.elevatedStyle,
-                  child: _isPressed
+                  child: state.isLoading
                       ? const CircularProgressIndicator()
                       : Text(local.save, style: color.elevatedTextStyle),
                 ),
