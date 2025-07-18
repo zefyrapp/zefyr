@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/invert_color.dart';
+import 'package:zefyr/common/extensions/media_query.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/live/data/models/stream_create_request.dart';
 import 'package:zefyr/features/live/data/services/camera_service.dart';
@@ -154,7 +155,15 @@ class _OnAirViewState extends ConsumerState<OnAirView>
     }
 
     if (cameraState.isReady && cameraState.controller != null) {
-      return SizedBox.expand(child: CameraPreview(cameraState.controller!));
+      final scale =
+          1 /
+          (cameraState.controller!.value.aspectRatio *
+              MediaQuery.of(context).size.aspectRatio);
+      return Transform.scale(
+        scale: scale,
+        alignment: Alignment.topCenter,
+        child: CameraPreview(cameraState.controller!),
+      );
     }
 
     return Container(

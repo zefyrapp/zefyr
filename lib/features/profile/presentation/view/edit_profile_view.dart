@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -166,6 +167,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
                       _buildTextField(
                         label: 'Никнейм',
                         controller: _nicknameController,
+                        inputFormatters: [NicknameInputFormatter()],
                       ),
 
                       // Поле "О себе"
@@ -217,10 +219,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
     required String label,
     required TextEditingController controller,
     int maxLines = 1,
+    List<TextInputFormatter>? inputFormatters,
   }) => CustomProfileField(
     label: label,
     controller: controller,
     maxLines: maxLines,
+    inputFormatters: inputFormatters,
   );
 }
 
@@ -236,6 +240,7 @@ class CustomProfileField extends StatelessWidget {
     this.readOnly = false,
     this.keyboardType,
     this.onChanged,
+    this.inputFormatters,
   });
   final String label;
   final TextEditingController? controller;
@@ -246,7 +251,7 @@ class CustomProfileField extends StatelessWidget {
   final bool readOnly;
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
-
+  final List<TextInputFormatter>? inputFormatters;
   @override
   Widget build(BuildContext context) => Container(
     constraints: const BoxConstraints(minHeight: 57),
@@ -278,6 +283,7 @@ class CustomProfileField extends StatelessWidget {
                 keyboardType: keyboardType,
                 onTap: onTap,
                 onChanged: onChanged,
+                inputFormatters: inputFormatters,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -306,4 +312,134 @@ class CustomProfileField extends StatelessWidget {
       ],
     ),
   );
+}
+
+class NicknameInputFormatter extends TextInputFormatter {
+  // Разрешенные символы: буквы, цифры, точка, подчеркивание
+  static final _allowedCharsRegExp = RegExp(r'[a-zA-Z0-9._@]');
+
+  // Проверка валидности никнейма
+  static final _validNicknameRegExp = RegExp(
+    r'^@[a-zA-Z0-9](?!.*[_.]{2})[a-zA-Z0-9._]{1,28}[a-zA-Z0-9]$',
+  );
+
+  // Минимальная длина никнейма (включая @)
+  static const int minLength = 3; // @xx
+
+  // Максимальная длина никнейма (включая @)
+  static const int maxLength = 31; // @xxxxxx...xxx (30 символов + @)
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String newText = newValue.text;
+
+    // Если текст пустой, добавляем @
+    if (newText.isEmpty) {
+      return const TextEditingValue(
+        text: '@',
+        selection: TextSelection.collapsed(offset: 1),
+      );
+    }
+
+    // Если первый символ не @, добавляем его
+    if (!newText.startsWith('@')) {
+      newText = '@$newText';
+    }
+
+    // Проверяем, что @ только в начале
+    if (newText.indexOf('@', 1) != -1) {
+      return oldValue; // Запрещаем дополнительные @
+    }
+
+    // Ограничиваем длину
+    if (newText.length > maxLength) {
+      newText = newText.substring(0, maxLength);
+    }
+
+    // Фильтруем разрешенные символы
+    final filtered = newText
+        .split('')
+        .where((char) => _allowedCharsRegExp.hasMatch(char))
+        .join();
+
+    // Проверяем базовые правила в реальном времени
+    if (!_isValidInProgress(filtered)) {
+      return oldValue;
+    }
+
+    // Вычисляем правильную позицию курсора
+    int cursorOffset = newValue.selection.baseOffset;
+
+    // Корректируем позицию курсора с учетом добавленного @
+    if (!newValue.text.startsWith('@') && filtered.startsWith('@')) {
+      cursorOffset += 1;
+    }
+
+    // Убеждаемся, что курсор находится в допустимых пределах
+    cursorOffset = cursorOffset.clamp(1, filtered.length);
+
+    return TextEditingValue(
+      text: filtered,
+      selection: TextSelection.collapsed(offset: cursorOffset),
+    );
+  }
+
+  /// Проверяет валидность никнейма в процессе ввода
+  bool _isValidInProgress(String text) {
+    if (text.isEmpty) return false;
+
+    // Должен начинаться с @
+    if (!text.startsWith('@')) return false;
+
+    // Если только @, то это валидно для промежуточного состояния
+    if (text.length == 1) return true;
+
+    // После @ должен быть буквенно-цифровой символ
+    if (text.length >= 2 && !RegExp(r'[a-zA-Z0-9]').hasMatch(text[1])) {
+      return false;
+    }
+
+    // Не должно быть двух подряд идущих специальных символов
+    if (RegExp(r'[_.]{2}').hasMatch(text)) {
+      return false;
+    }
+
+    // Не должен заканчиваться на точку или подчеркивание только если это финальное состояние
+    // В процессе ввода разрешаем, чтобы пользователь мог продолжить набор
+
+    return true;
+  }
+
+  /// Проверяет финальную валидность никнейма
+  static bool isValidNickname(String nickname) {
+    if (nickname.length < minLength) return false;
+    return _validNicknameRegExp.hasMatch(nickname);
+  }
+
+  /// Очищает и форматирует никнейм
+  static String formatNickname(String input) {
+    if (input.isEmpty) return '@';
+
+    // Добавляем @ если его нет
+    String processedInput = input;
+    if (!processedInput.startsWith('@')) {
+      processedInput = '@$processedInput';
+    }
+
+    // Удаляем недопустимые символы
+    final filtered = processedInput
+        .split('')
+        .where((char) => _allowedCharsRegExp.hasMatch(char))
+        .join();
+
+    // Ограничиваем длину
+    if (filtered.length > maxLength) {
+      return filtered.substring(0, maxLength);
+    }
+
+    return filtered;
+  }
 }
