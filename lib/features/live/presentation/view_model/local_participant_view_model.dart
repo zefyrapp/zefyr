@@ -55,7 +55,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
        ) {
     // Подписываемся на изменения состояния LiveKit
     _liveKitService.stateStream.listen((liveKitState) {
-      state = state.copyWith(liveKitState: liveKitState);
+      if (mounted) state = state.copyWith(liveKitState: liveKitState);
     });
   }
 
@@ -63,7 +63,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
 
   Future<void> connectAndStartStream() async {
     if (state.streamResponse == null) {
-     log('Ошибка: StreamCreateResponse не найден');
+      log('Ошибка: StreamCreateResponse не найден');
       return;
     }
 
@@ -76,10 +76,10 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
 
       if (liveKitState.isConnected) {
         state = state.copyWith(liveKitState: liveKitState, isStreaming: true);
-       log('Стрим успешно начат');
+        log('Стрим успешно начат');
       }
     } catch (e) {
-     log('Ошибка начала стрима: $e');
+      log('Ошибка начала стрима: $e');
     }
   }
 
@@ -92,9 +92,9 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
           status: LiveKitConnectionStatus.disconnected,
         ),
       );
-     log('Стрим остановлен');
+      log('Стрим остановлен');
     } catch (e) {
-     log('Ошибка остановки стрима: $e');
+      log('Ошибка остановки стрима: $e');
     }
   }
 
@@ -109,7 +109,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
         isCameraEnabled: !state.isCameraEnabled,
       );
     } catch (e) {
-     log('Ошибка переключения камеры: $e');
+      log('Ошибка переключения камеры: $e');
     }
   }
 
@@ -124,7 +124,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
         isMicrophoneEnabled: !state.isMicrophoneEnabled,
       );
     } catch (e) {
-     log('Ошибка переключения микрофона: $e');
+      log('Ошибка переключения микрофона: $e');
     }
   }
 
@@ -133,7 +133,7 @@ class LocalParticipantViewModel extends StateNotifier<LocalParticipantState> {
       final newState = await _liveKitService.switchCamera();
       state = state.copyWith(liveKitState: newState);
     } catch (e) {
-     log('Ошибка переключения камеры: $e');
+      log('Ошибка переключения камеры: $e');
     }
   }
 

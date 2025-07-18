@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_form_state.dart';
 
@@ -62,5 +64,11 @@ class StreamFormNotifier extends StateNotifier<StreamFormState> {
           previewUrlError == null &&
           state.title.trim().isNotEmpty,
     );
+  }
+
+  @override
+  void dispose() {
+    log('StreamFormNotifier disposed');
+    super.dispose();
   }
 }

@@ -31,6 +31,8 @@ class AuthInterceptor extends Interceptor {
       final tokens = await userDao.getTokensOnly();
       if (tokens?.accessToken != null) {
         options.headers['Authorization'] = 'Bearer ${tokens!.accessToken}';
+      }else{
+        options.headers.remove('Authorization');
       }
     } catch (e) {
       log(e.toString());

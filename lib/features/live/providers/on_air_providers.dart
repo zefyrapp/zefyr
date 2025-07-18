@@ -18,7 +18,7 @@ final onAirViewModelProvider =
     AutoDisposeStateNotifierProvider<OnAirViewModel, OnAirState>((ref) {
       ref.onDispose(() {});
       return OnAirViewModel(
-        cameraService: ref.read(cameraServiceProvider),
-        streamStatusService: ref.read(streamStatusServiceProvider),
+        cameraService: ref.watch(cameraServiceProvider),
+        streamStatusService: ref.watch(streamStatusServiceProvider),
       );
     });

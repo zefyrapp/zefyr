@@ -1,8 +1,14 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
+import 'package:zefyr/common/extensions/invert_color.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
+import 'package:zefyr/features/live/data/models/stream_create_request.dart';
 import 'package:zefyr/features/live/data/services/camera_service.dart';
 import 'package:zefyr/features/live/presentation/view_model/on_air_view_model.dart';
 import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
@@ -55,6 +61,12 @@ class _OnAirViewState extends ConsumerState<OnAirView>
   }
 
   @override
+  void didUpdateWidget(covariant OnAirView oldWidget) {
+    log('OnAirView didUpdateWidget $oldWidget');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
@@ -63,7 +75,7 @@ class _OnAirViewState extends ConsumerState<OnAirView>
   Widget build(BuildContext context) {
     final onAirState = ref.watch(onAirViewModelProvider);
     final streamState = ref.watch(streamViewModelProvider);
-
+    ref.watch(streamFormProvider);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -163,38 +175,55 @@ class _OnAirViewState extends ConsumerState<OnAirView>
     child: Container(
       padding: const EdgeInsets.all(16),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back, color: Colors.white.invertColor()),
+            onPressed: () => context.pushReplacement('/'),
           ),
-          const SizedBox(width: 8),
-          if (streamState is StreamStateSuccess) ...[
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    streamState.stream.stream?.title ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    streamState.stream.stream?.description ?? '',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-          // Статус стрима
-          _buildStatusBadge(onAirState),
+          // const SizedBox(width: 8),
+          // if (streamState is StreamStateSuccess) ...[
+          //   Expanded(
+          //     child: Column(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       mainAxisSize: MainAxisSize.min,
+          //       children: [
+          //         Text(
+          //           streamState.stream.stream?.title ?? '',
+          //           style: const TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 16,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //           overflow: TextOverflow.ellipsis,
+          //         ),
+          //         Text(
+          //           streamState.stream.stream?.description ?? '',
+          //           style: TextStyle(color: Colors.grey[400], fontSize: 14),
+          //           overflow: TextOverflow.ellipsis,
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ],
+          // // Статус стрима
+          // _buildStatusBadge(onAirState),
+          IconButton(
+            onPressed: () =>
+                context.push('/onAir/streamSettings').then((value) async {
+                  if (value == true) {
+                    // final formState = ref.read(streamFormProvider);
+
+                    // if (formState.canCreateStream) {
+                    //   final request = formState.toRequest();
+                    //   await ref
+                    //       .read(streamViewModelProvider.notifier)
+                    //       .createNewStream(request);
+                    // }
+                  }
+                }),
+            icon: Icon(Icons.settings, color: Colors.white.invertColor()),
+          ),
         ],
       ),
     ),
@@ -251,7 +280,7 @@ class _OnAirViewState extends ConsumerState<OnAirView>
                 onPressed: _getMainButtonAction(onAirState),
                 style: context.customTheme.overlayApp.elevatedStyle.copyWith(
                   backgroundColor: WidgetStateColor.resolveWith((state) {
-                    if (!onAirState.canGoLive) return Colors.grey;
+                    // if (!onAirState.canGoLive) return Colors.grey;
                     return const Color(0xff9972F4);
                   }),
                 ),
@@ -316,32 +345,51 @@ class _OnAirViewState extends ConsumerState<OnAirView>
   }
 
   VoidCallback? _getMainButtonAction(OnAirState onAirState) {
-    if (onAirState.streamState.isLive) return null;
-    if (onAirState.canGoLive) return () => _showGoLiveDialog(context);
-    if (onAirState.cameraState.hasError) {
-      return () =>
-          ref.read(onAirViewModelProvider.notifier).retryInitialization();
-    }
-    return null;
+    return () => _showGoLiveDialog(context);
+    // if (onAirState.streamState.isLive) return null;
+    // if (onAirState.canGoLive) return () => _showGoLiveDialog(context);
+    // if (onAirState.cameraState.hasError) {
+    //   return () =>
+    //       ref.read(onAirViewModelProvider.notifier).retryInitialization();
+    // }
+    // return null;
   }
 
   IconData _getMainButtonIcon(OnAirState onAirState) {
-    if (onAirState.streamState.isLive) return Icons.stop;
-    if (onAirState.canGoLive) return Icons.videocam;
-    return Icons.videocam_off;
+    return Icons.videocam;
+    // if (onAirState.streamState.isLive) return Icons.stop;
+    // if (onAirState.canGoLive) return Icons.videocam;
+    // return Icons.videocam_off;
   }
 
   String _getMainButtonText(OnAirState onAirState) {
-    if (onAirState.streamState.isLive) return 'В ЭФИРЕ';
-    if (onAirState.canGoLive) return 'Выйти в эфир';
-    if (onAirState.cameraState.hasError) return 'Повторить настройку';
-    return 'Настройка...';
+    return 'Выйти в эфир';
+    // if (onAirState.streamState.isLive) return 'В ЭФИРЕ';
+    // if (onAirState.canGoLive) return 'Выйти в эфир';
+    // if (onAirState.cameraState.hasError) return 'Повторить настройку';
+    // return 'Настройка...';
   }
 
   void _showGoLiveDialog(BuildContext context) {
+    final rootContext = context; // сохраняем валидный контекст
+    final overlay = Overlay.of(rootContext);
+    late OverlayEntry loaderOverlay;
+
+    loaderOverlay = OverlayEntry(
+      builder: (_) => Stack(
+        children: [
+          ModalBarrier(
+            dismissible: false,
+            color: Colors.black.withValues(alpha: 0.5),
+          ),
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
+        ],
+      ),
+    );
+
     showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
+      context: rootContext,
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.grey[900],
         title: const Text(
           'Выйти в эфир?',
@@ -353,11 +401,49 @@ class _OnAirViewState extends ConsumerState<OnAirView>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () => context.pushReplacement('/onAir/localParticipant'),
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+
+              overlay.insert(loaderOverlay);
+
+              try {
+                final formState = ref.read(streamFormProvider);
+                var request = formState.toRequest();
+
+                if (request.title.isEmpty) {
+                  final user = await ref.read(userDaoProvider).getUser();
+                  final name = user?.user?.name;
+                  request = StreamCreateRequest(
+                    title: name != null && name.isNotEmpty
+                        ? name
+                        : "New Stream",
+                    description: '',
+                    previewUrl: '',
+                  );
+                }
+
+                await ref
+                    .read(streamViewModelProvider.notifier)
+                    .createNewStream(request);
+
+                loaderOverlay.remove();
+
+                if (rootContext.mounted) {
+                  rootContext.pushReplacement('/onAir/localParticipant');
+                }
+              } catch (e) {
+                loaderOverlay.remove();
+                if (rootContext.mounted) {
+                  ScaffoldMessenger.of(rootContext).showSnackBar(
+                    const SnackBar(content: Text('Ошибка при создании стрима')),
+                  );
+                }
+              }
+            },
             child: const Text('Начать', style: TextStyle(color: Colors.purple)),
           ),
         ],
@@ -365,34 +451,32 @@ class _OnAirViewState extends ConsumerState<OnAirView>
     );
   }
 
-  void _showEndStreamDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text(
-          'Завершить стрим?',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: const Text(
-          'Вы уверены, что хотите завершить трансляцию?',
-          style: TextStyle(color: Colors.grey),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(onAirViewModelProvider.notifier).endStreaming();
-              Navigator.of(context).pop(); // Возвращаемся к предыдущему экрану
-            },
-            child: const Text('Завершить', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+  void _showEndStreamDialog(BuildContext context) => showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      backgroundColor: Colors.grey[900],
+      title: const Text(
+        'Завершить стрим?',
+        style: TextStyle(color: Colors.white),
       ),
-    );
-  }
+      content: const Text(
+        'Вы уверены, что хотите завершить трансляцию?',
+        style: TextStyle(color: Colors.grey),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Отмена', style: TextStyle(color: Colors.grey)),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            ref.read(onAirViewModelProvider.notifier).endStreaming();
+            Navigator.of(context).pop(); // Возвращаемся к предыдущему экрану
+          },
+          child: const Text('Завершить', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
 }

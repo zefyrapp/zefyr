@@ -29,8 +29,8 @@ class StreamDataSourceImpl implements StreamDataSource {
   Future<StreamCreateResponse> createStream({
     required StreamCreateRequest request,
   }) async => _handle<StreamCreateResponse>(() async {
-    final token = await ref.read(tokenManagerProvider).getAccessToken();
-    if (token != null) client.setAuthToken(token);
+    // final token = await ref.read(tokenManagerProvider).getAccessToken();
+    // if (token != null) client.setAuthToken(token);
     return (await client.postWithApiResponse<StreamCreateResponse>(
       '/api/streaming/streams/create/',
       data: {
@@ -44,8 +44,8 @@ class StreamDataSourceImpl implements StreamDataSource {
 
   @override
   Future<void> stopStream(String streamId) async {
-    final token = await ref.read(tokenManagerProvider).getAccessToken();
-    if (token != null) client.setAuthToken(token);
+    // final token = await ref.read(tokenManagerProvider).getAccessToken();
+    // if (token != null) client.setAuthToken(token);
     await _handle<StreamModel>(
       () async => (await client.postWithApiResponse<StreamModel>(
         '/api/streaming/streams/$streamId/end/',
