@@ -129,7 +129,7 @@ class AuthInterceptor extends Interceptor {
       final refreshDio = Dio();
       final response = await refreshDio.post<Map<String, dynamic>>(
         'https://back.tanysu.net/api/auth/refresh/',
-        data: {'refresh': refreshToken},
+        data: {'refresh_token': refreshToken},
       );
       if (response.statusCode == 200 && response.data != null) {
         final authResponse = AuthResponse.fromMap(response.data!);
