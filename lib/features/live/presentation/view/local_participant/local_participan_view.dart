@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/invert_color.dart';
 import 'package:zefyr/core/utils/icons/app_asset_icon.dart';
 import 'package:zefyr/core/utils/icons/app_icons_icons.dart';
@@ -25,28 +26,106 @@ class _LocalParticipanViewState extends ConsumerState<LocalParticipanView> {
     });
   }
 
+  bool _showExitPanel = false;
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(localParticipantViewModel);
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Основной видео контент
-          _buildVideoContent(state),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (result, obj) {
+        setState(() => _showExitPanel = true);
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Основной видео контент
+            _buildVideoContent(state),
 
-          /// Виджеты в шапке
-          _buildToolBar(context, state),
+            /// Виджеты в шапке
+            _buildToolBar(context, state),
 
-          // /// Виджет с аватаром и текстком
-          // _buildAvatarPanel(),
+            // /// Виджет с аватаром и текстком
+            // _buildAvatarPanel(),
 
-          /// Виджет с для написания сообщения
-          _buildBottomPanel(),
-        ],
+            /// Виджет  для написания сообщения
+            if (_showExitPanel) _buildExitPanel() else _buildBottomPanel(),
+          ],
+        ),
       ),
     );
   }
 
+  Widget _buildExitPanel() => Positioned(
+    bottom: 0,
+    left: 0,
+    right: 0,
+    child: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Material(
+          color: Colors.black.withValues(alpha: 0.66),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 25),
+            child: Column(
+              spacing: 16,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton(
+                    style: context.customTheme.overlayApp.elevatedStyle,
+                    onPressed: () {
+                      // Завершить стрим (например, отключить и выйти)
+
+                      context.pushReplacement('/');
+                    },
+                    child: const Text(
+                      'Завершить стрим',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        height: 28 / 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton(
+                    style: context.customTheme.overlayApp.elevatedStyle
+                        .copyWith(
+                          backgroundColor: const WidgetStatePropertyAll(
+                            Color(0xff1F2937),
+                          ),
+                        ),
+                    onPressed: () {
+                      setState(() => _showExitPanel = false);
+                    },
+                    child: const Text(
+                      'Продолжить',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+
+                        height: 28 / 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
   Widget _buildVideoContent(LocalParticipantState state) {
     if (state.liveKitState.localVideoTrack != null) {
       return SizedBox.expand(
@@ -75,6 +154,7 @@ class _LocalParticipanViewState extends ConsumerState<LocalParticipanView> {
             padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              spacing: 11,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,7 +173,11 @@ class _LocalParticipanViewState extends ConsumerState<LocalParticipanView> {
                       ],
                     ),
                     InkWell(
-                      onTap: context.pop,
+                      onTap: () {
+                        setState(() {
+                          _showExitPanel = true;
+                        });
+                      },
                       child: Icon(
                         Icons.close,
                         color: Colors.white.invertColor(),
