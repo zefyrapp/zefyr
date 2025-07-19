@@ -65,7 +65,9 @@ class ProfileView extends ConsumerWidget {
           ),
           const SizedBox(width: 18),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              ref.read(userDaoProvider).clearUser();
+            },
             child: const Icon(Icons.more_vert, color: Colors.white, size: 18),
           ),
         ],

@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/invert_color.dart';
-import 'package:zefyr/common/extensions/media_query.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/live/data/models/stream_create_request.dart';
 import 'package:zefyr/features/live/data/services/camera_service.dart';
@@ -442,6 +441,9 @@ class _OnAirViewState extends ConsumerState<OnAirView>
                 loaderOverlay.remove();
 
                 if (rootContext.mounted) {
+                  unawaited(
+                    ref.read(onAirViewModelProvider.notifier).disposeCamera(),
+                  );
                   rootContext.pushReplacement('/onAir/localParticipant');
                 }
               } catch (e) {

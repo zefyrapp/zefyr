@@ -73,6 +73,7 @@ class LiveKitServiceImpl implements LiveKitService {
   LocalAudioTrack? _localAudioTrack;
   CameraCaptureOptions? _captureOptions;
   EventsListener<RoomEvent>? _listener;
+  bool _isDisconnecting = false;
   LiveKitState _currentState = const LiveKitState(
     status: LiveKitConnectionStatus.disconnected,
   );
@@ -84,7 +85,9 @@ class LiveKitServiceImpl implements LiveKitService {
 
   void _updateState(LiveKitState newState) {
     _currentState = newState;
-    _stateController.add(newState);
+    if (!_stateController.isClosed) {
+      _stateController.add(newState);
+    }
   }
 
   @override
@@ -94,16 +97,19 @@ class LiveKitServiceImpl implements LiveKitService {
         _currentState.copyWith(status: LiveKitConnectionStatus.connecting),
       );
 
-      // Создаем комнату
+      // Clean up any existing connection first
+      await _cleanupConnection();
+
+      // Create new room
       _room = Room();
 
-      // Настраиваем слушатели событий
+      // Setup listeners before connecting
       _setupRoomListeners();
 
-      // Подключаемся к комнате
+      // Connect to room
       await _room!.connect(url, token);
 
-      // Включаем камеру и микрофон для стримера
+      // Enable camera and microphone for streamer
       await _enableCameraAndMicrophone();
 
       final newState = _currentState.copyWith(
@@ -118,9 +124,10 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
+      log('Error connecting as publisher: $e');
       final errorState = _currentState.copyWith(
         status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка подключения стримера: $e',
+        errorMessage: 'Connection failed: ${e.toString()}',
       );
       _updateState(errorState);
       return errorState;
@@ -134,13 +141,16 @@ class LiveKitServiceImpl implements LiveKitService {
         _currentState.copyWith(status: LiveKitConnectionStatus.connecting),
       );
 
-      // Создаем комнату
+      // Clean up any existing connection first
+      await _cleanupConnection();
+
+      // Create new room
       _room = Room();
 
-      // Настраиваем слушатели событий
+      // Setup listeners before connecting
       _setupRoomListeners();
 
-      // Подключаемся к комнате как зритель
+      // Connect to room as viewer
       await _room!.connect(url, token);
 
       final newState = _currentState.copyWith(
@@ -153,9 +163,10 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
+      log('Error connecting as viewer: $e');
       final errorState = _currentState.copyWith(
         status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка подключения зрителя: $e',
+        errorMessage: 'Connection failed: ${e.toString()}',
       );
       _updateState(errorState);
       return errorState;
@@ -164,38 +175,120 @@ class LiveKitServiceImpl implements LiveKitService {
 
   Future<void> _enableCameraAndMicrophone() async {
     try {
-      // Включаем камеру
+      // Initialize capture options
       _captureOptions = const CameraCaptureOptions(
         params: VideoParameters(
           dimensions: VideoDimensions(1280, 720),
-          encoding: VideoEncoding(maxBitrate: 3000000, maxFramerate: 30),
+          encoding: VideoEncoding(maxBitrate: 2000000, maxFramerate: 30),
         ),
       );
 
-      _localVideoTrack = await LocalVideoTrack.createCameraTrack(
-        _captureOptions,
-      );
-      await _room!.localParticipant!.publishVideoTrack(_localVideoTrack!);
+      // Enable camera with retry logic
+      await _enableCameraWithRetry();
 
-      // Включаем микрофон
+      // Enable microphone
       _localAudioTrack = await LocalAudioTrack.create();
       await _room!.localParticipant!.publishAudioTrack(_localAudioTrack!);
+
+      log('Camera and microphone enabled successfully');
     } catch (e) {
-      debugPrint('Ошибка включения камеры/микрофона: $e');
+      log('Error enabling camera/microphone: $e');
       rethrow;
     }
   }
 
+  Future<void> _enableCameraWithRetry({int maxRetries = 3}) async {
+    int retryCount = 0;
+    Exception? lastException;
+
+    while (retryCount < maxRetries) {
+      try {
+        // Stop any existing video track
+        if (_localVideoTrack != null) {
+          await _localVideoTrack!.stop();
+          await _localVideoTrack!.dispose();
+          _localVideoTrack = null;
+          // Add small delay to ensure camera is released
+          await Future.delayed(const Duration(milliseconds: 500));
+        }
+
+        _localVideoTrack = await LocalVideoTrack.createCameraTrack(
+          _captureOptions,
+        );
+        await _room!.localParticipant!.publishVideoTrack(_localVideoTrack!);
+
+        log('Camera enabled successfully on attempt ${retryCount + 1}');
+        return;
+      } catch (e) {
+        lastException = e is Exception ? e : Exception(e.toString());
+        retryCount++;
+        log('Camera enable attempt $retryCount failed: $e');
+
+        if (retryCount < maxRetries) {
+          // Wait before retrying, with exponential backoff
+          await Future.delayed(Duration(milliseconds: 500 * retryCount));
+        }
+      }
+    }
+
+    if (lastException != null) {
+      throw lastException;
+    }
+  }
+
+  Future<void> _cleanupConnection() async {
+    if (_isDisconnecting) return;
+    _isDisconnecting = true;
+
+    try {
+      // Stop tracks first
+      if (_localVideoTrack != null) {
+        await _localVideoTrack!.stop();
+        await _localVideoTrack!.dispose();
+        _localVideoTrack = null;
+      }
+
+      if (_localAudioTrack != null) {
+        await _localAudioTrack!.stop();
+        await _localAudioTrack!.dispose();
+        _localAudioTrack = null;
+      }
+
+      // Dispose listener
+      if (_listener != null) {
+        await _listener!.dispose();
+        _listener = null;
+      }
+
+      // Disconnect and dispose room
+      if (_room != null) {
+        await _room!.disconnect();
+        await _room!.dispose();
+        _room = null;
+      }
+
+      // Small delay to ensure cleanup is complete
+      await Future.delayed(const Duration(milliseconds: 200));
+    } catch (e) {
+      log('Error during cleanup: $e');
+    } finally {
+      _isDisconnecting = false;
+    }
+  }
+
   void _setupRoomListeners() {
+    if (_room == null) return;
+
     _room!.addListener(() {
-      _updateState(
-        _currentState.copyWith(
-          remoteParticipants: _room!.remoteParticipants.values.toList(),
-        ),
-      );
+      if (!_isDisconnecting) {
+        _updateState(
+          _currentState.copyWith(
+            remoteParticipants: _room!.remoteParticipants.values.toList(),
+          ),
+        );
+      }
     });
 
-    // Настраиваем слушатель событий
     _listener = _room!.createListener();
 
     _listener!
@@ -210,69 +303,77 @@ class LiveKitServiceImpl implements LiveKitService {
   }
 
   Future<void> _onRoomConnected(RoomConnectedEvent event) async {
-    log('Подключились к комнате');
+    log('Connected to room successfully');
   }
 
   void _onRoomDisconnected(RoomDisconnectedEvent event) {
-    log('Отключились от комнаты');
+    log('Disconnected from room: ${event.reason}');
+    if (!_isDisconnecting) {
+      _updateState(
+        _currentState.copyWith(
+          status: LiveKitConnectionStatus.disconnected,
+          errorMessage: 'Disconnected: ${event.reason}',
+        ),
+      );
+    }
   }
 
   void _onParticipantConnected(ParticipantConnectedEvent event) {
-    log('Участник подключился: ${event.participant.identity}');
+    log('Participant connected: ${event.participant.identity}');
+    _updateState(
+      _currentState.copyWith(
+        remoteParticipants: _room!.remoteParticipants.values.toList(),
+      ),
+    );
   }
 
   void _onParticipantDisconnected(ParticipantDisconnectedEvent event) {
-    log('Участник отключился: ${event.participant.identity}');
+    log('Participant disconnected: ${event.participant.identity}');
+    _updateState(
+      _currentState.copyWith(
+        remoteParticipants: _room!.remoteParticipants.values.toList(),
+      ),
+    );
   }
 
   void _onTrackSubscribed(TrackSubscribedEvent event) {
-    log('Подписались на трек: ${event.track.sid}');
+    log('Subscribed to track: ${event.track.sid}');
   }
 
   void _onTrackUnsubscribed(TrackUnsubscribedEvent event) {
-    log('Отписались от трека: ${event.track.sid}');
+    log('Unsubscribed from track: ${event.track.sid}');
   }
 
   void _onLocalTrackPublished(LocalTrackPublishedEvent event) {
-    log('Локальный трек опубликован: ${event.publication.sid}');
+    log('Local track published: ${event.publication.sid}');
   }
 
   void _onRecordingStatusChanged(RoomRecordingStatusChanged event) {
-    log('Статус записи изменился: ${event.activeRecording}');
+    log('Recording status changed: ${event.activeRecording}');
   }
 
   @override
   Future<void> disconnect() async {
     try {
-      await _localVideoTrack?.stop();
-      await _localAudioTrack?.stop();
-
-      await _localVideoTrack?.dispose();
-      await _localAudioTrack?.dispose();
-
-      await _room?.disconnect();
-
-      await _room?.dispose();
-      _room = null;
-      _localVideoTrack = null;
-      _localAudioTrack = null;
-      await _listener?.dispose();
+      await _cleanupConnection();
       _updateState(
         const LiveKitState(status: LiveKitConnectionStatus.disconnected),
       );
+      log('Disconnected successfully');
     } catch (e) {
-      debugPrint('Ошибка отключения: $e');
+      log('Error during disconnect: $e');
     }
   }
 
   @override
   Future<LiveKitState> enableCamera() async {
     try {
+      if (_room == null) {
+        throw Exception('Room is not connected');
+      }
+
       if (_localVideoTrack == null) {
-        _localVideoTrack = await LocalVideoTrack.createCameraTrack(
-          _captureOptions,
-        );
-        await _room!.localParticipant!.publishVideoTrack(_localVideoTrack!);
+        await _enableCameraWithRetry();
       } else {
         await _localVideoTrack!.enable();
       }
@@ -283,9 +384,10 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
+      log('Error enabling camera: $e');
       final errorState = _currentState.copyWith(
         status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка включения камеры: $e',
+        errorMessage: 'Failed to enable camera: ${e.toString()}',
       );
       _updateState(errorState);
       return errorState;
@@ -295,7 +397,9 @@ class LiveKitServiceImpl implements LiveKitService {
   @override
   Future<LiveKitState> disableCamera() async {
     try {
-      await _localVideoTrack?.disable();
+      if (_localVideoTrack != null) {
+        await _localVideoTrack!.disable();
+      }
 
       final newState = _currentState.copyWith(
         localVideoTrack: _localVideoTrack,
@@ -303,9 +407,10 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
+      log('Error disabling camera: $e');
       final errorState = _currentState.copyWith(
         status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка выключения камеры: $e',
+        errorMessage: 'Failed to disable camera: ${e.toString()}',
       );
       _updateState(errorState);
       return errorState;
@@ -315,6 +420,10 @@ class LiveKitServiceImpl implements LiveKitService {
   @override
   Future<LiveKitState> enableMicrophone() async {
     try {
+      if (_room == null) {
+        throw Exception('Room is not connected');
+      }
+
       if (_localAudioTrack == null) {
         _localAudioTrack = await LocalAudioTrack.create();
         await _room!.localParticipant!.publishAudioTrack(_localAudioTrack!);
@@ -328,9 +437,10 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
+      log('Error enabling microphone: $e');
       final errorState = _currentState.copyWith(
         status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка включения микрофона: $e',
+        errorMessage: 'Failed to enable microphone: ${e.toString()}',
       );
       _updateState(errorState);
       return errorState;
@@ -340,7 +450,9 @@ class LiveKitServiceImpl implements LiveKitService {
   @override
   Future<LiveKitState> disableMicrophone() async {
     try {
-      await _localAudioTrack?.disable();
+      if (_localAudioTrack != null) {
+        await _localAudioTrack!.disable();
+      }
 
       final newState = _currentState.copyWith(
         localAudioTrack: _localAudioTrack,
@@ -348,9 +460,10 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
+      log('Error disabling microphone: $e');
       final errorState = _currentState.copyWith(
         status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка выключения микрофона: $e',
+        errorMessage: 'Failed to disable microphone: ${e.toString()}',
       );
       _updateState(errorState);
       return errorState;
@@ -360,15 +473,22 @@ class LiveKitServiceImpl implements LiveKitService {
   @override
   Future<LiveKitState> switchCamera() async {
     try {
-      final track = _currentState
-          .localParticipant
-          ?.videoTrackPublications
-          .firstOrNull
-          ?.track;
-      if (track == null) return _currentState;
-      final newPosition = _captureOptions?.cameraPosition.switched();
-      if (newPosition == null) return _currentState;
-      await track.setCameraPosition(newPosition);
+      if (_room == null || _localVideoTrack == null) {
+        throw Exception('Camera not available');
+      }
+
+      // Get current camera position and switch it
+      final currentPosition =
+          _captureOptions?.cameraPosition ?? CameraPosition.front;
+      final newPosition = currentPosition == CameraPosition.front
+          ? CameraPosition.back
+          : CameraPosition.front;
+
+      // Update capture options
+      _captureOptions = _captureOptions?.copyWith(cameraPosition: newPosition);
+
+      // Switch the camera
+      await _localVideoTrack!.setCameraPosition(newPosition);
 
       final newState = _currentState.copyWith(
         localVideoTrack: _localVideoTrack,
@@ -376,16 +496,30 @@ class LiveKitServiceImpl implements LiveKitService {
       _updateState(newState);
       return newState;
     } catch (e) {
-      final errorState = _currentState.copyWith(
-        status: LiveKitConnectionStatus.error,
-        errorMessage: 'Ошибка переключения камеры: $e',
-      );
-      _updateState(errorState);
-      return errorState;
+      log('Error switching camera: $e');
+
+      // If switching fails, try to recreate the video track
+      try {
+        await _enableCameraWithRetry();
+        final newState = _currentState.copyWith(
+          localVideoTrack: _localVideoTrack,
+        );
+        _updateState(newState);
+        return newState;
+      } catch (recreateError) {
+        log('Error recreating camera after switch failure: $recreateError');
+        final errorState = _currentState.copyWith(
+          status: LiveKitConnectionStatus.error,
+          errorMessage: 'Failed to switch camera: ${e.toString()}',
+        );
+        _updateState(errorState);
+        return errorState;
+      }
     }
   }
 
   void dispose() {
+    disconnect();
     _stateController.close();
   }
 }

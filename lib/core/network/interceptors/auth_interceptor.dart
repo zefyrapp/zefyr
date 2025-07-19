@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/core/error/exceptions.dart';
+import 'package:zefyr/core/network/models/api_response.dart';
 import 'package:zefyr/features/auth/data/datasources/user_dao.dart';
 import 'package:zefyr/features/auth/data/models/auth_response.dart';
 
@@ -31,7 +32,7 @@ class AuthInterceptor extends Interceptor {
       final tokens = await userDao.getTokensOnly();
       if (tokens?.accessToken != null) {
         options.headers['Authorization'] = 'Bearer ${tokens!.accessToken}';
-      }else{
+      } else {
         options.headers.remove('Authorization');
       }
     } catch (e) {
@@ -132,7 +133,10 @@ class AuthInterceptor extends Interceptor {
         data: {'refresh_token': refreshToken},
       );
       if (response.statusCode == 200 && response.data != null) {
-        final authResponse = AuthResponse.fromMap(response.data!);
+        final authResponse = ApiResponse.fromJson(
+          response.data!,
+          fromJsonT: AuthResponse.fromMap,
+        ).data!;
         await userDao.updateTokens(
           accessToken: authResponse.accessToken,
           refreshToken: authResponse.refreshToken,
