@@ -42,8 +42,14 @@ AuthLocalDataSource authLocalDataSource(Ref ref) =>
     AuthLocalDataSourceImpl(ref.watch(userDaoProvider));
 
 @riverpod
-GoogleSignInDataSource googleSignInDataSource(Ref ref) =>
-    GoogleSignInDataSourceImpl();
+GoogleSignInDataSource googleSignInDataSource(Ref ref) {
+  final dataSource = GoogleSignInDataSourceImpl();
+  dataSource.init(); // Инициализируем сервис
+  ref.onDispose(
+    dataSource.dispose,
+  ); // Очищаем ресурсы при уничтожении провайдера
+  return dataSource;
+}
 
 // Repository
 @riverpod

@@ -1,47 +1,64 @@
+// Файл: google_signIn_data_source.dart
+
 import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-const List<String> _scopes = <String>[
-  'https://www.googleapis.com/auth/userinfo.profile',
-  'https://www.googleapis.com/auth/userinfo.email',
-  'openid',
+// Скоупы можно вынести сюда, если они константны для всего приложения
+const List<String> _defaultScopes = <String>[
+  'email',
+  'profile',
+  'openid', // openid часто идет без префикса, но для Google API лучше уточнить в доках
 ];
 
 abstract class GoogleSignInDataSource {
+  Future<void> init();
   Future<GoogleSignInAccount?> signIn();
   Future<void> signOut();
+  Future<GoogleSignInAuthentication> getAuthentication();
+  void dispose();
+
   GoogleSignInAccount? get currentUser;
   bool get isAuthorized;
 }
 
 class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
-  GoogleSignInDataSourceImpl();
-
-  late final GoogleSignIn _signIn = GoogleSignIn.instance;
-  GoogleSignInAccount? _currentUser;
-  bool _isAuthorized = false;
+  // Используем GoogleSignIn.instance, это синглтон
+  final GoogleSignIn _signIn = GoogleSignIn.instance;
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
 
-  void _ensureInitialized() {
-    unawaited(
-      _signIn
-          .initialize(
-            clientId: dotenv.get('GoogleClientID'),
-            serverClientId: dotenv.get('GoogleClientSecret'),
-          )
-          .then((_) {
-            // Подписываемся на события аутентификации
-            _authSubscription = _signIn.authenticationEvents.listen(
-              _handleAuthenticationEvent,
-            )..onError(_handleAuthenticationError);
+  GoogleSignInAccount? _currentUser;
+  bool _isAuthorized = false;
 
-            // Попытка легкой аутентификации при инициализации
-            _signIn.attemptLightweightAuthentication();
-          }),
-    );
+  @override
+  GoogleSignInAccount? get currentUser => _currentUser;
+  @override
+  bool get isAuthorized => _isAuthorized;
+
+  /// Инициализация. Должна быть вызвана ОДИН РАЗ.
+  @override
+  Future<void> init() async {
+    // Предотвращаем повторную инициализацию
+    if (_authSubscription != null) return;
+
+    try {
+      await _signIn.initialize(
+        clientId: dotenv.get('GoogleClientID'),
+        serverClientId: dotenv.get('GoogleClientSecret'),
+      );
+
+      _authSubscription = _signIn.authenticationEvents.listen(
+        _handleAuthenticationEvent,
+        onError: _handleAuthenticationError,
+      );
+
+      // Попытка "тихого" входа при старте
+      await _signIn.attemptLightweightAuthentication();
+    } catch (e) {
+      log('GoogleSignIn initialization error: $e');
+    }
   }
 
   Future<void> _handleAuthenticationEvent(
@@ -52,21 +69,21 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       GoogleSignInAuthenticationEventSignOut() => null,
     };
 
-    // Проверяем существующую авторизацию
-    final GoogleSignInClientAuthorization? authorization = await user
-        ?.authorizationClient
-        .authorizationForScopes(_scopes);
-
     _currentUser = user;
-    _isAuthorized = authorization != null;
 
-    if (user != null && authorization != null) {
-      log('User authenticated and authorized: ${user.email}');
-      unawaited(_getContact(user));
+    if (user != null) {
+      // Проверяем, есть ли у нас уже права на нужные скоупы
+      final authorization = await user.authorizationClient
+          .authorizationForScopes(_defaultScopes);
+      _isAuthorized = authorization != null;
+      log('User authenticated: ${user.email}, isAuthorized: $_isAuthorized');
+    } else {
+      _isAuthorized = false;
+      log('User signed out.');
     }
   }
 
-  Future<void> _handleAuthenticationError(Object error) async {
+  void _handleAuthenticationError(Object error) {
     _currentUser = null;
     _isAuthorized = false;
     final errorMessage = error is GoogleSignInException
@@ -78,83 +95,37 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
   @override
   Future<GoogleSignInAccount?> signIn() async {
     try {
-      _ensureInitialized();
+      // Инициируем стандартный флоу входа
+      final user = await _signIn.authenticate();
+      return user;
+    } on GoogleSignInException catch (e) {
+      log('Google sign-in error: Code ${e.code}, ${e.description}');
+      // Возвращаем null, если пользователь отменил вход
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return null;
+      }
+      // Перебрасываем остальные ошибки
+      rethrow;
     } catch (e) {
-      log('Google sign-in error: $e');
-      return null;
+      log('An unexpected error occurred during sign-in: $e');
+      rethrow;
     }
   }
 
-  Future<GoogleSignInAccount?> _getContact(GoogleSignInAccount user) async {
-    final authorization = await user.authorizationClient.authorizationForScopes(
-      _scopes,
-    );
-
-    if (authorization == null) {
-      // Если нет авторизации, запрашиваем её
-      await user.authorizationClient.authorizeScopes(_scopes);
+  @override
+  Future<GoogleSignInAuthentication> getAuthentication() async {
+    if (_currentUser == null) {
+      throw Exception('User is not signed in. Cannot get authentication.');
     }
-
-    return user;
+    return _currentUser!.authentication;
   }
 
   @override
   Future<void> signOut() async {
-    _ensureInitialized();
-    // Используем disconnect для полного выхода, как в примере
     await _signIn.disconnect();
-    _currentUser = null;
-    _isAuthorized = false;
   }
 
   @override
-  GoogleSignInAccount? get currentUser => _currentUser;
-
-  @override
-  bool get isAuthorized => _isAuthorized;
-
-  /// Запрос авторизации для дополнительных скоупов
-  Future<bool> authorizeScopes(List<String> scopes) async {
-    try {
-      _ensureInitialized();
-      final user = _currentUser;
-      if (user == null) return false;
-
-      await user.authorizationClient.authorizeScopes(scopes);
-      return true;
-    } catch (e) {
-      log('Authorization error: $e');
-      return false;
-    }
-  }
-
-  /// Получение заголовков авторизации для API запросов
-  Future<Map<String, String>?> getAuthorizationHeaders() async {
-    _ensureInitialized();
-    final user = _currentUser;
-    if (user == null || !_isAuthorized) return null;
-
-    return user.authorizationClient.authorizationHeaders(_scopes);
-  }
-
-  /// Получение server auth code
-  Future<String?> getServerAuthCode() async {
-    try {
-      _ensureInitialized();
-      final user = _currentUser;
-      if (user == null) return null;
-
-      final serverAuth = await user.authorizationClient.authorizeServer(
-        _scopes,
-      );
-      return serverAuth?.serverAuthCode;
-    } catch (e) {
-      log('Server auth code error: $e');
-      return null;
-    }
-  }
-
-  /// Освобождение ресурсов
   void dispose() {
     _authSubscription?.cancel();
   }
