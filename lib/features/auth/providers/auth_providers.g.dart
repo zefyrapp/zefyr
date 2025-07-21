@@ -96,7 +96,7 @@ final authLocalDataSourceProvider =
 // ignore: unused_element
 typedef AuthLocalDataSourceRef = AutoDisposeProviderRef<AuthLocalDataSource>;
 String _$googleSignInDataSourceHash() =>
-    r'8c64bb543d73aafda462adeddf30e311feebdf20';
+    r'ec1c53b20d48d7366283f343c98e74cc2990a3a3';
 
 /// See also [googleSignInDataSource].
 @ProviderFor(googleSignInDataSource)

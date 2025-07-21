@@ -6,6 +6,23 @@ part of 'profile_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$profileDaoHash() => r'c4fb55deddb24b0dabbb189a18f0e68e259be21c';
+
+/// See also [profileDao].
+@ProviderFor(profileDao)
+final profileDaoProvider = AutoDisposeProvider<ProfileDao>.internal(
+  profileDao,
+  name: r'profileDaoProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$profileDaoHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ProfileDaoRef = AutoDisposeProviderRef<ProfileDao>;
 String _$remoteProfileDataSourceHash() =>
     r'a339be2088e40d412d552c3c35c9af3aaec315d7';
 
@@ -27,7 +44,7 @@ final remoteProfileDataSourceProvider =
 typedef RemoteProfileDataSourceRef =
     AutoDisposeProviderRef<RemoteProfileDataSource>;
 String _$localProfileDataSourceHash() =>
-    r'8f9dab033a08df8f69d3b0f2092c8d19f1ca675a';
+    r'e856f1c86885e6a5311131f43bac50f9f4482353';
 
 /// See also [localProfileDataSource].
 @ProviderFor(localProfileDataSource)
@@ -272,7 +289,7 @@ class _UserProfileProviderElement
   String get userId => (origin as UserProfileProvider).userId;
 }
 
-String _$myProfileNotifierHash() => r'33aba2ef2530732d75ed076c5ccb0ea5f62a0924';
+String _$myProfileNotifierHash() => r'5caf446ce3af34f9dcb97cf6f8c5c6eb3c9ae211';
 
 /// See also [MyProfileNotifier].
 @ProviderFor(MyProfileNotifier)

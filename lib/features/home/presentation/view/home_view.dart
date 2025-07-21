@@ -2,12 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/widgets/gradient_border_image.dart';
+import 'package:zefyr/features/auth/data/models/user_model.dart';
 import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/home/presentation/view/streaming/streaming_list_view.dart';
 import 'package:zefyr/features/home/presentation/view/widgets/stream_category_chips.dart';
 import 'package:zefyr/features/home/presentation/widgets/money_chip.dart';
+import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
 import 'package:zefyr/features/profile/providers/profile_providers.dart';
 
 class HomeView extends StatelessWidget {
@@ -59,27 +62,30 @@ class AvatarHomeSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateChangesProvider).valueOrNull;
-    final color = context.customTheme.overlayApp;
     //  ref.read(userDaoProvider).clearUser();
-    // ref.watch(profileRepositoryProvider).getUserProfile(user!.id);
+
+    return ref
+        .watch(myProfileNotifierProvider)
+        .when(
+          data: (profile) => _buildChild(context, user: user, profile: profile),
+          error: (e, s) => const SizedBox.shrink(),
+          loading: () => Skeletonizer(child: _buildChild(context)),
+        );
+  }
+
+  Widget _buildChild(
+    BuildContext context, {
+    UserModel? user,
+    ProfileEntity? profile,
+  }) {
+    final color = context.customTheme.overlayApp;
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 16,
         vertical: user != null ? 13 : 8,
       ),
       child: user != null
-          ? Row(
-              spacing: 9,
-              children: [
-                GradientBorderImage(
-                  size: 42,
-                  onTap: () => context.push('/profile'),
-                  //!TODO: аватар пользователя
-                  child: CachedNetworkImage(imageUrl: user.avatar ?? ''),
-                ),
-                MoneyChip(onTap: () {}, coins: '100'),
-              ],
-            )
+          ? _buildProfile(context, profile?.avatar, profile?.balance)
           : Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
@@ -108,4 +114,18 @@ class AvatarHomeSection extends ConsumerWidget {
             ),
     );
   }
+
+  Widget _buildProfile(BuildContext context, String? avatar, double? coins) =>
+      Row(
+        spacing: 9,
+        children: [
+          GradientBorderImage(
+            size: 42,
+            onTap: () => context.push('/profile'),
+            //!TODO: аватар пользователя
+            child: CachedNetworkImage(imageUrl: avatar ?? ''),
+          ),
+          MoneyChip(onTap: () {}, coins: coins?.toStringAsFixed(0) ?? '0'),
+        ],
+      );
 }

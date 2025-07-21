@@ -107,6 +107,8 @@ extension UserModelDrift on UserModel {
     id: Value(int.tryParse(id) ?? 0),
     email: Value(email),
     lastActive: Value(lastActive),
+    name: Value(name),
+    avatar: Value(avatar),
   );
 }
 

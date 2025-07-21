@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:zefyr/core/database/database.dart';
 import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/core/usecases/usecases.dart';
+import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/profile/data/datasources/local_profile_data_source.dart';
+import 'package:zefyr/features/profile/data/datasources/profile_dao.dart';
 import 'package:zefyr/features/profile/data/datasources/remote_profile_data_source.dart';
 import 'package:zefyr/features/profile/data/models/edit_profile_request.dart';
 import 'package:zefyr/features/profile/data/repositories/profile_repository_impl.dart';
@@ -16,6 +19,8 @@ import 'package:zefyr/features/profile/usecases/update_my_profile.dart';
 
 part 'profile_providers.g.dart';
 
+@riverpod
+ProfileDao profileDao(Ref ref) => ProfileDao(ref.watch(appDatabaseProvider));
 // Data Sources
 @riverpod
 RemoteProfileDataSource remoteProfileDataSource(Ref ref) =>
@@ -23,7 +28,7 @@ RemoteProfileDataSource remoteProfileDataSource(Ref ref) =>
 
 @riverpod
 LocalProfileDataSource localProfileDataSource(Ref ref) =>
-    LocalProfileDataSourceImpl();
+    LocalProfileDataSourceImpl(ref.watch(profileDaoProvider));
 
 // Repository
 @riverpod
