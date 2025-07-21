@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -616,27 +617,80 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
     },
   );
 
-  Widget _buildMissionCard() => DecoratedBox(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(12),
-      image: const DecorationImage(
-        image: NetworkImage(
-          'https://example.com/tokyo-night.jpg',
-        ), // Replace with actual image
-        fit: BoxFit.cover,
-      ),
-    ),
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-        ),
-      ),
+  Widget _buildMissionCard() => ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: AspectRatio(
+      aspectRatio: 16 / 9, // Задаем соотношение сторон
       child: Stack(
         children: [
+          // Background image with CachedNetworkImage
+          Positioned.fill(
+            child: CachedNetworkImage(
+              imageUrl: 'https://example.com/tokyo-night.jpg',
+              fit: BoxFit.cover,
+              placeholder: (context, url) => DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[300],
+                ),
+                child: const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                    ),
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[400],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: Colors.white.withOpacity(0.7),
+                      size: 32,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Failed to load image',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Дополнительные настройки
+              fadeInDuration: const Duration(milliseconds: 500),
+              fadeOutDuration: const Duration(milliseconds: 200),
+              useOldImageOnUrlChange: true,
+              cacheKey: 'tokyo-night-mission', // Кастомный ключ кэша
+              httpHeaders: const {'User-Agent': 'YourApp/1.0'},
+              maxWidthDiskCache: 1000,
+              maxHeightDiskCache: 1000,
+            ),
+          ),
+          // Gradient overlay
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                ),
+              ),
+            ),
+          ),
           // View count
           Positioned(
             top: 8,

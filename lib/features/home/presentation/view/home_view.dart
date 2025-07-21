@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/home/presentation/view/streaming/streaming_list_view.dart';
 import 'package:zefyr/features/home/presentation/view/widgets/stream_category_chips.dart';
 import 'package:zefyr/features/home/presentation/widgets/money_chip.dart';
+import 'package:zefyr/features/profile/providers/profile_providers.dart';
 
 class HomeView extends StatelessWidget {
   /// Главный экран
@@ -58,7 +60,8 @@ class AvatarHomeSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateChangesProvider).valueOrNull;
     final color = context.customTheme.overlayApp;
- //  ref.read(userDaoProvider).clearUser();
+    //  ref.read(userDaoProvider).clearUser();
+    // ref.watch(profileRepositoryProvider).getUserProfile(user!.id);
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 16,
@@ -72,7 +75,7 @@ class AvatarHomeSection extends ConsumerWidget {
                   size: 42,
                   onTap: () => context.push('/profile'),
                   //!TODO: аватар пользователя
-                  child: const SizedBox.shrink(),
+                  child: CachedNetworkImage(imageUrl: user.avatar ?? ''),
                 ),
                 MoneyChip(onTap: () {}, coins: '100'),
               ],

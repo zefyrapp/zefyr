@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -20,9 +21,10 @@ class EditProfileView extends ConsumerStatefulWidget {
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileView> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _nicknameController = TextEditingController();
-  final TextEditingController _bioController = TextEditingController();
+  late final TextEditingController _nameController = TextEditingController();
+  late final TextEditingController _nicknameController =
+      TextEditingController();
+  late final TextEditingController _bioController = TextEditingController();
   late final EditProfileViewModel viewModel;
   @override
   void initState() {
@@ -70,9 +72,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileView> {
   Widget build(BuildContext context) {
     final color = context.customTheme.overlayApp;
     final local = context.localization;
-    final viewModel = ref.read(
-      editProfileViewModelProvider(widget.profile).notifier,
-    );
+
     final state = ref.watch(editProfileViewModelProvider(widget.profile));
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
@@ -316,7 +316,7 @@ class CustomProfileField extends StatelessWidget {
 
 class NicknameInputFormatter extends TextInputFormatter {
   // Разрешенные символы: буквы, цифры, точка, подчеркивание
-  static final _allowedCharsRegExp = RegExp(r'[a-zA-Z0-9._@]');
+  static final _allowedCharsRegExp = RegExp('[a-zA-Z0-9._@]');
 
   // Проверка валидности никнейма
   static final _validNicknameRegExp = RegExp(
@@ -398,12 +398,12 @@ class NicknameInputFormatter extends TextInputFormatter {
     if (text.length == 1) return true;
 
     // После @ должен быть буквенно-цифровой символ
-    if (text.length >= 2 && !RegExp(r'[a-zA-Z0-9]').hasMatch(text[1])) {
+    if (text.length >= 2 && !RegExp('[a-zA-Z0-9]').hasMatch(text[1])) {
       return false;
     }
 
     // Не должно быть двух подряд идущих специальных символов
-    if (RegExp(r'[_.]{2}').hasMatch(text)) {
+    if (RegExp('[_.]{2}').hasMatch(text)) {
       return false;
     }
 

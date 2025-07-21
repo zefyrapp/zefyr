@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/core/utils/handler/handler.dart';
 import 'package:zefyr/features/profile/data/models/edit_profile_request.dart';
@@ -43,9 +44,9 @@ class RemoteProfileDataSourceImpl implements RemoteProfileDataSource {
   @override
   Future<ProfileModel> updateMyProfile(EditProfileRequest request) async =>
       Handler.handle<ProfileModel>(() async {
-        final response = await client.patchWithApiResponse<ProfileModel>(
+        final response = await client.uploadPatchWithApiResponse<ProfileModel>(
           '/api/profiles/my-profile/',
-          data: request.toMap(),
+          formData: FormData.fromMap(request.toMap()),
           fromJson: ProfileModel.fromMap,
         );
         return response.data!;

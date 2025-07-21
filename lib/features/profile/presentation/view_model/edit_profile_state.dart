@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class EditProfileState {
   const EditProfileState({
     this.avatar,
@@ -27,10 +28,15 @@ class EditProfileState {
     bool cleanError = false,
   }) => EditProfileState(
     avatar: avatar ?? this.avatar,
+    avatarUrl: avatarUrl ?? this.avatarUrl,
     name: name ?? this.name,
     nickname: nickname ?? this.nickname,
     bio: bio ?? this.bio,
     isLoading: isLoading ?? this.isLoading,
     errorMessage: cleanError ? null : errorMessage ?? this.errorMessage,
   );
+
+  @override
+  String toString() =>
+      'EditProfileState(avatar: $avatar, avatarUrl: $avatarUrl, name: $name, nickname: $nickname, bio: $bio, isLoading: $isLoading, errorMessage: $errorMessage)';
 }

@@ -51,18 +51,23 @@ class ProfileEntity extends Equatable {
   List<Object?> get props => [
     name,
     nickname,
-    bio,
     avatar,
-    rating,
-    missionsCount,
+    avatarUrl,
+    bio,
+    dateOfBirth,
     followersCount,
     followingCount,
+    missionsCount,
     fansCount,
-    balance,
-    isLive,
+    isPrivate,
     isFollowing,
+    isFollowedBy,
     createdAt,
     updatedAt,
+    user,
+    rating,
+    balance,
+    isLive,
   ];
 }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/network/dio_client.dart';
@@ -68,15 +70,16 @@ class MyProfileNotifier extends _$MyProfileNotifier {
     required String name,
     required String nickname,
     required String bio,
+    String? avatar,
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final useCase = ref.read(updateMyProfileProvider);
-      final request = EditProfileRequest(
-        name: name,
-        nickname: nickname,
-        bio: bio,
-      );
+      late EditProfileRequest request;
+      request = EditProfileRequest(name: name, nickname: nickname, bio: bio);
+      if (avatar != null) {
+        request = request.copyWith(avatar: File(avatar));
+      }
       final result = await useCase(request);
 
       return result.fold((failure) => throw failure, (profile) => profile);
@@ -125,4 +128,3 @@ Future<ProfileEntity?> userProfile(Ref ref, String userId) async {
     error: (error, stack) => null,
   );
 }
-

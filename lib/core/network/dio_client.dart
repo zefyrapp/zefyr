@@ -370,6 +370,29 @@ class DioClient {
     }
   }
 
+  Future<ApiResponse<T>> uploadPatchWithApiResponse<T>(
+    String path, {
+    required FormData formData,
+    Options? options,
+    T Function(Map<String, dynamic>)? fromJson,
+    ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.patch<dynamic>(
+        path,
+        data: formData,
+        options: options,
+        onSendProgress: onSendProgress,
+        cancelToken: cancelToken,
+      );
+
+      return await _parseApiResponse<T>(response, fromJson);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   /// Классическая загрузка файла
   Future<T> upload<T>(
     String path, {

@@ -1,3 +1,4 @@
+
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
@@ -12,7 +13,7 @@ class EditProfileViewModel extends _$EditProfileViewModel {
   @override
   EditProfileState build(ProfileEntity profile) {
     _original = profile;
-    ref.onDispose(() {});
+    ref.keepAlive();
     return EditProfileState(
       name: profile.name,
       nickname: profile.nickname,
@@ -64,6 +65,7 @@ class EditProfileViewModel extends _$EditProfileViewModel {
         name: state.name!,
         nickname: state.nickname!,
         bio: state.bio!,
+        avatar: state.avatar,
       );
 
       state = state.copyWith(isLoading: false);
