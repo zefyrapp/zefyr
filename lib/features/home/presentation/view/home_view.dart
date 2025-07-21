@@ -122,7 +122,6 @@ class AvatarHomeSection extends ConsumerWidget {
           GradientBorderImage(
             size: 42,
             onTap: () => context.push('/profile'),
-            //!TODO: аватар пользователя
             child: CachedNetworkImage(imageUrl: avatar ?? ''),
           ),
           MoneyChip(onTap: () {}, coins: coins?.toStringAsFixed(0) ?? '0'),

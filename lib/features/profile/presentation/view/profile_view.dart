@@ -93,11 +93,10 @@ class ProfileView extends ConsumerWidget {
                             GradientBorderImage(
                               size: 84,
                               child: profile?.avatar != null
-                                  ? Image.network(
-                                      profile!.avatar!,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              _buildDefaultAvatar(),
+                                  ? CachedNetworkImage(
+                                      imageUrl: profile!.avatar!,
+                                      errorWidget: (context, url, error) =>
+                                          _buildDefaultAvatar(),
                                     )
                                   : _buildDefaultAvatar(),
                             ),
@@ -668,12 +667,10 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
                   ],
                 ),
               ),
-              // Дополнительные настройки
-              fadeInDuration: const Duration(milliseconds: 500),
               fadeOutDuration: const Duration(milliseconds: 200),
               useOldImageOnUrlChange: true,
               cacheKey: 'tokyo-night-mission', // Кастомный ключ кэша
-              httpHeaders: const {'User-Agent': 'YourApp/1.0'},
+           
               maxWidthDiskCache: 1000,
               maxHeightDiskCache: 1000,
             ),
