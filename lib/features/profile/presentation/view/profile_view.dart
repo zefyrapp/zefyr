@@ -669,7 +669,6 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
               ),
               fadeOutDuration: const Duration(milliseconds: 200),
               useOldImageOnUrlChange: true,
-              cacheKey: 'tokyo-night-mission', // Кастомный ключ кэша
            
               maxWidthDiskCache: 1000,
               maxHeightDiskCache: 1000,

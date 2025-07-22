@@ -115,7 +115,27 @@ final googleSignInDataSourceProvider =
 // ignore: unused_element
 typedef GoogleSignInDataSourceRef =
     AutoDisposeProviderRef<GoogleSignInDataSource>;
-String _$authRepositoryHash() => r'4a66a2dca4f51e86130c391e249eb1445a7201a4';
+String _$appleSignInDataSourceHash() =>
+    r'81c7b1adb72c1dc7d64792e6a49ef6cfff94a876';
+
+/// See also [appleSignInDataSource].
+@ProviderFor(appleSignInDataSource)
+final appleSignInDataSourceProvider =
+    AutoDisposeProvider<AppleSignInDataSource>.internal(
+      appleSignInDataSource,
+      name: r'appleSignInDataSourceProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$appleSignInDataSourceHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AppleSignInDataSourceRef =
+    AutoDisposeProviderRef<AppleSignInDataSource>;
+String _$authRepositoryHash() => r'60ff46bf1d85a158c888e4c02736eb20795f65c9';
 
 /// See also [authRepository].
 @ProviderFor(authRepository)

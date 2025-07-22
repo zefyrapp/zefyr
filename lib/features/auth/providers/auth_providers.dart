@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:zefyr/core/database/database.dart';
 import 'package:zefyr/core/network/dio_client.dart';
 import 'package:zefyr/core/services/token_manager.dart';
+import 'package:zefyr/features/auth/data/datasources/apple_signIn_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/google_signIn_data_source.dart';
@@ -51,12 +52,20 @@ GoogleSignInDataSource googleSignInDataSource(Ref ref) {
   return dataSource;
 }
 
+@riverpod
+AppleSignInDataSource appleSignInDataSource(Ref ref) {
+  final dataSource = AppleSignInDataSourceImpl();
+
+  return dataSource;
+}
+
 // Repository
 @riverpod
 AuthRepository authRepository(Ref ref) => AuthRepositoryImpl(
   remoteDataSource: ref.watch(authRemoteDataSourceProvider),
   localDataSource: ref.watch(authLocalDataSourceProvider),
   googleSignInDataSource: ref.watch(googleSignInDataSourceProvider),
+  appleSignInDataSource: ref.watch(appleSignInDataSourceProvider),
 );
 
 // Use Cases
