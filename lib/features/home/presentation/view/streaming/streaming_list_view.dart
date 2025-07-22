@@ -1,8 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/features/home/presentation/view/streaming/stream_short_card.dart';
 import 'package:zefyr/features/home/providers/home_stream_providers.dart';
 
@@ -35,6 +37,13 @@ class _StreamingListViewState extends ConsumerState<StreamingListView> {
   }
 
   void _onScroll() {
+    // Pull to refresh logic
+    if (_scrollController.hasClients && _scrollController.offset < -100) {
+      _onRefresh();
+      return;
+    }
+
+    // Pagination logic
     if (_isBottom) {
       ref.read(homeStreamViewModelProvider.notifier).loadStreams();
     }
@@ -47,10 +56,18 @@ class _StreamingListViewState extends ConsumerState<StreamingListView> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
+  Future<void> _onRefresh() async {
+    await HapticFeedback.mediumImpact();
+    await ref
+        .read(homeStreamViewModelProvider.notifier)
+        .loadStreams(isRefresh: true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(homeStreamViewModelProvider);
     final notifier = ref.read(homeStreamViewModelProvider.notifier);
+    final color = context.customTheme.overlayApp;
 
     return SliverPadding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
@@ -74,44 +91,107 @@ class _StreamingListViewState extends ConsumerState<StreamingListView> {
               ),
             )
           : state.streams.isEmpty
-          ? const SliverToBoxAdapter(
+          ? SliverToBoxAdapter(
               child: Center(
                 child: Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Text(
-                    'No streams available',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    spacing: 16,
+                    children: [
+                      const Text(
+                        'No streams available',
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                      Column(
+                        spacing: 8,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () =>
+                                notifier.loadStreams(isRefresh: true),
+                            style: color.elevatedStyle,
+                            child: Text(
+                              'Refresh',
+                              style: color.elevatedTextStyle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             )
-          : SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 177 / 314.66,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  if (index >= state.streams.length) {
-                    return const _LoadingCard();
-                  }
+          : SliverMainAxisGroup(
+              slivers: [
+                // Pull to refresh indicator
+                if (state.isLoading && state.streams.isNotEmpty)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Refreshing...',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                // Main grid
+                SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 177 / 314.66,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index >= state.streams.length) {
+                        return const _LoadingCard();
+                      }
 
-                  final stream = state.streams[index];
-                  return StreamShortCard(
-                    username: stream.owner,
-                    activity: stream.status,
-                    viewCount: stream.formattedViewCount,
-                    avatarUrl: stream.previewUrl,
-                    backgroundImageUrl: '',
-                    onTap: () => _onStreamTap(stream.id, stream.owner),
-                  );
-                },
-                childCount:
-                    state.streams.length +
-                    (state.isLoading && state.streams.isNotEmpty ? 2 : 0),
-              ),
+                      final stream = state.streams[index];
+                      return StreamShortCard(
+                        username: stream.owner,
+                        activity: stream.status,
+                        viewCount: stream.formattedViewCount,
+                        avatarUrl: stream.previewUrl,
+                        backgroundImageUrl: '',
+                        onTap: () => _onStreamTap(stream.id, stream.owner),
+                      );
+                    },
+                    childCount:
+                        state.streams.length +
+                        (state.isLoading && state.streams.isNotEmpty ? 2 : 0),
+                  ),
+                ),
+                // Pull to refresh hint at bottom
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: const Center(
+                      child: Text(
+                        'Pull down to refresh',
+                        style: TextStyle(color: Colors.white38, fontSize: 11),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
     );
   }
@@ -156,7 +236,16 @@ class _ErrorWidget extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+          Column(
+            spacing: 8,
+            children: [
+              ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+              const Text(
+                'Or pull down to refresh',
+                style: TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+            ],
+          ),
         ],
       ),
     ),
