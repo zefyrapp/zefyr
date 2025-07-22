@@ -3,6 +3,7 @@ import 'package:zefyr/core/usecases/usecases.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
 import 'package:zefyr/features/auth/usecases/check_email.dart';
 import 'package:zefyr/features/auth/usecases/login_user.dart';
+import 'package:zefyr/features/auth/usecases/login_with_apple.dart';
 import 'package:zefyr/features/auth/usecases/login_with_google.dart';
 import 'package:zefyr/features/auth/usecases/logout_user.dart';
 import 'package:zefyr/features/auth/usecases/register_user.dart';
@@ -14,16 +15,19 @@ class AuthViewModel extends StateNotifier<AuthState> {
     required RegisterUser registerUser,
     required LoginWithGoogle loginWithGoogle,
     required CheckEmail checkEmail,
+    required LoginWithApple loginWithApple,
   }) : _loginUser = loginUser,
        _logoutUser = logoutUser,
        _registerUser = registerUser,
        _loginWithGoogle = loginWithGoogle,
        _checkEmail = checkEmail,
+       _loginWithApple=loginWithApple,
        super(const AuthInitial());
   final LoginUser _loginUser;
   final LogoutUser _logoutUser;
   final RegisterUser _registerUser;
   final LoginWithGoogle _loginWithGoogle;
+  final LoginWithApple _loginWithApple;
   final CheckEmail _checkEmail;
   Future<void> login(String email, String password) async {
     state = const AuthLoading();
@@ -75,6 +79,15 @@ class AuthViewModel extends StateNotifier<AuthState> {
   Future<void> loginWithGoogle() async {
     state = const AuthLoading();
     final result = await _loginWithGoogle(NoParams());
+    result.fold(
+      (failure) => state = AuthError(failure.message),
+      (user) => state = AuthAuthenticated(user),
+    );
+  }
+
+  Future<void> loginWithApple() async {
+    state = const AuthLoading();
+    final result = await _loginWithApple(NoParams());
     result.fold(
       (failure) => state = AuthError(failure.message),
       (user) => state = AuthAuthenticated(user),

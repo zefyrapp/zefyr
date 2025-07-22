@@ -68,7 +68,13 @@ class AvatarHomeSection extends ConsumerWidget {
         .watch(myProfileNotifierProvider)
         .when(
           data: (profile) => _buildChild(context, user: user, profile: profile),
-          error: (e, s) => const SizedBox.shrink(),
+          error: (e, s) => Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical:   8,
+      ),
+      child: _buildSignIn(context),
+          ),
           loading: () => Skeletonizer(child: _buildChild(context)),
         );
   }
@@ -77,41 +83,43 @@ class AvatarHomeSection extends ConsumerWidget {
     BuildContext context, {
     UserModel? user,
     ProfileEntity? profile,
-  }) {
-    final color = context.customTheme.overlayApp;
-    return Padding(
+  }) => Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 16,
         vertical: user != null ? 13 : 8,
       ),
       child: user != null
           ? _buildProfile(context, profile?.avatar, profile?.balance)
-          : Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton(
-                onPressed: () => context.go('/auth?from=/'),
-                style: ButtonStyle(
-                  shape: WidgetStatePropertyAll(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                      side: BorderSide(color: color.indicatorColor),
-                    ),
-                  ),
-                  minimumSize: const WidgetStatePropertyAll(Size(80, 30)),
-                  backgroundColor: const WidgetStatePropertyAll(Colors.black),
-                ),
-                child: Text(
-                  'Войти',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w800,
-                    fontSize: 12,
-                    height: 1,
-                    color: color.white,
-                  ),
-                ),
-              ),
+          : _buildSignIn(context),
+    );
+
+  Widget _buildSignIn(BuildContext context) {
+    final color = context.customTheme.overlayApp;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ElevatedButton(
+        onPressed: () => context.go('/auth?from=/'),
+        style: ButtonStyle(
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+              side: BorderSide(color: color.indicatorColor),
             ),
+          ),
+          minimumSize: const WidgetStatePropertyAll(Size(80, 30)),
+          backgroundColor: const WidgetStatePropertyAll(Colors.black),
+        ),
+        child: Text(
+          'Войти',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+            height: 1,
+            color: color.white,
+          ),
+        ),
+      ),
     );
   }
 

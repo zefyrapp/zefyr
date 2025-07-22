@@ -15,6 +15,7 @@ import 'package:zefyr/features/auth/presentation/view_model/auth_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:zefyr/features/auth/usecases/check_email.dart';
 import 'package:zefyr/features/auth/usecases/login_user.dart';
+import 'package:zefyr/features/auth/usecases/login_with_apple.dart';
 import 'package:zefyr/features/auth/usecases/login_with_google.dart';
 import 'package:zefyr/features/auth/usecases/logout_user.dart';
 import 'package:zefyr/features/auth/usecases/register_user.dart';
@@ -82,7 +83,9 @@ RegisterUser registerUser(Ref ref) =>
 @riverpod
 LoginWithGoogle loginWithGoogle(Ref ref) =>
     LoginWithGoogle(ref.watch(authRepositoryProvider));
-
+@riverpod
+LoginWithApple loginWithApple(Ref ref) =>
+    LoginWithApple(ref.watch(authRepositoryProvider));
 @riverpod
 CheckEmail checkEmail(Ref ref) => CheckEmail(ref.watch(authRepositoryProvider));
 
@@ -92,6 +95,7 @@ final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>(
     logoutUser: ref.read(logoutUserProvider),
     registerUser: ref.read(registerUserProvider),
     loginWithGoogle: ref.read(loginWithGoogleProvider),
+    loginWithApple: ref.read(loginWithAppleProvider),
     checkEmail: ref.watch(checkEmailProvider),
   ),
 );

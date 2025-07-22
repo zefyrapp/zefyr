@@ -25,11 +25,12 @@ enum AuthSignEnum {
     };
   }
 
-  void onTap(AuthFlowViewModel authFlowViewModel, WidgetRef ref) =>
-      switch (this) {
+  void onTap(AuthFlowViewModel authFlowViewModel, WidgetRef ref) {
+    final model=ref.read(authViewModelProvider.notifier);
+ return   switch (this) {
         email => authFlowViewModel.setFlowType(AuthFlowType.register),
-        google => ref.read(authViewModelProvider.notifier).loginWithGoogle(),
-
-        apple => () {},
+        google =>model.loginWithGoogle(),
+        apple => model.loginWithApple(),
       };
+  }
 }

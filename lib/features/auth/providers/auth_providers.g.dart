@@ -220,6 +220,23 @@ final loginWithGoogleProvider = AutoDisposeProvider<LoginWithGoogle>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LoginWithGoogleRef = AutoDisposeProviderRef<LoginWithGoogle>;
+String _$loginWithAppleHash() => r'57c706df3b304061bddb20cab4bd2c43dcd4f98f';
+
+/// See also [loginWithApple].
+@ProviderFor(loginWithApple)
+final loginWithAppleProvider = AutoDisposeProvider<LoginWithApple>.internal(
+  loginWithApple,
+  name: r'loginWithAppleProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$loginWithAppleHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef LoginWithAppleRef = AutoDisposeProviderRef<LoginWithApple>;
 String _$checkEmailHash() => r'803130868b456e3ff6b75c98d49d5d266736a958';
 
 /// See also [checkEmail].
