@@ -3,6 +3,7 @@ import 'package:zefyr/common/exceptions/repository_helper.dart';
 import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/core/error/failures.dart';
 import 'package:zefyr/core/network/models/api_response.dart';
+import 'package:zefyr/features/auth/data/datasources/apple_signIn_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:zefyr/features/auth/data/datasources/google_signIn_data_source.dart';
@@ -14,10 +15,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required this.remoteDataSource,
     required this.localDataSource,
     required this.googleSignInDataSource,
+    required this.appleSignInDataSource,
   });
   final AuthRemoteDataSource remoteDataSource;
   final AuthLocalDataSource localDataSource;
   final GoogleSignInDataSource googleSignInDataSource;
+  final AppleSignInDataSource appleSignInDataSource;
   @override
   Future<Either<Failure, AuthResponse>> login(
     String email,
@@ -71,7 +74,32 @@ class AuthRepositoryImpl implements AuthRepository {
         await localDataSource.cacheUser(user);
         return user;
       });
+  @override
+  Future<Either<Failure, AuthResponse>> loginWithApple() async =>
+      RepositoryHelper.safeCall(() async {
+        final credential = await appleSignInDataSource.signIn();
+        if (credential == null) {
+          throw const AuthException('Apple sign-in cancelled');
+        }
 
+        final identityToken = credential.identityToken;
+        if (identityToken == null) {
+          throw const AuthException('Failed to get identity token from Apple');
+        }
+
+        // Передаем identity token и дополнительную информацию на бэкенд
+        final user = await remoteDataSource.appleSignIn(
+          identityToken: identityToken,
+        );
+
+        await localDataSource.cacheUser(user);
+        return user;
+      });
+  @override
+  Future<Either<Failure, bool>> isAppleSignInAvailable() async =>
+      RepositoryHelper.safeCall(
+        () async => appleSignInDataSource.isAvailable(),
+      );
   @override
   Future<Either<Failure, ApiResponse<dynamic>>> checkEmail({
     required String email,

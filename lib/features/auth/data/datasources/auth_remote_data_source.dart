@@ -28,6 +28,8 @@ abstract class AuthRemoteDataSource {
   /// Выполняет вход пользователя с использованием Google OAuth.
   /// Возвращает объект UserModel, если вход успешен, или null в случае ошибки
   Future<AuthResponse> googleSignIn({required String accessToken});
+
+  Future<AuthResponse> appleSignIn({required String identityToken});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -101,6 +103,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         () async => client.post<AuthResponse>(
           '/api/auth/google/',
           data: {'access_token': accessToken},
+        ),
+      );
+  @override
+  Future<AuthResponse> appleSignIn({required String identityToken}) async =>
+      _handle<AuthResponse>(
+        () async => client.post<AuthResponse>(
+          '/api/auth/apple/',
+          data: {'identity_token': identityToken},
         ),
       );
 
