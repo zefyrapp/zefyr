@@ -100,7 +100,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponse> googleSignIn({required String accessToken}) async =>
       _handle<AuthResponse>(
-        () async => client.post<AuthResponse>(
+        () async => client.postWithApiResponse<AuthResponse>(
           '/api/auth/google/',
           data: {'access_token': accessToken},
         ),
@@ -108,7 +108,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponse> appleSignIn({required String identityToken}) async =>
       _handle<AuthResponse>(
-        () async => client.post<AuthResponse>(
+        () async => client.postWithApiResponse<AuthResponse>(
           '/api/auth/apple/',
           data: {'identity_token': identityToken},
         ),
