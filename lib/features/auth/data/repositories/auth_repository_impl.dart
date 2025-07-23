@@ -74,6 +74,7 @@ class AuthRepositoryImpl implements AuthRepository {
         await localDataSource.cacheUser(user);
         return user;
       });
+
   @override
   Future<Either<Failure, AuthResponse>> loginWithApple() async =>
       RepositoryHelper.safeCall(() async {
@@ -95,11 +96,13 @@ class AuthRepositoryImpl implements AuthRepository {
         await localDataSource.cacheUser(user);
         return user;
       });
+
   @override
   Future<Either<Failure, bool>> isAppleSignInAvailable() async =>
       RepositoryHelper.safeCall(
         () async => appleSignInDataSource.isAvailable(),
       );
+
   @override
   Future<Either<Failure, ApiResponse<dynamic>>> checkEmail({
     required String email,
