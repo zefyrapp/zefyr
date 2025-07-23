@@ -50,10 +50,10 @@ signingConfigs {
    buildTypes {
        release {
           signingConfig = signingConfigs.getByName("release")
+          isMinifyEnabled = true
+          
        }
-       debug {
-           signingConfig = signingConfigs.getByName("release")
-       }
+       
    }
 }
 

@@ -50,7 +50,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       );
 
       // Попытка "тихого" входа при старте
-      //  await _signIn.attemptLightweightAuthentication();
+       await _signIn.attemptLightweightAuthentication();
     } catch (e) {
       log('GoogleSignIn initialization error: $e');
     }

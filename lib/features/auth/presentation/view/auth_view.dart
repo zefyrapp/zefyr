@@ -7,7 +7,6 @@ import 'package:zefyr/common/extensions/context_theme.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_state.dart';
 import 'package:zefyr/features/auth/presentation/view_model/auth_flow_view_model.dart';
-import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/auth/usecases/enums/auth_sign_enum.dart';
 import 'package:zefyr/features/auth/usecases/privacy_text.dart';
 
@@ -40,50 +39,47 @@ class AuthView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Consumer(
-                  builder: (context, ref, _) {
-                    ref.watch(googleSignInDataSourceProvider);
-                    return Column(
-                      children: AuthSignEnum.values
-                          .mapIndexed(
-                            (i, el) => Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadiusGeometry.circular(8),
+                  builder: (context, ref, _) => Column(
+                    children: AuthSignEnum.values
+                        .mapIndexed(
+                          (i, el) => Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadiusGeometry.circular(8),
+                            ),
+                            color: const Color(0xff374151),
+                            clipBehavior: Clip.hardEdge,
+                            child: ListTile(
+                              onTap: () => el.onTap(
+                                ref.read(authFlowViewModelProvider.notifier),
+                                ref,
                               ),
-                              color: const Color(0xff374151),
-                              clipBehavior: Clip.hardEdge,
-                              child: ListTile(
-                                onTap: () => el.onTap(
-                                  ref.read(authFlowViewModelProvider.notifier),
-                                  ref,
-                                ),
-                                leading: i == 1
-                                    ? SvgPicture.asset(
-                                        el.icon as String,
-                                        color: color.white,
-                                        width: 16,
-                                        height: 16,
-                                      )
-                                    : Icon(
-                                        el.icon as IconData,
-                                        color: color.white,
-                                        size: 16,
-                                      ),
-                                title: Text(
-                                  el.title(context),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                    height: 1,
-                                    color: color.white,
-                                  ),
+                              leading: i == 1
+                                  ? SvgPicture.asset(
+                                      el.icon as String,
+                                      color: color.white,
+                                      width: 16,
+                                      height: 16,
+                                    )
+                                  : Icon(
+                                      el.icon as IconData,
+                                      color: color.white,
+                                      size: 16,
+                                    ),
+                              title: Text(
+                                el.title(context),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  height: 1,
+                                  color: color.white,
                                 ),
                               ),
                             ),
-                          )
-                          .toList(),
-                    );
-                  },
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
               const Spacer(),
