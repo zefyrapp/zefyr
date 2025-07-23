@@ -1,17 +1,12 @@
-// Файл: google_signIn_data_source.dart
-
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 // Скоупы можно вынести сюда, если они константны для всего приложения
-const List<String> _defaultScopes = <String>[
-  'email',
-  'profile',
-  'openid', // openid часто идет без префикса, но для Google API лучше уточнить в доках
-];
+const List<String> _defaultScopes = <String>['email', 'profile', 'openid'];
 
 abstract class GoogleSignInDataSource {
   Future<void> init();
@@ -55,7 +50,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       );
 
       // Попытка "тихого" входа при старте
-      await _signIn.attemptLightweightAuthentication();
+      //  await _signIn.attemptLightweightAuthentication();
     } catch (e) {
       log('GoogleSignIn initialization error: $e');
     }
