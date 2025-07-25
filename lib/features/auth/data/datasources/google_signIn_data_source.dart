@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -50,7 +49,7 @@ class GoogleSignInDataSourceImpl implements GoogleSignInDataSource {
       );
 
       // Попытка "тихого" входа при старте
-       await _signIn.attemptLightweightAuthentication();
+      await _signIn.attemptLightweightAuthentication();
     } catch (e) {
       log('GoogleSignIn initialization error: $e');
     }

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zefyr/core/error/exceptions.dart';
 import 'package:zefyr/core/network/dio_client.dart';
-import 'package:zefyr/features/auth/providers/auth_providers.dart';
 import 'package:zefyr/features/live/data/models/stream_create_request.dart';
 import 'package:zefyr/features/live/data/models/stream_create_response.dart';
 import 'package:zefyr/features/live/domain/entities/stream_model.dart';
@@ -28,10 +27,8 @@ class StreamDataSourceImpl implements StreamDataSource {
   @override
   Future<StreamCreateResponse> createStream({
     required StreamCreateRequest request,
-  }) async => _handle<StreamCreateResponse>(() async {
-    // final token = await ref.read(tokenManagerProvider).getAccessToken();
-    // if (token != null) client.setAuthToken(token);
-    return (await client.postWithApiResponse<StreamCreateResponse>(
+  }) async => _handle<StreamCreateResponse>(
+    () async => (await client.postWithApiResponse<StreamCreateResponse>(
       '/api/streaming/streams/create/',
       data: {
         'title': request.title,
@@ -39,20 +36,16 @@ class StreamDataSourceImpl implements StreamDataSource {
         'preview_url': request.previewUrl,
       },
       fromJson: StreamCreateResponse.fromMap,
-    )).data!;
-  });
+    )).data!,
+  );
 
   @override
-  Future<void> stopStream(String streamId) async {
-    // final token = await ref.read(tokenManagerProvider).getAccessToken();
-    // if (token != null) client.setAuthToken(token);
-    await _handle<StreamModel>(
+  Future<void> stopStream(String streamId) async =>  _handle<StreamModel>(
       () async => (await client.postWithApiResponse<StreamModel>(
         '/api/streaming/streams/$streamId/end/',
         fromJson: StreamModel.fromMap,
       )).data!,
     );
-  }
 
   Future<T> _handle<T>(Future<T> Function() f) async {
     try {

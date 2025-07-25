@@ -1,5 +1,3 @@
-// Файл: apple_sign_in_data_source.dart
-
 import 'dart:async';
 import 'dart:developer';
 

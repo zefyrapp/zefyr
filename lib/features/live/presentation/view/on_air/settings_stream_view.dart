@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toastification/toastification.dart';
 import 'package:zefyr/common/extensions/context_theme.dart';
-import 'package:zefyr/common/extensions/invert_color.dart';
 import 'package:zefyr/common/extensions/localization.dart';
 import 'package:zefyr/features/auth/presentation/view/widgets/app_text_field.dart';
-import 'package:zefyr/features/live/data/models/stream_create_response.dart';
-import 'package:zefyr/features/live/presentation/view_model/stream_view_state.dart';
 import 'package:zefyr/features/live/providers/stream_providers.dart';
 
 class SettingsStreamView extends ConsumerStatefulWidget {
