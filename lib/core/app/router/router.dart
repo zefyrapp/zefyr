@@ -20,9 +20,15 @@ import 'package:zefyr/features/live/presentation/view/remote_participant/remote_
 import 'package:zefyr/features/main_view.dart';
 import 'package:zefyr/features/mission/presentation/view/mission_view.dart';
 import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/account_settings.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/blocked_settings.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/language_settings.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/statistics_settings.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/support_settings.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/withdraw_settings.dart';
 import 'package:zefyr/features/profile/presentation/view/edit_profile_view.dart';
 import 'package:zefyr/features/profile/presentation/view/profile_view.dart';
-import 'package:zefyr/features/profile/presentation/view/settings/profile_settings.dart';
+import 'package:zefyr/features/profile/presentation/settings/presentation/view/profile_settings.dart';
 
 part 'router.g.dart';
 
@@ -198,6 +204,33 @@ GoRouter router(Ref ref) {
         path: '/profile/settings',
         parentNavigatorKey: navigatorKey,
         builder: (context, state) => const ProfileSettings(),
+        routes: [
+          GoRoute(
+            path: 'account',
+            builder: (context, state) => const AccountSettings(),
+          ),
+          GoRoute(
+            path: 'language',
+            builder: (context, state) => const LanguageSettings(),
+          ),
+
+          GoRoute(
+            path: 'withdraw',
+            builder: (context, state) => const WithdrawSettings(),
+          ),
+          GoRoute(
+            path: 'support',
+            builder: (context, state) => const SupportSettings(),
+          ),
+          GoRoute(
+            path: 'statistics',
+            builder: (context, state) => const StatisticsSettings(),
+          ),
+          GoRoute(
+            path: 'blocked',
+            builder: (context, state) => const BlockedSettings(),
+          ),
+        ],
       ),
     ],
   );
