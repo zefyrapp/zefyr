@@ -22,6 +22,7 @@ import 'package:zefyr/features/mission/presentation/view/mission_view.dart';
 import 'package:zefyr/features/profile/domain/entities/profile_entity.dart';
 import 'package:zefyr/features/profile/presentation/view/edit_profile_view.dart';
 import 'package:zefyr/features/profile/presentation/view/profile_view.dart';
+import 'package:zefyr/features/profile/presentation/view/settings/profile_settings.dart';
 
 part 'router.g.dart';
 
@@ -183,7 +184,7 @@ GoRouter router(Ref ref) {
       ),
       GoRoute(
         path: '/profile/edit',
-
+        parentNavigatorKey: navigatorKey,
         redirect: (context, state) => RedirectService().authRedirect(
           isAuth: isAuth.value.value ?? false,
           state: state,
@@ -192,6 +193,11 @@ GoRouter router(Ref ref) {
           key: state.pageKey,
           child: EditProfileView(profile: state.extra! as ProfileEntity),
         ),
+      ),
+      GoRoute(
+        path: '/profile/settings',
+        parentNavigatorKey: navigatorKey,
+        builder: (context, state) => const ProfileSettings(),
       ),
     ],
   );

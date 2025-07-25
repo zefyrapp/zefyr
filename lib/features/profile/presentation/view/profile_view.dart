@@ -66,9 +66,7 @@ class ProfileView extends ConsumerWidget {
           ),
           const SizedBox(width: 18),
           InkWell(
-            onTap: () {
-              ref.read(userDaoProvider).clearUser();
-            },
+            onTap: () => context.push('/profile/settings'),
             child: const Icon(Icons.more_vert, color: Colors.white, size: 18),
           ),
         ],
@@ -653,14 +651,14 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
                   children: [
                     Icon(
                       Icons.error_outline,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       size: 32,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Failed to load image',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
@@ -669,7 +667,7 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
               ),
               fadeOutDuration: const Duration(milliseconds: 200),
               useOldImageOnUrlChange: true,
-           
+
               maxWidthDiskCache: 1000,
               maxHeightDiskCache: 1000,
             ),
@@ -682,7 +680,10 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.7),
+                  ],
                 ),
               ),
             ),
@@ -694,7 +695,7 @@ class _ProfileMissionChatViewState extends State<ProfileMissionChatView>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Row(
